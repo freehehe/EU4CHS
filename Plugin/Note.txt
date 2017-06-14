@@ -1,0 +1,1765 @@
+﻿55 8B EC 8B D1 83 EC 0C 8B 42 1C
+const char * __thiscall SLanguageData::LocalizeString(SLanguageData *this, const char *)
+
+55 8B EC 83 E4 F8 81 EC 94 00 00 00 8B 45 0C
+int __thiscall CBitMapFont::GetWidthOfString(CBitMapFont *this, const char *text, const int length, bool bUseSpecialChars)
+
+
+--------------------------------------大佬的遗物--------------------------------------
+汉化破解步骤：
+
+一 无关反汇编部分
+1 增加文件0x2000长度
+2 修改PE头，去除reloaction,增加新程序段
+3 总觉得不放心干脆把relocation全0了算了。。。
+#########
+MU:利用AddSection.exe这个小工具来添加8192byte（也就是上面的0x2000长度），软件有个小bug,程序段
+名字会有点问题，直接利用UE去调整，
+0140h:将22改为23 取消relocation
+0340h:将后面改为2E 4E 65 77 53 65 63 00(治好强迫症把程序段名称变为.NewSec而不是在前面多个空格)
+0360h:在13位将00变为E0使得最后4位变成E0 00 00 E0(这里到底是个啥)
+有意思的是下载的1.15头文件里面还有一个程序段.rmnet，大佬说不是他加的，查了一下似乎是这玩意染上木马了
+所以注意不要瞎搞...
+############
+本次新加段起点####01EC8000是1.15.1的新加段#########
+01EC8000
+
+
+二 反汇编部分
+
+1 三个公共函数
+
+第一个在初始化字体信息时使用
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01EC8930    55              PUSH EBP
+01EC8931    8BEC            MOV EBP,ESP
+01EC8933    B9 EADB3D01     MOV ECX,013DDBEA
+01EC8938    90              NOP
+01EC8939    53              PUSH EBX
+01EC893A    8B5D 08         MOV EBX,DWORD PTR SS:[EBP+8]
+01EC893D    57              PUSH EDI
+01EC893E    8B13            MOV EDX,DWORD PTR DS:[EBX]
+01EC8940    85D2            TEST EDX,EDX
+01EC8942    75 23           JNE SHORT 01EC8967
+01EC8944    68 FCFF0300     PUSH 3FFFC
+01EC8949    FFD1            CALL ECX
+01EC894B    8BD0            MOV EDX,EAX
+01EC894D    83C4 04         ADD ESP,4
+01EC8950    8913            MOV DWORD PTR DS:[EBX],EDX
+01EC8952    85D2            TEST EDX,EDX
+01EC8954    74 75           JE SHORT 01EC89CB
+01EC8956    B9 FFFF0000     MOV ECX,0FFFF
+01EC895B    33C0            XOR EAX,EAX
+01EC895D    8BFA            MOV EDI,EDX
+01EC895F    F3:AB           REP STOS DWORD PTR ES:[EDI]
+01EC8961    B9 EADB3D01     MOV ECX,013DDBEA
+01EC8966    90              NOP
+01EC8967    8B45 0C         MOV EAX,DWORD PTR SS:[EBP+0C]
+01EC896A    3D FFFF0000     CMP EAX,0FFFF
+01EC896F    77 5A           JA SHORT 01EC89CB
+01EC8971    56              PUSH ESI
+01EC8972    8B75 10         MOV ESI,DWORD PTR SS:[EBP+10]
+01EC8975    893482          MOV DWORD PTR DS:[EAX*4+EDX],ESI
+01EC8978    83F8 20         CMP EAX,20
+01EC897B    75 0D           JNE SHORT 01EC898A
+01EC897D    89B3 80000000   MOV DWORD PTR DS:[EBX+80],ESI
+01EC8983    5E              POP ESI
+01EC8984    5F              POP EDI
+01EC8985    5B              POP EBX
+01EC8986    5D              POP EBP
+01EC8987    C2 0C00         RETN 0C
+01EC898A    83F8 40         CMP EAX,40
+01EC898D    75 3B           JNE SHORT 01EC89CA
+01EC898F    8D78 E1         LEA EDI,[EAX-1F]
+01EC8992    6A 10           PUSH 10
+01EC8994    FFD1            CALL ECX
+01EC8996    8904BB          MOV DWORD PTR DS:[EDI*4+EBX],EAX
+01EC8999    83C4 04         ADD ESP,4
+01EC899C    8B0E            MOV ECX,DWORD PTR DS:[ESI]
+01EC899E    8908            MOV DWORD PTR DS:[EAX],ECX
+01EC89A0    8B0CBB          MOV ECX,DWORD PTR DS:[EDI*4+EBX]
+01EC89A3    8B46 04         MOV EAX,DWORD PTR DS:[ESI+4]
+01EC89A6    8941 04         MOV DWORD PTR DS:[ECX+4],EAX
+01EC89A9    8B0CBB          MOV ECX,DWORD PTR DS:[EDI*4+EBX]
+01EC89AC    8B46 08         MOV EAX,DWORD PTR DS:[ESI+8]
+01EC89AF    8941 08         MOV DWORD PTR DS:[ECX+8],EAX
+01EC89B2    8B0CBB          MOV ECX,DWORD PTR DS:[EDI*4+EBX]
+01EC89B5    47              INC EDI
+01EC89B6    8B46 0C         MOV EAX,DWORD PTR DS:[ESI+0C]
+01EC89B9    8941 0C         MOV DWORD PTR DS:[ECX+0C],EAX
+01EC89BC    B9 EADB3D01     MOV ECX,013DDBEA
+01EC89C1    90              NOP
+01EC89C2    81FF FF000000   CMP EDI,0FF
+01EC89C8  ^ 72 C8           JB SHORT 01EC8992
+01EC89CA    5E              POP ESI
+01EC89CB    5F              POP EDI
+01EC89CC    5B              POP EBX
+01EC89CD    5D              POP EBP
+01EC89CE    C2 0C00         RETN 0C
+
+
+
+第二个在显示时从字符串读取文字时使用
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01EC8080    55              PUSH EBP
+01EC8081    8BEC            MOV EBP,ESP
+01EC8083    8B45 10         MOV EAX,DWORD PTR SS:[EBP+10]
+01EC8086    8B4D 0C         MOV ECX,DWORD PTR SS:[EBP+0C]
+01EC8089    8B10            MOV EDX,DWORD PTR DS:[EAX]
+01EC808B    C642 04 00      MOV BYTE PTR DS:[EDX+4],0
+01EC808F    85C9            TEST ECX,ECX
+01EC8091    75 2C           JNE SHORT 01EC80BF
+01EC8093    890A            MOV DWORD PTR DS:[EDX],ECX
+01EC8095    8B45 08         MOV EAX,DWORD PTR SS:[EBP+8]
+01EC8098    03C8            ADD ECX,EAX
+01EC809A    8A01            MOV AL,BYTE PTR DS:[ECX]
+01EC809C    3C 80           CMP AL,80
+01EC809E    72 18           JB SHORT 01EC80B8
+01EC80A0    3C A7           CMP AL,0A7
+01EC80A2    74 08           JE SHORT 01EC80AC
+01EC80A4    3C A3           CMP AL,0A3
+01EC80A6    74 04           JE SHORT 01EC80AC
+01EC80A8    3C A4           CMP AL,0A4
+01EC80AA    75 06           JNE SHORT 01EC80B2
+01EC80AC    8079 01 80      CMP BYTE PTR DS:[ECX+1],80
+01EC80B0    76 06           JBE SHORT 01EC80B8
+01EC80B2    8842 04         MOV BYTE PTR DS:[EDX+4],AL
+01EC80B5    C601 2E         MOV BYTE PTR DS:[ECX],2E
+01EC80B8    0FB601          MOVZX EAX,BYTE PTR DS:[ECX]
+01EC80BB    5D              POP EBP
+01EC80BC    C2 1000         RETN 10
+01EC80BF    833A 00         CMP DWORD PTR DS:[EDX],0
+01EC80C2  ^ 74 D1           JE SHORT 01EC8095
+01EC80C4    034D 08         ADD ECX,DWORD PTR SS:[EBP+8]
+01EC80C7    8A01            MOV AL,BYTE PTR DS:[ECX]
+01EC80C9    8842 04         MOV BYTE PTR DS:[EDX+4],AL
+01EC80CC    C601 2E         MOV BYTE PTR DS:[ECX],2E
+01EC80CF    0FB601          MOVZX EAX,BYTE PTR DS:[ECX]
+01EC80D2    5D              POP EBP
+01EC80D3    C2 1000         RETN 10
+
+
+第三个在显示时读取字体信息时使用
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01EC80E0    55              PUSH EBP
+01EC80E1    8BEC            MOV EBP,ESP
+01EC80E3    8B45 10         MOV EAX,DWORD PTR SS:[EBP+10]
+01EC80E6    56              PUSH ESI
+01EC80E7    8B75 08         MOV ESI,DWORD PTR SS:[EBP+8]
+01EC80EA    57              PUSH EDI
+01EC80EB    8B08            MOV ECX,DWORD PTR DS:[EAX]
+01EC80ED    8B45 0C         MOV EAX,DWORD PTR SS:[EBP+0C]
+01EC80F0    8A51 04         MOV DL,BYTE PTR DS:[ECX+4]
+01EC80F3    84D2            TEST DL,DL
+01EC80F5    74 07           JE SHORT 01EC80FE
+01EC80F7    881406          MOV BYTE PTR DS:[EAX+ESI],DL
+01EC80FA    C641 04 00      MOV BYTE PTR DS:[ECX+4],0
+01EC80FE    85C0            TEST EAX,EAX
+01EC8100    75 13           JNE SHORT 01EC8115
+01EC8102    8901            MOV DWORD PTR DS:[ECX],EAX
+01EC8104    53              PUSH EBX
+01EC8105    8A1C06          MOV BL,BYTE PTR DS:[EAX+ESI]
+01EC8108    84DB            TEST BL,BL
+01EC810A    75 47           JNE SHORT 01EC8153
+01EC810C    5B              POP EBX
+01EC810D    5F              POP EDI
+01EC810E    33C0            XOR EAX,EAX
+01EC8110    5E              POP ESI
+01EC8111    5D              POP EBP
+01EC8112    C2 1000         RETN 10
+01EC8115    8339 00         CMP DWORD PTR DS:[ECX],0
+01EC8118  ^ 74 EA           JE SHORT 01EC8104
+01EC811A    F645 14 01      TEST BYTE PTR SS:[EBP+14],01
+01EC811E    74 24           JE SHORT 01EC8144
+01EC8120    803C06 20       CMP BYTE PTR DS:[EAX+ESI],20
+01EC8124    74 12           JE SHORT 01EC8138
+01EC8126    8B81 B8000000   MOV EAX,DWORD PTR DS:[ECX+0B8]
+01EC812C    5F              POP EDI
+01EC812D    C701 00000000   MOV DWORD PTR DS:[ECX],0
+01EC8133    5E              POP ESI
+01EC8134    5D              POP EBP
+01EC8135    C2 1000         RETN 10
+01EC8138    8B81 80000000   MOV EAX,DWORD PTR DS:[ECX+80]
+01EC813E    5F              POP EDI
+01EC813F    5E              POP ESI
+01EC8140    5D              POP EBP
+01EC8141    C2 1000         RETN 10
+01EC8144    5F              POP EDI
+01EC8145    C701 00000000   MOV DWORD PTR DS:[ECX],0
+01EC814B    8D41 08         LEA EAX,[ECX+8]
+01EC814E    5E              POP ESI
+01EC814F    5D              POP EBP
+01EC8150    C2 1000         RETN 10
+01EC8153    80FB 80         CMP BL,80
+01EC8156    72 08           JB SHORT 01EC8160
+01EC8158    8A7C06 01       MOV BH,BYTE PTR DS:[EAX+ESI+1]
+01EC815C    84FF            TEST BH,BH
+01EC815E    75 0D           JNE SHORT 01EC816D
+01EC8160    0FB6C3          MOVZX EAX,BL
+01EC8163    5B              POP EBX
+01EC8164    5F              POP EDI
+01EC8165    5E              POP ESI
+01EC8166    8B0481          MOV EAX,DWORD PTR DS:[EAX*4+ECX]
+01EC8169    5D              POP EBP
+01EC816A    C2 1000         RETN 10
+01EC816D    80FF 20         CMP BH,20
+01EC8170    75 24           JNE SHORT 01EC8196
+01EC8172    F645 14 01      TEST BYTE PTR SS:[EBP+14],01
+01EC8176    74 1E           JE SHORT 01EC8196
+01EC8178    8A5430 02       MOV DL,BYTE PTR DS:[ESI+EAX+2]
+01EC817C    83C0 02         ADD EAX,2
+01EC817F    84D2            TEST DL,DL
+01EC8181    74 13           JE SHORT 01EC8196
+01EC8183    80FA 20         CMP DL,20
+01EC8186    75 0B           JNE SHORT 01EC8193
+01EC8188    8A5430 01       MOV DL,BYTE PTR DS:[ESI+EAX+1]
+01EC818C    40              INC EAX
+01EC818D    84D2            TEST DL,DL
+01EC818F  ^ 75 F2           JNE SHORT 01EC8183
+01EC8191    EB 03           JMP SHORT 01EC8196
+01EC8193    8A3C30          MOV BH,BYTE PTR DS:[ESI+EAX]
+01EC8196    0FB6C7          MOVZX EAX,BH
+01EC8199    C1E0 08         SHL EAX,8
+01EC819C    0FB6D3          MOVZX EDX,BL
+01EC819F    0BC2            OR EAX,EDX
+01EC81A1    8B0481          MOV EAX,DWORD PTR DS:[EAX*4+ECX]
+01EC81A4    85C0            TEST EAX,EAX
+01EC81A6    74 09           JE SHORT 01EC81B1
+01EC81A8    5B              POP EBX
+01EC81A9    5F              POP EDI
+01EC81AA    8911            MOV DWORD PTR DS:[ECX],EDX
+01EC81AC    5E              POP ESI
+01EC81AD    5D              POP EBP
+01EC81AE    C2 1000         RETN 10
+01EC81B1    8B0491          MOV EAX,DWORD PTR DS:[EDX*4+ECX]
+01EC81B4    5B              POP EBX
+01EC81B5    5F              POP EDI
+01EC81B6    5E              POP ESI
+01EC81B7    5D              POP EBP
+01EC81B8    C2 1000         RETN 10
+
+
+三个函数后多留一些空白以备修改
+
+在新加段开始处记录三个函数位置，直接用地址call，方便以后修改函数
+
+
+2 初始化字体处的修改：
+
+寻找：
+
+CPU Disasm
+Address   Hex dump          Command                                                                  Comments
+010399C5  |.  6A 10         |PUSH 10
+010399C7  |.  E8 1E423A00   |CALL 013DDBEA
+010399CC  |.  83C4 04       |ADD ESP,4
+010399CF  |.  85C0          |TEST EAX,EAX
+010399D1  |.  74 46         |JZ SHORT 01039A19
+010399D3  |.  0FB74D E8     |MOVZX ECX,WORD PTR SS:[EBP-18]
+010399D7  |.  66:8B55 E4    |MOV DX,WORD PTR SS:[EBP-1C]
+010399DB  |.  66:8908       |MOV WORD PTR DS:[EAX],CX
+010399DE  |.  0FB74D D0     |MOVZX ECX,WORD PTR SS:[EBP-30]
+010399E2  |.  66:8948 04    |MOV WORD PTR DS:[EAX+4],CX
+010399E6  |.  0FB74D D4     |MOVZX ECX,WORD PTR SS:[EBP-2C]
+010399EA  |.  66:8950 02    |MOV WORD PTR DS:[EAX+2],DX
+010399EE  |.  F30F2C55 D8   |CVTTSS2SI EDX,DWORD PTR SS:[EBP-28]
+010399F3  |.  66:8950 06    |MOV WORD PTR DS:[EAX+6],DX
+010399F7  |.  8B55 08       |MOV EDX,DWORD PTR SS:[EBP+8]
+010399FA  |.  66:8948 0A    |MOV WORD PTR DS:[EAX+0A],CX
+010399FE  |.  8B4D CC       |MOV ECX,DWORD PTR SS:[EBP-34]
+01039A01  |.  66:8978 08    |MOV WORD PTR DS:[EAX+8],DI
+01039A05  |.  66:8970 0C    |MOV WORD PTR DS:[EAX+0C],SI
+01039A09  |.  C640 0E 00    |MOV BYTE PTR DS:[EAX+0E],0
+01039A0D  |.  89848A BC0000 |MOV DWORD PTR DS:[ECX*4+EDX+0BC],EAX
+01039A14  |.^ E9 24FDFFFF   |JMP 0103973D
+01039A19  |>  8B55 08       |MOV EDX,DWORD PTR SS:[EBP+8]
+01039A1C  |.  8B4D CC       |MOV ECX,DWORD PTR SS:[EBP-34]
+01039A1F  |.  33C0          |XOR EAX,EAX
+01039A21  |.  89848A BC0000 |MOV DWORD PTR DS:[ECX*4+EDX+0BC],EAX
+01039A28  |.^ E9 10FDFFFF   |JMP 0103973D
+
+
+首先替换第一个公共函数中的malloc地址为 013DDBEA
+
+
+第一个MOV DWORD PTR DS:[ECX*4+EDX+0BC],EAX 跳到 01EC8200
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01EC8200   \50              PUSH EAX
+01EC8201    51              PUSH ECX
+01EC8202    8D92 BC000000   LEA EDX,[EDX+0BC]
+01EC8208    52              PUSH EDX
+01EC8209    E8 02FEFFFF     CALL 01EC8010
+01EC820E  ^ E9 011817FF     JMP 01039A14
+
+
+
+第二个MOV DWORD PTR DS:[ECX*4+EDX+0BC],EAX 跳到 01EC8220
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01EC8220   \50              PUSH EAX
+01EC8221    51              PUSH ECX
+01EC8222    8D92 BC000000   LEA EDX,[EDX+0BC]
+01EC8228    52              PUSH EDX
+01EC8229    FF15 0080EC01   CALL DWORD PTR DS:[1EC8000]
+01EC822F  ^ E9 F41717FF     JMP 01039A28
+
+
+
+
+注：以上两处中调用的函数为第一个函数
+
+
+3 跳过kerneling
+上方调用不远处找到
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+010398C7    8B84B2 BC000000 MOV EAX,DWORD PTR DS:[ESI*4+EDX+0BC]
+010398CE    C640 0E 01      MOV BYTE PTR DS:[EAX+0E],1
+
+改成
+010398CE    C640 0E 00      MOV BYTE PTR DS:[EAX+0E],0
+
+
+
+
+
+3 调用字体显示处的修改
+
+概述：
+以exx*4+exx+0bc为特征找到所有显示相关处，并找到其附近第一次读取字符串处。
+
+随后将第一个字符串读取处调用第二个函数，实际exx*4+exx+0bc调用第三个函数。调用前先push eax,ecx,edx以保留寄存器内容。
+
+
+~~~~~~
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01039873  |.  0FB675 E4     MOVZX ESI,BYTE PTR SS:[EBP-1C]
+01039877  |.  8B55 08       MOV EDX,DWORD PTR SS:[EBP+8]
+0103987A  |.  83C4 04       ADD ESP,4
+0103987D  |.  83BCB2 BC0000 CMP DWORD PTR DS:[ESI*4+EDX+0BC],0
+01039885  |.^ 0F84 B2FEFFFF JE 0103973D
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+010398C7  |.  8B84B2 BC0000 MOV EAX,DWORD PTR DS:[ESI*4+EDX+0BC]
+010398CE  |.  C640 0E 00    MOV BYTE PTR DS:[EAX+0E],0
+010398D2  |.^ E9 66FEFFFF   JMP 0103973D
+
+
+初始读取kerneling相关，忽略
+
+
+
+~~~~~~~~~~~~
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01039FBB  |.  83F9 10       |CMP ECX,10
+01039FBE  |.  73 03         |JAE SHORT 01039FC3
+01039FC0  |.  8D45 94       |LEA EAX,[EBP-6C]
+01039FC3  |>  8A0407        |MOV AL,BYTE PTR DS:[EAX+EDI]
+01039FC6  |.  F30F1083 F004 |MOVSS XMM0,DWORD PTR DS:[EBX+4F0]
+01039FCE  |.  0FB6C0        |MOVZX EAX,AL
+01039FD1  |.  8B8483 BC0000 |MOV EAX,DWORD PTR DS:[EAX*4+EBX+0BC]
+01039FD8  |.  8DB3 BC000000 |LEA ESI,[EBX+0BC]
+01039FDE  |.  8985 38FFFFFF |MOV DWORD PTR SS:[EBP-0C8],EAX
+01039FE4  |.  85C0          |TEST EAX,EAX
+
+可能是简单的按钮排版。
+上方
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01039D04  |.  8BC2          |MOV EAX,EDX
+01039D06  |.  83F9 10       |CMP ECX,10
+01039D09  |.  73 03         |JAE SHORT 01039D0E
+01039D0B  |.  8D45 94       |LEA EAX,[EBP-6C]
+01039D0E  |>  803C38 A7     |CMP BYTE PTR DS:[EDI+EAX],0A7
+01039D12  |.  8BC2          |MOV EAX,EDX
+01039D14  |.  0F85 82000000 |JNE 01039D9C
+
+为第一次读取处。
+
+
+两处的EAX均为字符串地址，EDI为index，EBX+0BC为字体基础地址。 flag暂时传0
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01EC8250   \50              PUSH EAX
+01EC8251    51              PUSH ECX
+01EC8252    52              PUSH EDX
+01EC8253    68 00000000     PUSH 0
+01EC8258    8D8B BC000000   LEA ECX,[EBX+0BC]
+01EC825E    51              PUSH ECX
+01EC825F    57              PUSH EDI
+01EC8260    50              PUSH EAX
+01EC8261    FF15 0480EC01   CALL DWORD PTR DS:[1EC8004]
+01EC8267    5A              POP EDX
+01EC8268    59              POP ECX
+01EC8269    58              POP EAX
+01EC826A    803C38 A7       CMP BYTE PTR DS:[EDI+EAX],0A7
+01EC826E    89D0            MOV EAX,EDX
+01EC8270  ^ E9 9F1A17FF     JMP 01039D14
+
+
+
+
+随后实际读取处把从字符串读取字节相关代码移除以保留寄存器内容
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01039FC0  |.  8D45 94       LEA EAX,[EBP-6C]
+01039FC3      90            NOP
+01039FC4      90            NOP
+01039FC5      90            NOP
+01039FC6  |.  F30F1083 F004 MOVSS XMM0,DWORD PTR DS:[EBX+4F0]
+01039FCE      90            NOP
+01039FCF      90            NOP
+01039FD0      90            NOP
+01039FD1  |.  E9 BAE2E800   JMP 01EC8290
+
+随后跳到
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01EC8290   \50              PUSH EAX
+01EC8291    51              PUSH ECX
+01EC8292    52              PUSH EDX
+01EC8293    68 00000000     PUSH 0
+01EC8298    8D8B BC000000   LEA ECX,[EBX+0BC]
+01EC829E    51              PUSH ECX
+01EC829F    57              PUSH EDI
+01EC82A0    50              PUSH EAX
+01EC82A1    FF15 0880EC01   CALL DWORD PTR DS:[1EC8008]
+01EC82A7    5A              POP EDX
+01EC82A8    59              POP ECX
+01EC82A9    83C4 04         ADD ESP,4
+01EC82AC  ^ E9 271D17FF     JMP 01039FD8
+
+
+
+
+~~~~~~~~~~~~~
+
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+0103B614  |> \0FB60C30      MOVZX ECX,BYTE PTR DS:[ESI+EAX]
+0103B618  |.  8BBC8B BC0000 MOV EDI,DWORD PTR DS:[ECX*4+EBX+0BC]
+0103B61F  |.  F30F108B F004 MOVSS XMM1,DWORD PTR DS:[EBX+4F0]
+0103B627  |.  F30F118D 34FF MOVSS DWORD PTR SS:[EBP-0CC],XMM1
+0103B62F  |.  85FF          TEST EDI,EDI
+0103B631  |.  0F85 D1000000 JNZ 0103B708
+
+可能是简单的按钮显示。
+
+上方
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+0103AFEA  |> \803C30 A7     CMP BYTE PTR DS:[ESI+EAX],0A7
+0103AFEE  |.  8BC1          MOV EAX,ECX
+0103AFF0  |.  0F85 AB020000 JNE 0103B2A1
+
+为第一次读取处。
+
+两处的EAX均为字符串地址，ESI为index，EBX+0BC为字体基础地址。 flag暂时传0
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01EC82D0   \50              PUSH EAX
+01EC82D1    51              PUSH ECX
+01EC82D2    52              PUSH EDX
+01EC82D3    68 00000000     PUSH 0
+01EC82D8    8D8B BC000000   LEA ECX,[EBX+0BC]
+01EC82DE    51              PUSH ECX
+01EC82DF    56              PUSH ESI
+01EC82E0    50              PUSH EAX
+01EC82E1    FF15 0480EC01   CALL DWORD PTR DS:[1EC8004]
+01EC82E7    5A              POP EDX
+01EC82E8    59              POP ECX
+01EC82E9    58              POP EAX
+01EC82EA    803C30 A7       CMP BYTE PTR DS:[ESI+EAX],0A7
+01EC82EE    89C8            MOV EAX,ECX
+01EC82F0  ^ E9 FB2C17FF     JMP 0103AFF0
+
+
+
+
+随后实际读取处
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01EC8310   \50              PUSH EAX
+01EC8311    51              PUSH ECX
+01EC8312    52              PUSH EDX
+01EC8313    68 00000000     PUSH 0
+01EC8318    8D8B BC000000   LEA ECX,[EBX+0BC]
+01EC831E    51              PUSH ECX
+01EC831F    56              PUSH ESI
+01EC8320    50              PUSH EAX
+01EC8321    FF15 0880EC01   CALL DWORD PTR DS:[1EC8008]
+01EC8327    89C7            MOV EDI,EAX
+01EC8329    5A              POP EDX
+01EC832A    59              POP ECX
+01EC832B    58              POP EAX
+01EC832C  ^ E9 EE3217FF     JMP 0103B61F
+
+
+
+~~~~~~~~~
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+0103C8C8  |> \F30F1083 F004 MOVSS XMM0,DWORD PTR DS:[EBX+4F0]        ; FLOAT 0.0
+0103C8D0  |.  0FB6C0        MOVZX EAX,AL
+0103C8D3  |.  8B8483 BC0000 MOV EAX,DWORD PTR DS:[EAX*4+EBX+0BC]
+0103C8DA  |.  8D8B BC000000 LEA ECX,[EBX+0BC]
+0103C8E0  |.  898424 A00000 MOV DWORD PTR SS:[ESP+0A0],EAX
+0103C8E7  |.  85C0          TEST EAX,EAX
+0103C8E9  |.  0F84 5A030000 JZ 0103CC49
+
+应当是instant box 分词排版
+上方
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+0103C5B2  |> /8A87 48C38201 MOV AL,BYTE PTR DS:[EDI+182C348]
+0103C5B8  |. |8886 08B68201 MOV BYTE PTR DS:[ESI+182B608],AL
+0103C5BE  |. |46            INC ESI
+0103C5BF  |. |807D 3C 00    CMP BYTE PTR SS:[EBP+3C],0
+0103C5C3  |. |897424 30     MOV DWORD PTR SS:[ESP+30],ESI
+0103C5C7  |. |0F84 FB020000 JE 0103C8C8
+0103C5CD  |. |3C 24         CMP AL,24
+0103C5CF  |. /0F85 9B010000 JNE 0103C770
+
+
+这里其实并不需要替换，但是依然用同样方法处理。
+
+两处的字符串地址为[182C348]，EDI为index，EBX+0BC为字体基础地址。 flag暂时传0
+注意这里的改动如果relocation存在则不会正常工作，如有必须使用relocation的情况，这里的改动要酌情变化
+
+跳到
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01EC8350    50              PUSH EAX
+01EC8351    51              PUSH ECX
+01EC8352    52              PUSH EDX
+01EC8353    68 00000000     PUSH 0
+01EC8358    8D8B BC000000   LEA ECX,[EBX+0BC]
+01EC835E    51              PUSH ECX
+01EC835F    57              PUSH EDI
+01EC8360    68 48C38201     PUSH OFFSET 0182C348
+01EC8365    FF15 0480EC01   CALL DWORD PTR DS:[1EC8004]
+01EC836B    5A              POP EDX
+01EC836C    59              POP ECX
+01EC836D    58              POP EAX
+01EC836E    8A87 48C38201   MOV AL,BYTE PTR DS:[EDI+182C348]
+01EC8374    3C 24           CMP AL,24
+01EC8376  ^ 0F85 F44317FF   JNE 0103C770
+01EC837C  ^ E9 544217FF     JMP 0103C5D5
+
+注意修改字符串地址和最后jne和jmp的地址
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01EC83A0    50              PUSH EAX
+01EC83A1    51              PUSH ECX
+01EC83A2    52              PUSH EDX
+01EC83A3    68 00000000     PUSH 0
+01EC83A8    8D8B BC000000   LEA ECX,[EBX+0BC]
+01EC83AE    51              PUSH ECX
+01EC83AF    57              PUSH EDI
+01EC83B0    68 48C38201     PUSH OFFSET 0182C348
+01EC83B5    FF15 0880EC01   CALL DWORD PTR DS:[1EC8008]
+01EC83BB    5A              POP EDX
+01EC83BC    59              POP ECX
+01EC83BD    83C4 04         ADD ESP,4
+01EC83C0  ^ E9 154517FF     JMP 0103C8DA
+
+
+~~~~~~~~~~~~~~~~~~~
+
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+0103DA77  |> \8A97 08B78201 MOV DL,BYTE PTR DS:[EDI+182B708]
+0103DA7D  |.  F30F1083 F004 MOVSS XMM0,DWORD PTR DS:[EBX+4F0]
+0103DA85  |.  0FB6CA        MOVZX ECX,DL
+0103DA88  |.  8B8C8B BC0000 MOV ECX,DWORD PTR DS:[ECX*4+EBX+0BC]
+0103DA8F  |.  8D83 BC000000 LEA EAX,[EBX+0BC]
+0103DA95  |.  898C24 A00000 MOV DWORD PTR SS:[ESP+0A0],ECX
+0103DA9C  |.  F30F118424 A4 MOVSS DWORD PTR SS:[ESP+0A4],XMM0
+0103DAA5  |.  85C9          TEST ECX,ECX
+0103DAA7  |.  0F85 2E010000 JNZ 0103DBDB
+
+应当是instant box 显示
+注意这里的改动如果relocation存在则不会正常工作，如有必须使用relocation的情况，这里的改动要酌情变化
+
+上方
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+0103D4BA  |.  8A87 08B78201 MOV AL,BYTE PTR DS:[EDI+182B708]
+0103D4C0  |.  3C A7         CMP AL,0A7
+0103D4C2  |.  0F85 4B010000 JNE 0103D613
+
+修改MOV AL,BYTE PTR DS:[EDI+182B708]
+
+跳到
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01EC83E0    50              PUSH EAX
+01EC83E1    51              PUSH ECX
+01EC83E2    52              PUSH EDX
+01EC83E3    68 00000000     PUSH 0
+01EC83E8    8D8B BC000000   LEA ECX,[EBX+0BC]
+01EC83EE    51              PUSH ECX
+01EC83EF    57              PUSH EDI
+01EC83F0    68 08B78201     PUSH OFFSET 0182B708
+01EC83F5    FF15 0480EC01   CALL DWORD PTR DS:[1EC8004]
+01EC83FB    5A              POP EDX
+01EC83FC    59              POP ECX
+01EC83FD    58              POP EAX
+01EC83FE    8A87 08B78201   MOV AL,BYTE PTR DS:[EDI+182B708]
+01EC8404  ^ E9 B75017FF     JMP 0103D4C0
+
+读取字体信息处
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01EC8420   \50              PUSH EAX
+01EC8421    51              PUSH ECX
+01EC8422    52              PUSH EDX
+01EC8423    68 00000000     PUSH 0
+01EC8428    8D8B BC000000   LEA ECX,[EBX+0BC]
+01EC842E    51              PUSH ECX
+01EC842F    57              PUSH EDI
+01EC8430    68 08B78201     PUSH OFFSET 0182B708
+01EC8435    FF15 0880EC01   CALL DWORD PTR DS:[1EC8008]
+01EC843B    5A              POP EDX
+01EC843C    59              POP ECX
+01EC843D    89C1            MOV ECX,EAX
+01EC843F    58              POP EAX
+01EC8440  ^ E9 4A5617FF     JMP 0103DA8F
+
+~~~~~~~~~~~~~~~~~~~
+
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+0103E482  |> \0FB61438      MOVZX EDX,BYTE PTR DS:[EDI+EAX]
+0103E486  |.  8B8496 BC0000 MOV EAX,DWORD PTR DS:[EDX*4+ESI+0BC]
+0103E48D  |.  F30F108E F004 MOVSS XMM1,DWORD PTR DS:[ESI+4F0]
+0103E495  |.  81C6 BC000000 ADD ESI,0BC
+0103E49B  |.  85C0          TEST EAX,EAX
+0103E49D  |.  0F84 1B010000 JZ 0103E5BE
+
+
+上方
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+0103E28E  |.  83F9 10       CMP ECX,10
+0103E291  |.  72 04         JB SHORT 0103E297
+0103E293  |.  8B03          MOV EAX,DWORD PTR DS:[EBX]
+0103E295  |.  EB 02         JMP SHORT 0103E299
+0103E297  |>  8BC3          MOV EAX,EBX
+0103E299  |>  803C38 A7     CMP BYTE PTR DS:[EDI+EAX],0A7
+0103E29D  |.  75 06         JNE SHORT 0103E2A5
+0103E29F  |.  47            INC EDI
+0103E2A0  |.  E9 9A010000   JMP 0103E43F
+
+
+字符串EAX，index在EDI，字体信息ESI， flag =0
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01EC8460    50              PUSH EAX
+01EC8461    51              PUSH ECX
+01EC8462    52              PUSH EDX
+01EC8463    68 00000000     PUSH 0
+01EC8468    8D8E BC000000   LEA ECX,[ESI+0BC]
+01EC846E    51              PUSH ECX
+01EC846F    57              PUSH EDI
+01EC8470    50              PUSH EAX
+01EC8471    FF15 0480EC01   CALL DWORD PTR DS:[1EC8004]
+01EC8477    5A              POP EDX
+01EC8478    59              POP ECX
+01EC8479    58              POP EAX
+01EC847A    803C38 A7       CMP BYTE PTR DS:[EDI+EAX],0A7
+01EC847E  ^ 0F85 215E17FF   JNE 0103E2A5
+01EC8484  ^ E9 165E17FF     JMP 0103E29F
+
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01EC84A0    50              PUSH EAX
+01EC84A1    51              PUSH ECX
+01EC84A2    52              PUSH EDX
+01EC84A3    68 00000000     PUSH 0
+01EC84A8    8D8E BC000000   LEA ECX,[ESI+0BC]
+01EC84AE    51              PUSH ECX
+01EC84AF    57              PUSH EDI
+01EC84B0    50              PUSH EAX
+01EC84B1    FF15 0880EC01   CALL DWORD PTR DS:[1EC8008]
+01EC84B7    5A              POP EDX
+01EC84B8    59              POP ECX
+01EC84B9    83C4 04         ADD ESP,4
+01EC84BC  ^ E9 CC5F17FF     JMP 0103E48D
+
+
+~~~~~~~~~~~~
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+0103E749  |> \8A043B        |MOV AL,BYTE PTR DS:[EDI+EBX]
+0103E74C  |.  F30F108A F004 |MOVSS XMM1,DWORD PTR DS:[EDX+4F0]
+0103E754  |.  0FB6C8        |MOVZX ECX,AL
+0103E757  |.  8BBC8A BC0000 |MOV EDI,DWORD PTR DS:[ECX*4+EDX+0BC]
+0103E75E  |.  8DB2 BC000000 |LEA ESI,[EDX+0BC]
+0103E764  |.  85FF          |TEST EDI,EDI
+0103E766  |.  0F84 98000000 |JZ 0103E804
+
+上方
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+0103E685  |.  8A043B        |MOV AL,BYTE PTR DS:[EDI+EBX]
+0103E688  |.  3C A7         |CMP AL,0A7
+0103E68A  |.  75 06         |JNE SHORT 0103E692
+0103E68C  |.  43            |INC EBX
+0103E68D  |.  E9 A1010000   |JMP 0103E833
+
+
+字符串EDI，index在EBX，字体信息EDX， flag =0
+
+a7处连mov一起拉走
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01EC84E0    50              PUSH EAX
+01EC84E1    51              PUSH ECX
+01EC84E2    52              PUSH EDX
+01EC84E3    68 00000000     PUSH 0
+01EC84E8    8D8A BC000000   LEA ECX,[EDX+0BC]
+01EC84EE    51              PUSH ECX
+01EC84EF    53              PUSH EBX
+01EC84F0    57              PUSH EDI
+01EC84F1    FF15 0480EC01   CALL DWORD PTR DS:[1EC8004]
+01EC84F7    5A              POP EDX
+01EC84F8    59              POP ECX
+01EC84F9    58              POP EAX
+01EC84FA    8A043B          MOV AL,BYTE PTR DS:[EDI+EBX]
+01EC84FD    3C A7           CMP AL,0A7
+01EC84FF  ^ E9 866117FF     JMP 0103E68A
+
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01EC8520    50              PUSH EAX
+01EC8521    51              PUSH ECX
+01EC8522    52              PUSH EDX
+01EC8523    68 00000000     PUSH 0
+01EC8528    8D8A BC000000   LEA ECX,[EDX+0BC]
+01EC852E    51              PUSH ECX
+01EC852F    53              PUSH EBX
+01EC8530    57              PUSH EDI
+01EC8531    FF15 0880EC01   CALL DWORD PTR DS:[1EC8008]
+01EC8537    89C7            MOV EDI,EAX
+01EC8539    5A              POP EDX
+01EC853A    59              POP ECX
+01EC853B    58              POP EAX
+01EC853C  ^ E9 1D6217FF     JMP 0103E75E
+
+
+~~~~~~~~~~~~~~~~
+
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+0103FC5E  |> \8BC6          MOV EAX,ESI
+0103FC60  |>  8A0438        MOV AL,BYTE PTR DS:[EDI+EAX]
+0103FC63  |.  8B4C24 20     MOV ECX,DWORD PTR SS:[ESP+20]
+0103FC67  |.  F30F1081 F004 MOVSS XMM0,DWORD PTR DS:[ECX+4F0]
+0103FC6F  |.  0FB6C0        MOVZX EAX,AL
+0103FC72  |.  8B9C81 BC0000 MOV EBX,DWORD PTR DS:[EAX*4+ECX+0BC]
+0103FC79  |.  85DB          TEST EBX,EBX
+0103FC7B  |.  0F84 8F010000 JZ 0103FE10
+
+上方
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+0103FA7D  |> \803C38 A7     CMP BYTE PTR DS:[EDI+EAX],0A7
+0103FA81  |.  0F85 93000000 JNE 0103FB1A
+0103FA87  |.  47            INC EDI
+0103FA88  |.  83FA 10       CMP EDX,10
+0103FA8B  |.  72 04         JB SHORT 0103FA91
+
+
+
+字符串EAX，index在EDI，字体信息ECX（ESP+20）， flag =0
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01EC8560    50              PUSH EAX
+01EC8561    51              PUSH ECX
+01EC8562    52              PUSH EDX
+01EC8563    68 00000000     PUSH 0
+01EC8568    8B4CE4 30       MOV ECX,DWORD PTR SS:[ESP+30]
+01EC856C    8D89 BC000000   LEA ECX,[ECX+0BC]
+01EC8572    51              PUSH ECX
+01EC8573    57              PUSH EDI
+01EC8574    50              PUSH EAX
+01EC8575    FF15 0480EC01   CALL DWORD PTR DS:[1EC8004]
+01EC857B    5A              POP EDX
+01EC857C    59              POP ECX
+01EC857D    58              POP EAX
+01EC857E    803C38 A7       CMP BYTE PTR DS:[EDI+EAX],0A7
+01EC8582  ^ 0F85 927517FF   JNE 0103FB1A
+01EC8588  ^ E9 FA7417FF     JMP 0103FA87
+
+注意计算esp+30
+
+读取字体信息处清除一些对eax的操作
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+0103FC5E  |> \8BC6          MOV EAX,ESI
+0103FC60      90            NOP
+0103FC61      90            NOP
+0103FC62      90            NOP
+0103FC63  |.  8B4C24 20     MOV ECX,DWORD PTR SS:[ESP+20]
+0103FC67  |.  F30F1081 F004 MOVSS XMM0,DWORD PTR DS:[ECX+4F0]
+0103FC6F      90            NOP
+0103FC70      90            NOP
+0103FC71      90            NOP
+0103FC72      E9 3989E800   JMP 01EC85B0
+0103FC77      90            NOP
+0103FC78      90            NOP
+0103FC79  |.  85DB          TEST EBX,EBX
+
+然后调到
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01EC85B0    50              PUSH EAX
+01EC85B1    51              PUSH ECX
+01EC85B2    52              PUSH EDX
+01EC85B3    68 00000000     PUSH 0
+01EC85B8    8D89 BC000000   LEA ECX,[ECX+0BC]
+01EC85BE    51              PUSH ECX
+01EC85BF    57              PUSH EDI
+01EC85C0    50              PUSH EAX
+01EC85C1    FF15 0880EC01   CALL DWORD PTR DS:[1EC8008]
+01EC85C7    89C3            MOV EBX,EAX
+01EC85C9    5A              POP EDX
+01EC85CA    59              POP ECX
+01EC85CB    58              POP EAX
+01EC85CC  ^ E9 A87617FF     JMP 0103FC79
+
+
+~~~~~~~~~~~~~~~~~~
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01040425  |.  83F9 10       CMP ECX,10
+01040428  |.  73 04         JAE SHORT 0104042E
+0104042A  |.  8D4424 34     LEA EAX,[ESP+34]
+0104042E  |>  0FB60410      MOVZX EAX,BYTE PTR DS:[EDX+EAX]
+01040432  |.  8B8486 BC0000 MOV EAX,DWORD PTR DS:[EAX*4+ESI+0BC]
+01040439  |.  F30F10AE F004 MOVSS XMM5,DWORD PTR DS:[ESI+4F0]
+01040441  |.  8D8E BC000000 LEA ECX,[ESI+0BC]
+01040447  |.  898C24 D00000 MOV DWORD PTR SS:[ESP+0D0],ECX
+0104044E  |.  F30F11AC24 BC MOVSS DWORD PTR SS:[ESP+1BC],XMM5
+01040457  |.  85C0          TEST EAX,EAX
+
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+0104021D  |> \803C10 A7     CMP BYTE PTR DS:[EDX+EAX],0A7
+01040221  |.  8B4424 34     MOV EAX,DWORD PTR SS:[ESP+34]
+01040225  |.  0F85 16010000 JNE 01040341
+0104022B  |.  42            INC EDX
+
+
+字符串EAX，index在EDX，字体信息ECX， flag =0
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01EC85F0    50              PUSH EAX
+01EC85F1    51              PUSH ECX
+01EC85F2    52              PUSH EDX
+01EC85F3    68 00000000     PUSH 0
+01EC85F8    8D8E BC000000   LEA ECX,[ESI+0BC]
+01EC85FE    51              PUSH ECX
+01EC85FF    52              PUSH EDX
+01EC8600    50              PUSH EAX
+01EC8601    FF15 0480EC01   CALL DWORD PTR DS:[1EC8004]
+01EC8607    5A              POP EDX
+01EC8608    59              POP ECX
+01EC8609    58              POP EAX
+01EC860A    803C10 A7       CMP BYTE PTR DS:[EDX+EAX],0A7
+01EC860E    8B44E4 34       MOV EAX,DWORD PTR SS:[ESP+34]
+01EC8612  ^ E9 0E7C17FF     JMP 01040225
+
+读取字体信息处清除一些对eax的操作
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+0104042A  |.  8D4424 34     LEA EAX,[ESP+34]
+0104042E      90            NOP
+0104042F      90            NOP
+01040430      90            NOP
+01040431      90            NOP
+01040432      E9 F981E800   JMP 01EC8630
+01040437      90            NOP
+01040438      90            NOP
+然后跳到
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01EC8630    50              PUSH EAX
+01EC8631    51              PUSH ECX
+01EC8632    52              PUSH EDX
+01EC8633    68 00000000     PUSH 0
+01EC8638    8D8E BC000000   LEA ECX,[ESI+0BC]
+01EC863E    51              PUSH ECX
+01EC863F    52              PUSH EDX
+01EC8640    50              PUSH EAX
+01EC8641    FF15 0880EC01   CALL DWORD PTR DS:[1EC8008]
+01EC8647    5A              POP EDX
+01EC8648    59              POP ECX
+01EC8649    83C4 04         ADD ESP,4
+01EC864C  ^ E9 E87D17FF     JMP 01040439
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+010412C8  |.  83FE 10       CMP ESI,10
+010412CB  |.  73 04         JAE SHORT 010412D1
+010412CD  |.  8D4424 58     LEA EAX,[ESP+58]
+010412D1  |>  0FB60418      MOVZX EAX,BYTE PTR DS:[EBX+EAX]
+010412D5  |.  8B4D 08       MOV ECX,DWORD PTR SS:[EBP+8]
+010412D8  |.  8B8481 BC0000 MOV EAX,DWORD PTR DS:[EAX*4+ECX+0BC]
+010412DF  |.  F30F10A9 F004 MOVSS XMM5,DWORD PTR DS:[ECX+4F0]
+010412E7  |.  F30F11AC24 DC MOVSS DWORD PTR SS:[ESP+0DC],XMM5
+
+
+无a3等判断，估计是大地图
+
+字符串EAX，index在EBX，字体信息ECX， flag =1
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+010412CD  |.  8D4424 58     LEA EAX,[ESP+58]
+010412D1      90            NOP
+010412D2      90            NOP
+010412D3      90            NOP
+010412D4      90            NOP
+010412D5  |.  8B4D 08       MOV ECX,DWORD PTR SS:[EBP+8]
+010412D8      E9 9373E800   JMP 01EC8670
+010412DD      90            NOP
+010412DE      90            NOP
+010412DF  |.  F30F10A9 F004 MOVSS XMM5,DWORD PTR DS:[ECX+4F0]
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01EC8670    50              PUSH EAX
+01EC8671    51              PUSH ECX
+01EC8672    52              PUSH EDX
+01EC8673    68 01000000     PUSH 1
+01EC8678    8D89 BC000000   LEA ECX,[ECX+0BC]
+01EC867E    51              PUSH ECX
+01EC867F    53              PUSH EBX
+01EC8680    50              PUSH EAX
+01EC8681    FF15 0880EC01   CALL DWORD PTR DS:[1EC8008]
+01EC8687    5A              POP EDX
+01EC8688    59              POP ECX
+01EC8689    83C4 04         ADD ESP,4
+01EC868C  ^ E9 4E8C17FF     JMP 010412DF
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01042557  |> \8A0418        MOV AL,BYTE PTR DS:[EBX+EAX]
+0104255A  |.  F30F1096 F004 MOVSS XMM2,DWORD PTR DS:[ESI+4F0]
+01042562  |.  0FB6C0        MOVZX EAX,AL
+01042565  |.  8B8486 BC0000 MOV EAX,DWORD PTR DS:[EAX*4+ESI+0BC]
+0104256C  |.  85C0          TEST EAX,EAX
+0104256E  |.  0F84 6E010000 JZ 010426E2
+加...处
+
+上方
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01042383  |> \803C18 A7     CMP BYTE PTR DS:[EBX+EAX],0A7
+01042387  |.  75 06         JNE SHORT 0104238F
+01042389  |.  43            INC EBX
+0104238A  |.  E9 AC000000   JMP 0104243B
+
+
+字符串EAX，index在EBX，字体信息ESI， flag =0
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01EC86B0    50              PUSH EAX
+01EC86B1    51              PUSH ECX
+01EC86B2    52              PUSH EDX
+01EC86B3    68 00000000     PUSH 0
+01EC86B8    8D8E BC000000   LEA ECX,[ESI+0BC]
+01EC86BE    51              PUSH ECX
+01EC86BF    53              PUSH EBX
+01EC86C0    50              PUSH EAX
+01EC86C1    FF15 0480EC01   CALL DWORD PTR DS:[1EC8004]
+01EC86C7    5A              POP EDX
+01EC86C8    59              POP ECX
+01EC86C9    58              POP EAX
+01EC86CA    803C18 A7       CMP BYTE PTR DS:[EBX+EAX],0A7
+01EC86CE  ^ 0F85 BB9C17FF   JNE 0104238F
+01EC86D4  ^ E9 B09C17FF     JMP 01042389
+
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01042557     \90            NOP
+01042558      90            NOP
+01042559      90            NOP
+0104255A  |.  F30F1096 F004 MOVSS XMM2,DWORD PTR DS:[ESI+4F0]
+01042562      90            NOP
+01042563      90            NOP
+01042564      90            NOP
+01042565      E9 8661E800   JMP 01EC86F0
+0104256A      90            NOP
+0104256B      90            NOP
+0104256C  |.  85C0          TEST EAX,EAX
+
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01EC86F0    50              PUSH EAX
+01EC86F1    51              PUSH ECX
+01EC86F2    52              PUSH EDX
+01EC86F3    68 00000000     PUSH 0
+01EC86F8    8D8E BC000000   LEA ECX,[ESI+0BC]
+01EC86FE    51              PUSH ECX
+01EC86FF    53              PUSH EBX
+01EC8700    50              PUSH EAX
+01EC8701    FF15 0880EC01   CALL DWORD PTR DS:[1EC8008]
+01EC8707    5A              POP EDX
+01EC8708    59              POP ECX
+01EC8709    83C4 04         ADD ESP,4
+01EC870C  ^ E9 5B9E17FF     JMP 0104256C
+
+下方
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+0104287C  |> \C64418 FC 20  MOV BYTE PTR DS:[EBX+EAX-4],20
+01042881  |.  397E 14       CMP DWORD PTR DS:[ESI+14],EDI
+01042884  |.  72 04         JB SHORT 0104288A
+01042886  |.  8B06          MOV EAX,DWORD PTR DS:[ESI]
+01042888  |.  EB 02         JMP SHORT 0104288C
+0104288A  |>  8BC6          MOV EAX,ESI
+0104288C  |>  B1 2E         MOV CL,2E
+0104288E  |.  884C18 FD     MOV BYTE PTR DS:[EBX+EAX-3],CL
+01042892  |.  397E 14       CMP DWORD PTR DS:[ESI+14],EDI
+01042895  |.  72 04         JB SHORT 0104289B
+01042897  |.  8B06          MOV EAX,DWORD PTR DS:[ESI]
+01042899  |.  EB 02         JMP SHORT 0104289D
+0104289B  |>  8BC6          MOV EAX,ESI
+0104289D  |>  884C18 FE     MOV BYTE PTR DS:[EBX+EAX-2],CL
+010428A1  |.  397E 14       CMP DWORD PTR DS:[ESI+14],EDI
+010428A4  |.  72 02         JB SHORT 010428A8
+010428A6  |.  8B36          MOV ESI,DWORD PTR DS:[ESI]
+010428A8  |>  884C1E FF     MOV BYTE PTR DS:[EBX+ESI-1],CL
+010428AC  |>  8B8C24 EC0000 MOV ECX,DWORD PTR SS:[ESP+0EC]
+010428B3  |.  5F            POP EDI
+010428B4  |.  5E            POP ESI
+010428B5  |.  64:890D 00000 MOV DWORD PTR FS:[0],ECX
+
+MOV BYTE PTR DS:[EBX+EAX-4],20 去掉
+
+~~~~~~~~~~~~~
+
+还有一个大地图
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01040FBC    0FB60438        MOVZX EAX,BYTE PTR DS:[EDI+EAX]
+01040FC0    8B4C24 2C       MOV ECX,DWORD PTR SS:[ESP+2C]
+01040FC4    8B0481          MOV EAX,DWORD PTR DS:[EAX*4+ECX]
+01040FC7    F30F1081 340400 MOVSS XMM0,DWORD PTR DS:[ECX+434]
+01040FCF    898424 90000000 MOV DWORD PTR SS:[ESP+90],EAX
+01040FD6    85C0            TEST EAX,EAX
+
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01040FBC    90              NOP
+01040FBD    90              NOP
+01040FBE    90              NOP
+01040FBF    90              NOP
+01040FC0    8B4C24 2C       MOV ECX,DWORD PTR SS:[ESP+2C]
+01040FC4    E9 6777E800     JMP 01EC8730
+01040FC9    90              NOP
+01040FCA    90              NOP
+01040FCB    90              NOP
+01040FCC    90              NOP
+01040FCD    90              NOP
+01040FCE    90              NOP
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01EC8730    50              PUSH EAX
+01EC8731    51              PUSH ECX
+01EC8732    52              PUSH EDX
+01EC8733    68 01000000     PUSH 1
+01EC8738    51              PUSH ECX
+01EC8739    57              PUSH EDI
+01EC873A    50              PUSH EAX
+01EC873B    FF15 0880EC01   CALL DWORD PTR DS:[1EC8008]
+01EC8741    5A              POP EDX
+01EC8742    59              POP ECX
+01EC8743    83C4 04         ADD ESP,4
+01EC8746    F30F1081 340400 MOVSS XMM0,DWORD PTR DS:[ECX+434]
+01EC874E  ^ E9 7C8817FF     JMP 01040FCF
+
+
+
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01042BB4  |> \8A0418        MOV AL,BYTE PTR DS:[EBX+EAX]
+01042BB7  |.  8B7424 28     MOV ESI,DWORD PTR SS:[ESP+28]
+01042BBB  |.  F30F1086 F004 MOVSS XMM0,DWORD PTR DS:[ESI+4F0]
+01042BC3  |.  81C6 BC000000 ADD ESI,0BC
+01042BC9  |.  0FB6C0        MOVZX EAX,AL
+01042BCC  |.  8B0486        MOV EAX,DWORD PTR DS:[EAX*4+ESI]
+01042BCF  |.  85C0          TEST EAX,EAX
+01042BD1  |.  0F84 19030000 JZ 01042EF0
+
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+010429DF  |> \803C18 A7     CMP BYTE PTR DS:[EBX+EAX],0A7
+010429E3  |.  75 06         JNE SHORT 010429EB
+010429E5  |.  43            INC EBX
+
+
+
+另一个+...相关，通过搜2e比较方便寻找。。
+
+字符串在eax，index ebx，字体esp+28(esi) flag=0
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01EC8780    50              PUSH EAX
+01EC8781    51              PUSH ECX
+01EC8782    52              PUSH EDX
+01EC8783    68 00000000     PUSH 0
+01EC8788    8B4CE4 38       MOV ECX,DWORD PTR SS:[ESP+38]
+01EC878C    8D89 BC000000   LEA ECX,[ECX+0BC]
+01EC8792    51              PUSH ECX
+01EC8793    53              PUSH EBX
+01EC8794    50              PUSH EAX
+01EC8795    FF15 0480EC01   CALL DWORD PTR DS:[1EC8004]
+01EC879B    5A              POP EDX
+01EC879C    59              POP ECX
+01EC879D    58              POP EAX
+01EC879E    803C18 A7       CMP BYTE PTR DS:[EBX+EAX],0A7
+01EC87A2  ^ 0F85 43A217FF   JNE 010429EB
+01EC87A8  ^ E9 38A217FF     JMP 010429E5
+
+
+
+MOV EAX,DWORD PTR DS:[EAX*4+ESI]处地方不够，挪用上面的一起跳
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01042BB4     \90            NOP
+01042BB5      90            NOP
+01042BB6      90            NOP
+01042BB7  |.  8B7424 28     MOV ESI,DWORD PTR SS:[ESP+28]
+01042BBB  |.  F30F1086 F004 MOVSS XMM0,DWORD PTR DS:[ESI+4F0]
+01042BC3  |.  81C6 BC000000 ADD ESI,0BC
+01042BC9      E9 025CE800   JMP 01EC87D0
+01042BCE      90            NOP
+
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01EC87D0    50              PUSH EAX
+01EC87D1    51              PUSH ECX
+01EC87D2    52              PUSH EDX
+01EC87D3    68 00000000     PUSH 0
+01EC87D8    56              PUSH ESI
+01EC87D9    53              PUSH EBX
+01EC87DA    50              PUSH EAX
+01EC87DB    FF15 0880EC01   CALL DWORD PTR DS:[1EC8008]
+01EC87E1    5A              POP EDX
+01EC87E2    59              POP ECX
+01EC87E3    83C4 04         ADD ESP,4
+01EC87E6  ^ E9 E4A317FF     JMP 01042BCF
+
+
+
+
+
+附近有加。。。处可能需要处理，不过。。。总觉得怎么处理都有漏洞，暂时放置。。。
+
+
+
+还漏一个, 大概是算高度
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01041C98  |> \803C18 A7     |CMP BYTE PTR DS:[EBX+EAX],0A7
+01041C9C  |.  75 06         |JNE SHORT 01041CA4
+01041C9E  |.  43            |INC EBX
+
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01041E4B  |> \0FB60418      |MOVZX EAX,BYTE PTR DS:[EBX+EAX]
+01041E4F  |.  8B3C81        |MOV EDI,DWORD PTR DS:[EAX*4+ECX]
+01041E52  |.  8B4C24 34     |MOV ECX,DWORD PTR SS:[ESP+34]
+01041E56  |.  F30F1099 3404 |MOVSS XMM3,DWORD PTR DS:[ECX+434]
+01041E5E  |.  F30F115C24 3C |MOVSS DWORD PTR SS:[ESP+3C],XMM3
+01041E64  |.  85FF          |TEST EDI,EDI
+01041E66  |.  0F84 B4010000 |JZ 01042020
+
+
+地址eax，index ebx，字体ecx，flag=0
+
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01EC88C0    50              PUSH EAX
+01EC88C1    51              PUSH ECX
+01EC88C2    52              PUSH EDX
+01EC88C3    68 00000000     PUSH 0
+01EC88C8    51              PUSH ECX
+01EC88C9    53              PUSH EBX
+01EC88CA    50              PUSH EAX
+01EC88CB    FF15 0480EC01   CALL DWORD PTR DS:[1EC8004]
+01EC88D1    5A              POP EDX
+01EC88D2    59              POP ECX
+01EC88D3    58              POP EAX
+01EC88D4    803C18 A7       CMP BYTE PTR DS:[EBX+EAX],0A7
+01EC88D8  ^ 0F85 C69317FF   JNE 01041CA4
+01EC88DE  ^ E9 BB9317FF     JMP 01041C9E
+
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01EC8900    50              PUSH EAX
+01EC8901    51              PUSH ECX
+01EC8902    52              PUSH EDX
+01EC8903    68 00000000     PUSH 0
+01EC8908    51              PUSH ECX
+01EC8909    53              PUSH EBX
+01EC890A    50              PUSH EAX
+01EC890B    FF15 0880EC01   CALL DWORD PTR DS:[1EC8008]
+01EC8911    89C7            MOV EDI,EAX
+01EC8913    5A              POP EDX
+01EC8914    59              POP ECX
+01EC8915    58              POP EAX
+01EC8916  ^ E9 379517FF     JMP 01041E52
+01EC891B    CC              INT3
+
+
+
+
+
+
+
+
+
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+010012A1  |. /7D 33         JGE SHORT 010012D6
+010012A3  |. |46            INC ESI
+010012A4  |. |56            PUSH ESI
+010012A5  |. |52            PUSH EDX
+010012A6  |. |FFD0          CALL EAX
+010012A8  |. |3BC3          CMP EAX,EBX
+010012AA  |. |7D 51         JGE SHORT 010012FD
+010012AC  |. |8D6424 00     LEA ESP,[ESP]
+010012B0  |> |0FB687 B80000 /MOVZX EAX,BYTE PTR DS:[EDI+0B8]
+010012B7  |. |8B4F 78       |MOV ECX,DWORD PTR DS:[EDI+78]
+010012BA  |. |8B11          |MOV EDX,DWORD PTR DS:[ECX]
+010012BC  |. |8B52 2C       |MOV EDX,DWORD PTR DS:[EDX+2C]
+010012BF  |. |50            |PUSH EAX
+010012C0  |. |8B45 08       |MOV EAX,DWORD PTR SS:[EBP+8]
+010012C3  |. |46            |INC ESI
+010012C4  |. |56            |PUSH ESI
+010012C5  |. |50            |PUSH EAX
+010012C6  |. |FFD2          |CALL EDX
+010012C8  |. |3BC3          |CMP EAX,EBX
+010012CA  |.^|7C E4         \JL SHORT 010012B0
+010012CC  |. |8BC6          MOV EAX,ESI
+010012CE  |. |5E            POP ESI
+010012CF  |. |5B            POP EBX
+010012D0  |. |8BE5          MOV ESP,EBP
+010012D2  |. |5D            POP EBP
+010012D3  |. |C2 0400       RETN 4
+010012D6  |> \4E            DEC ESI
+010012D7  |.  56            PUSH ESI
+010012D8  |.  52            PUSH EDX
+010012D9  |.  FFD0          CALL EAX
+010012DB  |.  3BC3          CMP EAX,EBX
+010012DD  |.  7C 1D         JL SHORT 010012FC
+010012DF  |.  90            NOP
+010012E0  |>  0FB687 B80000 /MOVZX EAX,BYTE PTR DS:[EDI+0B8]
+010012E7  |.  8B4F 78       |MOV ECX,DWORD PTR DS:[EDI+78]
+010012EA  |.  8B11          |MOV EDX,DWORD PTR DS:[ECX]
+010012EC  |.  8B52 2C       |MOV EDX,DWORD PTR DS:[EDX+2C]
+010012EF  |.  50            |PUSH EAX
+010012F0  |.  8B45 08       |MOV EAX,DWORD PTR SS:[EBP+8]
+010012F3  |.  4E            |DEC ESI
+010012F4  |.  56            |PUSH ESI
+010012F5  |.  50            |PUSH EAX
+010012F6  |.  FFD2          |CALL EDX
+010012F8  |.  3BC3          |CMP EAX,EBX
+010012FA  |.^ 7D E4         \JGE SHORT 010012E0
+010012FC      46            INC ESI
+010012FD  |>  8BC6          MOV EAX,ESI
+010012FF  |.  5E            POP ESI
+01001300  |.  5B            POP EBX
+01001301  |.  8BE5          MOV ESP,EBP
+01001303  |.  5D            POP EBP
+01001304  \.  C2 0400       RETN 4
+
+
+自动断句处的处理。。。
+
+前一段从010012A3跳走
+CPU Disasm
+Address   Hex dump          Command                                                              Comments
+01EC8800    46              INC ESI
+01EC8801    56              PUSH ESI
+01EC8802    52              PUSH EDX
+01EC8803    FFD0            CALL EAX
+01EC8805    3BC3            CMP EAX,EBX
+01EC8807    7D 20           JGE SHORT 01EC8829
+01EC8809    8D6424 00       LEA ESP,[ESP]
+01EC880D    0FB687 B8000000 MOVZX EAX,BYTE PTR DS:[EDI+0B8]
+01EC8814    8B4F 78         MOV ECX,DWORD PTR DS:[EDI+78]
+01EC8817    8B11            MOV EDX,DWORD PTR DS:[ECX]
+01EC8819    8B52 2C         MOV EDX,DWORD PTR DS:[EDX+2C]
+01EC881C    50              PUSH EAX
+01EC881D    8B45 08         MOV EAX,DWORD PTR SS:[EBP+8]
+01EC8820    46              INC ESI
+01EC8821    56              PUSH ESI
+01EC8822    50              PUSH EAX
+01EC8823    FFD2            CALL EDX
+01EC8825    3BC3            CMP EAX,EBX
+01EC8827  ^ 7C E4           JL SHORT 01EC880D
+01EC8829    8B4F 78         MOV ECX,DWORD PTR DS:[EDI+78]
+01EC882C    8B89 BC000000   MOV ECX,DWORD PTR DS:[ECX+0BC]
+01EC8832    8339 00         CMP DWORD PTR DS:[ECX],0
+01EC8835    74 01           JE SHORT 01EC8838
+01EC8837    46              INC ESI
+01EC8838  ^ E9 8F8A13FF     JMP 010012CC
+
+
+
+
+后一段从010012D6跳到
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01EC8860    4E              DEC ESI
+01EC8861    56              PUSH ESI
+01EC8862    52              PUSH EDX
+01EC8863    FFD0            CALL EAX
+01EC8865    3BC3            CMP EAX,EBX
+01EC8867    7C 1D           JL SHORT 01EC8886
+01EC8869    90              NOP
+01EC886A    0FB687 B8000000 MOVZX EAX,BYTE PTR DS:[EDI+0B8]
+01EC8871    8B4F 78         MOV ECX,DWORD PTR DS:[EDI+78]
+01EC8874    8B11            MOV EDX,DWORD PTR DS:[ECX]
+01EC8876    8B52 2C         MOV EDX,DWORD PTR DS:[EDX+2C]
+01EC8879    50              PUSH EAX
+01EC887A    8B45 08         MOV EAX,DWORD PTR SS:[EBP+8]
+01EC887D    4E              DEC ESI
+01EC887E    56              PUSH ESI
+01EC887F    50              PUSH EAX
+01EC8880    FFD2            CALL EDX
+01EC8882    3BC3            CMP EAX,EBX
+01EC8884  ^ 7D E4           JGE SHORT 01EC886A
+01EC8886    46              INC ESI
+01EC8887    8B4F 78         MOV ECX,DWORD PTR DS:[EDI+78]
+01EC888A    8B89 BC000000   MOV ECX,DWORD PTR DS:[ECX+0BC]
+01EC8890    8339 00         CMP DWORD PTR DS:[ECX],0
+01EC8893    75 01           JNE SHORT 01EC8896
+01EC8895    4E              DEC ESI
+01EC8896  ^ E9 628A13FF     JMP 010012FD
+
+
+
+
+
+
+
+
+搜
+ control character 附近
+读取utf的地方，跳掉导致读不出的判定
+
+
+
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+012D5D4C  |.  8D51 FE       LEA EDX,[ECX-2]
+012D5D4F  |.  83FA 01       CMP EDX,1
+012D5D52      0F87 1B040000 JA 012D6173
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+012D5F75  |> \8D88 0000FFFF LEA ECX,[EAX+FFFF0000]
+012D5F7B  |.  81F9 FFFF0F00 CMP ECX,0FFFFF
+012D5F81      0F87 EC010000 JA 012D6173
+不用跳
+
+
+大小写
+
+CPU Disasm
+Address   Hex dump          Command                                                   Comments
+00C6FEAF      E8 AC2A5300   CALL 011A2960
+
+
+nop
+
+可以通过跟踪这个函数里的大小写转换找到
+
+
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+00FBDA39  |.  E8 D24646FF   CALL 00422110                            ; \eu4-chi-bak17.00422110
+00FBDA3E  |>  6A 01         PUSH 1                                   ; /Arg3 = 1
+00FBDA40  |.  6A 00         PUSH 0                                   ; |Arg2 = 0
+00FBDA42  |.  8D4D FC       LEA ECX,[EBP-4]                          ; |
+00FBDA45  |.  51            PUSH ECX                                 ; |Arg1 => OFFSET LOCAL.1
+00FBDA46  |.  8BCE          MOV ECX,ESI                              ; |
+00FBDA48  |.  C645 FC A7    MOV BYTE PTR SS:[EBP-4],0A7              ; |
+00FBDA4C  |.  E8 5F591E00   CALL 011A33B0                            ; \eu4-chi-bak17.011A33B0
+00FBDA51  |.  83F8 FF       CMP EAX,-1
+00FBDA54  |.  75 0B         JNE SHORT 00FBDA61
+00FBDA56  |.  6A A7         PUSH -59                                 ; /Arg2 = -59
+00FBDA58  |.  6A 01         PUSH 1                                   ; |Arg1 = 1
+00FBDA5A  |.  8BCE          MOV ECX,ESI                              ; |
+00FBDA5C  |.  E8 AF4646FF   CALL 00422110                            ; \eu4-chi-bak17.00422110
+00FBDA61  |>  6A 01         PUSH 1                                   ; /Arg3 = 1
+00FBDA63  |.  6A 00         PUSH 0                                   ; |Arg2 = 0
+00FBDA65  |.  8D55 FC       LEA EDX,[EBP-4]                          ; |
+00FBDA68  |.  52            PUSH EDX                                 ; |Arg1 => OFFSET LOCAL.1
+00FBDA69  |.  8BCE          MOV ECX,ESI                              ; |
+00FBDA6B  |.  C645 FC A4    MOV BYTE PTR SS:[EBP-4],0A4              ; |
+00FBDA6F  |.  E8 3C591E00   CALL 011A33B0                            ; \eu4-chi-bak17.011A33B0
+00FBDA74  |.  83F8 FF       CMP EAX,-1
+00FBDA77  |.  75 0B         JNE SHORT 00FBDA84
+00FBDA79  |.  6A A4         PUSH -5C                                 ; /Arg2 = -5C
+00FBDA7B  |.  6A 01         PUSH 1                                   ; |Arg1 = 1
+00FBDA7D  |.  8BCE          MOV ECX,ESI                              ; |
+00FBDA7F  |.  E8 8C4646FF   CALL 00422110                            ; \eu4-chi-bak17.00422110
+00FBDA84  |>  6A 01         PUSH 1                                   ; /Arg3 = 1
+00FBDA86  |.  6A 00         PUSH 0                                   ; |Arg2 = 0
+00FBDA88  |.  8D45 FC       LEA EAX,[EBP-4]                          ; |
+00FBDA8B  |.  50            PUSH EAX                                 ; |Arg1 => OFFSET LOCAL.1
+00FBDA8C  |.  8BCE          MOV ECX,ESI                              ; |
+00FBDA8E  |.  C645 FC A3    MOV BYTE PTR SS:[EBP-4],0A3              ; |
+00FBDA92  |.  E8 19591E00   CALL 011A33B0                            ; \eu4-chi-bak17.011A33B0
+00FBDA97  |.  83F8 FF       CMP EAX,-1
+00FBDA9A  |.  75 0B         JNE SHORT 00FBDAA7
+00FBDA9C  |.  6A A3         PUSH -5D                                 ; /Arg2 = -5D
+00FBDA9E  |.  6A 01         PUSH 1                                   ; |Arg1 = 1
+00FBDAA0  |.  8BCE          MOV ECX,ESI                              ; |
+00FBDAA2  |.  E8 694646FF   CALL 00422110                            ; \eu4-chi-bak17.00422110
+00FBDAA7  |>  6A 01         PUSH 1                                   ; /Arg3 = 1
+00FBDAA9  |.  6A 00         PUSH 0                                   ; |Arg2 = 0
+00FBDAAB  |.  8D4D FC       LEA ECX,[EBP-4]                          ; |
+00FBDAAE  |.  51            PUSH ECX                                 ; |Arg1 => OFFSET LOCAL.1
+00FBDAAF  |.  8BCE          MOV ECX,ESI                              ; |
+00FBDAB1  |.  C645 FC 40    MOV BYTE PTR SS:[EBP-4],40               ; |
+00FBDAB5  |.  E8 F6581E00   CALL 011A33B0                            ; \eu4-chi-bak17.011A33B0
+00FBDABA  |.  83F8 FF       CMP EAX,-1
+00FBDABD  |.  75 0B         JNE SHORT 00FBDACA
+00FBDABF  |.  6A 40         PUSH 40                                  ; /Arg2 = 40
+00FBDAC1  |.  6A 01         PUSH 1                                   ; |Arg1 = 1
+00FBDAC3  |.  8BCE          MOV ECX,ESI                              ; |
+00FBDAC5  |.  E8 464646FF   CALL 00422110                            ; \eu4-chi-bak17.00422110
+00FBDACA  |>  6A 01         PUSH 1                                   ; /Arg3 = 1
+00FBDACC  |.  6A 00         PUSH 0                                   ; |Arg2 = 0
+00FBDACE  |.  8D55 FC       LEA EDX,[EBP-4]                          ; |
+00FBDAD1  |.  52            PUSH EDX                                 ; |Arg1 => OFFSET LOCAL.1
+00FBDAD2  |.  8BCE          MOV ECX,ESI                              ; |
+00FBDAD4  |.  C645 FC 7B    MOV BYTE PTR SS:[EBP-4],7B               ; |
+00FBDAD8  |.  E8 D3581E00   CALL 011A33B0                            ; \eu4-chi-bak17.011A33B0
+00FBDADD  |.  83F8 FF       CMP EAX,-1
+00FBDAE0  |.  75 0B         JNE SHORT 00FBDAED
+00FBDAE2  |.  6A 7B         PUSH 7B                                  ; /Arg2 = 7B
+00FBDAE4  |.  6A 01         PUSH 1                                   ; |Arg1 = 1
+00FBDAE6  |.  8BCE          MOV ECX,ESI                              ; |
+00FBDAE8  |.  E8 234646FF   CALL 00422110                            ; \eu4-chi-bak17.00422110
+00FBDAED  |>  6A 01         PUSH 1                                   ; /Arg3 = 1
+00FBDAEF  |.  6A 00         PUSH 0                                   ; |Arg2 = 0
+00FBDAF1  |.  8D45 FC       LEA EAX,[EBP-4]                          ; |
+00FBDAF4  |.  50            PUSH EAX                                 ; |Arg1 => OFFSET LOCAL.1
+00FBDAF5  |.  8BCE          MOV ECX,ESI                              ; |
+00FBDAF7  |.  C645 FC 7D    MOV BYTE PTR SS:[EBP-4],7D               ; |
+
+
+
+初始化Editbox禁用词汇
+
+IDA找到， CEditBox__AddDefaultForbiddenChars
+
+把这些特殊的改ff吧233
+
+
+
+CBitmapFont__RemoveSpecialChars
+
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+010434CD  |.  6A 05         PUSH 5                                   ; /Arg2 = 5
+010434CF  |.  33DB          XOR EBX,EBX                              ; |
+010434D1  |.  BE 0F000000   MOV ESI,0F                               ; |
+010434D6  |.  68 44106F01   PUSH OFFSET 016F1044                     ; |Arg1 = eu4-chi-bak17.16F1044
+010434DB  |.  8D4D D8       LEA ECX,[EBP-28]                         ; |
+010434DE  |.  8975 EC       MOV DWORD PTR SS:[EBP-14],ESI            ; |
+010434E1  |.  895D E8       MOV DWORD PTR SS:[EBP-18],EBX            ; |
+010434E4  |.  885D D8       MOV BYTE PTR SS:[EBP-28],BL              ; |
+010434E7  |.  E8 F4043CFF   CALL 004039E0                            ; \eu4-chi-bak17.004039E0
+
+
+PUSH OFFSET 016F1044 里是一些特殊字符
+
+
+CEditBox__HandleTextInputEvent
+
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+00FBD7A0    68 1CB56E01     PUSH OFFSET 016EB51C
+00FBD7A5    8D4C24 18       LEA ECX,[ESP+18]
+00FBD7A9    C74424 2C 0F000 MOV DWORD PTR SS:[ESP+2C],0F
+00FBD7B1    895C24 28       MOV DWORD PTR SS:[ESP+28],EBX
+00FBD7B5    885C24 18       MOV BYTE PTR SS:[ESP+18],BL
+00FBD7B9    E8 226244FF     CALL 004039E0
+
+
+push 里是一些特殊字符
+
+
+
+
+
+
+
+
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01000DC7  |.  2BC6          SUB EAX,ESI
+01000DC9  |.  50            PUSH EAX                                 ; /Arg2
+01000DCA  |.  52            PUSH EDX                                 ; |Arg1
+01000DCB  |.  8D4D C8       LEA ECX,[EBP-38]                         ; |
+01000DCE  |.  E8 0D2C40FF   CALL 004039E0                            ; \eu4-chi-bak19.004039E0
+01000DD3  |.  8D45 C8       LEA EAX,[EBP-38]
+01000DD6  |.  8D75 AC       LEA ESI,[EBP-54]
+01000DD9  |.  C645 FC 01    MOV BYTE PTR SS:[EBP-4],1
+01000DDD      E8 9EDC9FFF   CALL 009FEA80 
+01000DE2      397D BC       CMP DWORD PTR SS:[EBP-44],EDI
+CTextBuffer__Write proc near    
+中调用
+CString__RemoveIf_SCharIsInString_ proc near
+01000DDD      E8 9EDC9FFF   CALL 009FEA80  nop
+
+
+
+
+
+
+
+
+存档， IDA里找cloudgame_tab附近
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+007FB448    33C0            XOR EAX,EAX
+007FB44A    C745 FC FFFFFFF MOV DWORD PTR SS:[EBP-4],-1
+007FB451    A3 E01CAE01     MOV DWORD PTR DS:[1AE1CE0],EAX
+007FB456    F30F7E07        MOVQ XMM0,QWORD PTR DS:[EDI]
+007FB45A    8B57 08         MOV EDX,DWORD PTR DS:[EDI+8]
+007FB45D    83EC 0C         SUB ESP,0C
+007FB460    8BC4            MOV EAX,ESP
+007FB462    660FD600        MOVQ QWORD PTR DS:[EAX],XMM0
+007FB466    8950 08         MOV DWORD PTR DS:[EAX+8],EDX
+007FB469    E8 02BBD3FF     CALL 00536F70
+007FB46E    8378 14 10      CMP DWORD PTR DS:[EAX+14],10
+007FB472    72 04           JB SHORT 007FB478
+007FB474    8B30            MOV ESI,DWORD PTR DS:[EAX]
+007FB476    EB 02           JMP SHORT 007FB47A
+007FB478    8BF0            MOV ESI,EAX
+007FB47A    8BC6            MOV EAX,ESI
+007FB47C    C745 9C 0F00000 MOV DWORD PTR SS:[EBP-64],0F
+007FB483    895D 98         MOV DWORD PTR SS:[EBP-68],EBX
+007FB486    885D 88         MOV BYTE PTR SS:[EBP-78],BL
+007FB489    8D50 01         LEA EDX,[EAX+1]
+007FB48C    8D6424 00       LEA ESP,[ESP]
+007FB490    8A08            MOV CL,BYTE PTR DS:[EAX]
+007FB492    40              INC EAX
+007FB493    3ACB            CMP CL,BL
+007FB495  ^ 75 F9           JNE SHORT 007FB490
+改
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+007FB45D    83EC 0C         SUB ESP,0C
+007FB460    8BC4            MOV EAX,ESP
+007FB462    660FD600        MOVQ QWORD PTR DS:[EAX],XMM0
+007FB466    8950 08         MOV DWORD PTR DS:[EAX+8],EDX
+007FB469    E8 02BBD3FF     CALL 00536F70
+007FB46E    89FE            MOV ESI,EDI
+007FB470    90              NOP
+007FB471    90              NOP
+007FB472    90              NOP
+007FB473    90              NOP
+007FB474    90              NOP
+007FB475    90              NOP
+007FB476    90              NOP
+007FB477    90              NOP
+007FB478    90              NOP
+007FB479    90              NOP
+007FB47A    8BC6            MOV EAX,ESI
+007FB47C    C745 9C 0F00000 MOV DWORD PTR SS:[EBP-64],0F
+007FB483    895D 98         MOV DWORD PTR SS:[EBP-68],EBX
+007FB486    885D 88         MOV BYTE PTR SS:[EBP-78],BL
+
+
+ctrl V
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+0109B280  /$  55            PUSH EBP
+0109B281  |.  8BEC          MOV EBP,ESP
+0109B283  |.  51            PUSH ECX
+0109B284  |.  57            PUSH EDI
+0109B285  |.  C745 FC 00000 MOV DWORD PTR SS:[EBP-4],0
+0109B28C  |.  E8 DFC91100   CALL SDL_GetClipboardText
+0109B291  |.  8BC8          MOV ECX,EAX
+0109B293  |.  C746 14 0F000 MOV DWORD PTR DS:[ESI+14],0F
+0109B29A  |.  C746 10 00000 MOV DWORD PTR DS:[ESI+10],0
+0109B2A1  |.  C606 00       MOV BYTE PTR DS:[ESI],0
+0109B2A4  |.  8D79 01       LEA EDI,[ECX+1]
+0109B2A7  |>  8A11          /MOV DL,BYTE PTR DS:[ECX]
+0109B2A9  |.  41            |INC ECX
+0109B2AA  |.  84D2          |TEST DL,DL
+0109B2AC  |.^ 75 F9         \JNZ SHORT 0109B2A7
+0109B2AE  |.  2BCF          SUB ECX,EDI
+0109B2B0  |.  51            PUSH ECX                                 ; /Arg2
+0109B2B1  |.  50            PUSH EAX                                 ; |Arg1
+0109B2B2  |.  8BCE          MOV ECX,ESI                              ; |
+0109B2B4  |.  E8 278736FF   CALL 004039E0                            ; \eu4-chi-bak22.004039E0
+0109B2B9  |.  8BC6          MOV EAX,ESI
+0109B2BB  |.  5F            POP EDI
+0109B2BC  |.  8BE5          MOV ESP,EBP
+0109B2BE  |.  5D            POP EBP
+0109B2BF  \.  C3            RETN
+0109B2C0  /.  55            PUSH EBP
+0109B2C1  |.  8BEC          MOV EBP,ESP
+0109B2C3  |.  8B01          MOV EAX,DWORD PTR DS:[ECX]
+0109B2C5  |.  8B90 64010000 MOV EDX,DWORD PTR DS:[EAX+164]
+0109B2CB  |.  56            PUSH ESI
+0109B2CC  |.  8B75 08       MOV ESI,DWORD PTR SS:[EBP+8]
+0109B2CF  |.  56            PUSH ESI
+0109B2D0  |.  FFD2          CALL EDX
+0109B2D2  |.  8BC6          MOV EAX,ESI
+0109B2D4  |.  5E            POP ESI
+0109B2D5  |.  5D            POP EBP
+0109B2D6  \.  C2 0400       RETN 4
+
+
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+0109B280  /$  55            PUSH EBP
+0109B281  |.  8BEC          MOV EBP,ESP
+0109B283  |.  51            PUSH ECX
+0109B284  |.  57            PUSH EDI
+0109B285  |.  C745 FC 00000 MOV DWORD PTR SS:[EBP-4],0
+0109B28C  |.  E8 DFC91100   CALL SDL_GetClipboardText
+0109B291      E9 EAD7E200   JMP 01EC8A80
+0109B296      90            NOP
+0109B297      90            NOP
+0109B298      90            NOP
+0109B299      90            NOP
+0109B29A  |.  C746 10 00000 MOV DWORD PTR DS:[ESI+10],0
+0109B2A1  |.  C606 00       MOV BYTE PTR DS:[ESI],0
+0109B2A4  |.  8D79 01       LEA EDI,[ECX+1]
+0109B2A7  |>  8A11          /MOV DL,BYTE PTR DS:[ECX]
+0109B2A9  |.  41            |INC ECX
+
+跳
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01EC8A80    50              PUSH EAX
+01EC8A81    51              PUSH ECX
+01EC8A82    52              PUSH EDX
+01EC8A83    50              PUSH EAX
+01EC8A84    E8 70FFFFFF     CALL 01EC89F9
+01EC8A89    5A              POP EDX
+01EC8A8A    59              POP ECX
+01EC8A8B    58              POP EAX
+01EC8A8C    89C1            MOV ECX,EAX
+01EC8A8E    C746 14 0F00000 MOV DWORD PTR DS:[ESI+14],0F
+01EC8A95  ^ E9 00281DFF     JMP 0109B29A
+
+01EC89F9：
+CPU Disasm
+Address   Hex dump          Command                                  Comments
+01EC89F9    55              PUSH EBP
+01EC89FA    8BEC            MOV EBP,ESP
+01EC89FC    81EC 90010000   SUB ESP,190
+01EC8A02    56              PUSH ESI
+01EC8A03    57              PUSH EDI
+01EC8A04    8B7D 08         MOV EDI,DWORD PTR SS:[EBP+8]
+01EC8A07    8BF7            MOV ESI,EDI
+01EC8A09    803F 00         CMP BYTE PTR DS:[EDI],0
+01EC8A0C    74 06           JE SHORT 01EC8A14
+01EC8A0E    46              INC ESI
+01EC8A0F    803E 00         CMP BYTE PTR DS:[ESI],0
+01EC8A12  ^ 75 FA           JNE SHORT 01EC8A0E
+01EC8A14    68 C8000000     PUSH 0C8
+01EC8A19    8D85 70FEFFFF   LEA EAX,[EBP-190]
+01EC8A1F    50              PUSH EAX
+01EC8A20    6A FF           PUSH -1
+01EC8A22    57              PUSH EDI
+01EC8A23    6A 00           PUSH 0
+01EC8A25    68 E9FD0000     PUSH 0FDE9
+01EC8A2A    FF15 F8415301   CALL DWORD PTR DS:[<&KERNEL32.MultiByteT
+01EC8A30    85C0            TEST EAX,EAX
+01EC8A32    7E 1E           JLE SHORT 01EC8A52
+01EC8A34    6A 00           PUSH 0
+01EC8A36    6A 00           PUSH 0
+01EC8A38    2BF7            SUB ESI,EDI
+01EC8A3A    8D85 70FEFFFF   LEA EAX,[EBP-190]
+01EC8A40    56              PUSH ESI
+01EC8A41    57              PUSH EDI
+01EC8A42    6A FF           PUSH -1
+01EC8A44    50              PUSH EAX
+01EC8A45    6A 00           PUSH 0
+01EC8A47    68 A8030000     PUSH 3A8
+01EC8A4C    FF15 DC425301   CALL DWORD PTR DS:[<&KERNEL32.WideCharTo
+01EC8A52    5F              POP EDI
+01EC8A53    5E              POP ESI
+01EC8A54    8BE5            MOV ESP,EBP
+01EC8A56    5D              POP EBP
+01EC8A57    C2 0400         RETN 4
+
+注意改两个API函数地址
