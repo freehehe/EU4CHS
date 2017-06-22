@@ -10,7 +10,10 @@
 #include <Shlwapi.h>
 #pragma comment(lib, "Shlwapi.lib")
 
-void work(const char *folder)
+#include <utility>
+#include <vector>
+
+void emurate_chars(const char *folder)
 {
 	std::set<wchar_t> collection;
 	std::vector<char> buffer;
@@ -54,7 +57,7 @@ void work(const char *folder)
 
 		for (auto chr : wbuffer)
 		{
-			if (chr > 255)
+			//if (chr > 255)
 			{
 				collection.insert(chr);
 			}
@@ -71,7 +74,7 @@ void work(const char *folder)
 
 int main(int argc, char **argv)
 {
-	work("C:\\SS");
+	emurate_chars("D:\\ymls");
 
 	return 0;
 }

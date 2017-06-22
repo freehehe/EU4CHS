@@ -14,8 +14,12 @@ class plugin
 
 	void patch() const;
 
-	std::wstring dds_path;
+	std::string dds_path;
+	std::string dat_path;
+
+	void init(HMODULE hself);
 
 public:	
-	void init(HMODULE hself);
+	const char *texture_path() const;
+	const char *data_path() const;
 };

@@ -14,7 +14,7 @@ class char_positions
 		unsigned char column;
 	};
 
-	std::unique_ptr<std::array<position, 65536>> data;
+	std::unique_ptr<std::array<position, 0xFFFF>> data;
 
 	char_positions();
 	~char_positions() = default;

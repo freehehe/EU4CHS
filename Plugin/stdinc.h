@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <cstddef>
 
 #define VALIDATE_SIZE(type,size) static_assert(sizeof(type)==size);
 

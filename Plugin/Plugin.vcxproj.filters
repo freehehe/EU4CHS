@@ -24,10 +24,16 @@
     <ClCompile Include="plugin.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="function.cpp">
+    <ClCompile Include="bitmapfont.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="bitmapfont.cpp">
+    <ClCompile Include="functions.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="eu4.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="positions.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -53,7 +59,7 @@
     <ClInclude Include="positions.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="function.h">
+    <ClInclude Include="functions.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
