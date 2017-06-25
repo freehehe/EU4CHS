@@ -39,7 +39,7 @@ struct CVector4
 	T w;
 };
 
-struct CString
+class CString
 {
 	union
 	{
@@ -51,11 +51,7 @@ struct CString
 	unsigned int length;
 	unsigned int capacity;
 
-	char *data()
-	{
-		return capacity > 15 ? heap : sso_head;
-	}
-
+public:
 	const char *data() const
 	{
 		return capacity > 15 ? heap : sso_head;
@@ -63,5 +59,22 @@ struct CString
 };
 VALIDATE_SIZE(CString, 0x18)
 
-void *eu4_malloc(std::size_t size);
-void eu4_free(void *p, int a2, int a3);
+struct game_data
+{
+	std::uintptr_t pfCTextureHandler_LoadTexture;
+	std::uintptr_t pfCTextureHandler_GetTexture;
+	std::uintptr_t pfCTextureHandler_UnloadTexture;
+	std::uintptr_t pfCBitMapFont_GetKerning;
+	std::uintptr_t pfConvertUTF8ToLatin1;
+	std::uintptr_t pfCBitMapFont_GetWidthOfString;
+	std::uintptr_t pfCBitMapFont_GetHeightOfString;
+	std::uintptr_t pfCBitMapFont_RenderToScreen;
+	std::uintptr_t pfCBitMapFont_RenderToTexture;
+
+	char *poriginal_text;
+	char *pword;
+
+	game_data();
+};
+
+extern game_data eu4_game;

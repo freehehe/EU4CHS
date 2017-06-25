@@ -62,8 +62,12 @@
     <ClInclude Include="functions.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="pointer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Note.txt" />
+    <Text Include="Temp.txt" />
   </ItemGroup>
 </Project>

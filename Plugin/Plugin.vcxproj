@@ -127,7 +127,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PostBuildEvent>
-      <Command>copy /y "$(TargetPath)" "D:\Europa Universalis IV 1.21.1\scripts"</Command>
+      <Command>copy /y "$(TargetPath)" "D:\Europa Universalis IV 1.21.1\scripts\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -160,6 +160,7 @@
     <ClInclude Include="byte_pattern.h" />
     <ClInclude Include="eu4.h" />
     <ClInclude Include="functions.h" />
+    <ClInclude Include="pointer.h" />
     <ClInclude Include="stdinc.h" />
     <ClInclude Include="plugin.h" />
     <ClInclude Include="singleton.hpp" />
@@ -167,6 +168,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="Note.txt" />
+    <Text Include="Temp.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

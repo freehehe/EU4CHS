@@ -17,9 +17,8 @@ class plugin
 	std::string dds_path;
 	std::string dat_path;
 
+public:
 	void init(HMODULE hself);
-
-public:	
 	const char *texture_path() const;
 	const char *data_path() const;
 };

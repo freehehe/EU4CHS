@@ -13,7 +13,7 @@
 #include <utility>
 #include <vector>
 
-void emurate_chars(const char *folder)
+void enumerate_chars(const char *folder)
 {
 	std::set<wchar_t> collection;
 	std::vector<char> buffer;
@@ -25,7 +25,7 @@ void emurate_chars(const char *folder)
 	WIN32_FIND_DATAA fda;
 
 	std::strcpy(fullpath, folder);
-	PathAppendA(fullpath, "*.yml");
+	PathAppendA(fullpath, "*.*");
 
 	HANDLE hfind = FindFirstFileA(fullpath, &fda);
 
@@ -53,6 +53,11 @@ void emurate_chars(const char *folder)
 
 		wbuffer.clear();
 
+		if (!utf8::starts_with_bom(buffer.begin(), buffer.end()))
+		{
+			continue;
+		}
+
 		utf8::utf8to16(buffer.begin(), buffer.end(), std::back_inserter(wbuffer));
 
 		for (auto chr : wbuffer)
@@ -74,7 +79,7 @@ void emurate_chars(const char *folder)
 
 int main(int argc, char **argv)
 {
-	emurate_chars("D:\\ymls");
+	enumerate_chars(R"(D:\ymls)");
 
 	return 0;
 }

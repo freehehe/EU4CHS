@@ -1,18 +1,66 @@
-﻿55 8B EC 8B D1 83 EC 0C 8B 42 1C
-const char * __thiscall SLanguageData::LocalizeString(SLanguageData *this, const char *)
-
-55 8B EC 83 E4 F8 81 EC 94 00 00 00 8B 45 0C
-int __thiscall CBitMapFont::GetWidthOfString(CBitMapFont *this, const char *text, const int length, bool bUseSpecialChars)
-
-Native Characters
-0x0000 - 0x00FF
-0x0161 'š'
+﻿Native Characters
+0x0000 - 0x007F
+0x00a0 ' '
+0x00a1 '¡'
+0x00a3 '£'
+0x00a4 '¤'
+0x00a7 '§'
+0x00c1 'Á'
+0x00c5 'Å'
+0x00c9 'É'
+0x00cd 'Í'
+0x00d6 'Ö'
+0x00d8 'Ø'
+0x00dc 'Ü'
+0x00df 'ß'
+0x00e1 'á'
+0x00e2 'â'
+0x00e3 'ã'
+0x00e4 'ä'
+0x00e5 'å'
+0x00e6 'æ'
+0x00e7 'ç'
+0x00e8 'è'
+0x00e9 'é'
+0x00ea 'ê'
+0x00eb 'ë'
+0x00ed 'í'
+0x00ee 'î'
+0x00ef 'ï'
+0x00f1 'ñ'
+0x00f2 'ò'
+0x00f3 'ó'
+0x00f4 'ô'
+0x00f6 'ö'
+0x00f8 'ø'
+0x00fa 'ú'
+0x00fc 'ü'
 0x2013 '–'
 0x2014 '—'
 0x2018 '‘'
-0x201c '“'
-0x201d '”'
 0x2026 '…'
+
+Special Characters
+0x40 
+0x7B
+0xA3
+0xA4
+0xA7
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 --------------------------------------大佬的遗物--------------------------------------

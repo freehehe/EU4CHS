@@ -95,7 +95,7 @@ private:
 	match_method _method;
 };
 
-class auto_pointer
+class pattern_match
 {
 	union
 	{
@@ -104,12 +104,12 @@ class auto_pointer
 	};
 
 public:
-	auto_pointer(void* pointer)
+	pattern_match(void* pointer)
 		: _pointer(pointer)
 	{
 	}
 
-	auto_pointer(std::uintptr_t address)
+	pattern_match(std::uintptr_t address)
 		: _address(address)
 	{
 	}
@@ -130,7 +130,7 @@ class byte_pattern
 {
 	std::pair<std::uintptr_t, std::uintptr_t> _range;
 	std::vector<pattern_byte> _pattern;
-	std::vector<auto_pointer> _result;
+	std::vector<pattern_match> _result;
 
 	bool _processed = false;
 
@@ -138,11 +138,11 @@ class byte_pattern
 	std::vector<std::ptrdiff_t> _bmgs;
 
 	void transform_pattern(const char *pattern_literal);
-	void executable_range(auto_pointer module);
+	void executable_range(pattern_match module);
 
 	void initialize(const char *pattern_literal);
-	void initialize(auto_pointer module, const char *pattern_literal);
-	void initialize(auto_pointer range_begin, auto_pointer range_end, const char *pattern_literal);
+	void initialize(pattern_match module, const char *pattern_literal);
+	void initialize(pattern_match range_begin, pattern_match range_end, const char *pattern_literal);
 	void do_search();
 
 	void bm_preprocess();
@@ -150,15 +150,15 @@ class byte_pattern
 
 public:
 	explicit byte_pattern(const char *pattern_literal);
-	explicit byte_pattern(auto_pointer module = default_module, const char *pattern_literal = nullptr);
-	byte_pattern(auto_pointer range_begin, auto_pointer range_end, const char *pattern_literal = nullptr);
+	explicit byte_pattern(pattern_match module = default_module, const char *pattern_literal = nullptr);
+	byte_pattern(pattern_match range_begin, pattern_match range_end, const char *pattern_literal = nullptr);
 
-	const auto_pointer &get(std::size_t index) const;
+	const pattern_match &get(std::size_t index) const;
 
 	byte_pattern &set_pattern(const char *pattern_literal);
 	byte_pattern &set_pattern(const void *data, std::size_t size);
-	byte_pattern &set_module(auto_pointer module = default_module);
-	byte_pattern &set_range(auto_pointer beg, auto_pointer end);
+	byte_pattern &set_module(pattern_match module = default_module);
+	byte_pattern &set_range(pattern_match beg, pattern_match end);
 	byte_pattern &force_search();
 
 	std::size_t size() const;

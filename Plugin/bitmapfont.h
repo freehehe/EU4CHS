@@ -2,21 +2,22 @@
 #include "stdinc.h"
 #include "eu4.h"
 
+struct CBitMapFontCharacterValues
+{
+	int16 x;
+	int16 y;
+	int16 w;
+	int16 h;
+	int16 xoff;
+	int16 yoff;
+	int16 xadvance;
+	bool kerning;
+};
+VALIDATE_SIZE(CBitMapFontCharacterValues,0x10)
+
 struct CBitMapFontCharacterSet
 {
-	struct CBitMapFontCharacterValue
-	{
-		int16 x;
-		int16 y;
-		int16 w;
-		int16 h;
-		int16 xoff;
-		int16 yoff;
-		int16 xadvance;
-		int8 page;
-	} *field_0[256];
-
-	float field_434;
+	CBitMapFontCharacterValues *field_0[256];
 };
 
 struct CBitMapFont
@@ -24,7 +25,6 @@ struct CBitMapFont
 	bool field_8; //use special chars
 	CString field_9C;
 	CBitMapFontCharacterSet field_B4;
-	float field_428;
 	char field_24F8[800];
 };
 

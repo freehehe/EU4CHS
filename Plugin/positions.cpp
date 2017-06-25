@@ -16,7 +16,7 @@ void char_positions::read_table(const char *filename)
 
 	if (ifs)
 	{
-		std::copy_n(std::istream_iterator<position>(ifs), this->data->size(), this->data->begin());
+		ifs.read(reinterpret_cast<char *>(this->data->data()), 131072);
 	}
 }
 

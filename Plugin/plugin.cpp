@@ -1,4 +1,4 @@
-#include "stdinc.h"
+﻿#include "stdinc.h"
 #include "plugin.h"
 #include "functions.h"
 #include "bitmapfont.h"
@@ -6,6 +6,7 @@
 #include "../include/injector/hooking.hpp"
 #include "../include/injector/assembly.hpp"
 #include "../include/injector/calling.hpp"
+#include "../include/utf8cpp/utf8.h"
 #include <cstring>
 #include "eu4.h"
 
@@ -39,33 +40,5 @@ const char *plugin::texture_path() const
 
 void plugin::patch() const
 {
-	void *patch_pointer;
-	std::uintptr_t patch_address;
-
-	g_pattern.set_pattern("55 8B EC 6A FF 64 A1 00 00 00 00 68 ? ? ? ? 50 64 89 25 00 00 00 00 81 EC B0 00 00 00 53 56 8B F1 8B DA 57 80 3E 00").force_search();
-
-	if (!g_pattern.empty())
-	{
-		patch_pointer = g_pattern.get(0).pointer();
-		injector::MakeJMP(patch_pointer, ConvertUTF8ToLatin1);
-	}
-
-
 
 }
-
-struct LoadTextureHook
-{
-	void operator()(injector::reg_pack &regs) const
-	{
-
-	}
-};
-
-struct UnloadTextureHook
-{
-	void operator()(injector::reg_pack &regs) const
-	{
-
-	}
-};

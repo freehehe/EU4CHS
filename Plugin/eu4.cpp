@@ -1,17 +1,23 @@
 #include "eu4.h"
 #include "byte_pattern.h"
-#include "../include/injector/calling.hpp"
+#include "../include/injector/injector.hpp"
 
-void *eu4_malloc(std::size_t size)
+game_data::game_data()
 {
-	static void *pfunction = g_pattern.set_pattern("55 8B EC EB 1F").force_search().get(0).pointer();
+	g_pattern.set_module();
 
-	return injector::cstd<void *(std::size_t)>::call(pfunction, size);
+	this->pfCTextureHandler_LoadTexture;
+	this->pfCTextureHandler_GetTexture;
+	this->pfCTextureHandler_UnloadTexture;
+	this->pfCBitMapFont_GetKerning = g_pattern.set_pattern("55 8B EC 56 8B F1 0F B6 4D 08").force_search().get(0).address();
+	this->pfConvertUTF8ToLatin1 = g_pattern.set_pattern("55 8B EC 6A FF 64 A1 00 00 00 00 68 ? ? ? ? 50 64 89 25 00 00 00 00 81 EC B0 00 00 00 53 56 8B F1 8B DA 57 80 3E 00").force_search().get(0).address();
+	this->pfCBitMapFont_GetWidthOfString = g_pattern.set_pattern("55 8B EC 83 E4 F8 81 EC 8C 00 00 00").force_search().get(0).address();
+	this->pfCBitMapFont_GetHeightOfString;
+	this->pfCBitMapFont_RenderToScreen = g_pattern.set_pattern("55 8B EC 6A FF 68 ? ? ? ? 64 A1 00 00 00 00 50 64 89 25 00 00 00 00 81 EC 1C 06 00 00").force_search().get(0).address();
+	this->pfCBitMapFont_RenderToTexture = g_pattern.set_pattern("55 8B EC 6A FF 68 ? ? ? ? 64 A1 00 00 00 00 50 64 89 25 00 00 00 00 81 EC 54 05 00 00").force_search().get(0).address();
+
+	poriginal_text = *(char **)(this->pfCBitMapFont_RenderToScreen + 0xD1);
+	pword= *(char **)(this->pfCBitMapFont_RenderToScreen + 0x10C);
 }
 
-void eu4_free(void *p, int a2, int a3)
-{
-	static void *pfunction = g_pattern.set_pattern("55 8B EC 83 C8 FF 8B 4D 0C 33 D2 F7 75 10 3B C8 0F 87 A6 C9 F7 00").force_search().get(0).pointer();
-
-	injector::cstd<void(void *, int, int)>::call(pfunction, p, a2, a3);
-}
+game_data eu4_game;
