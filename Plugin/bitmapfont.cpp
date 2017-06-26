@@ -8,7 +8,7 @@
 #include <xmmintrin.h>
 #include "byte_pattern.h"
 
-int __fastcall CBitMapFont_GetWidthOfString(CBitMapFont *pFont, int edx, const char *text, const int length, bool bUseSpecialChars)
+int __fastcall CBitMapFont_GetWidthOfString(CBitmapFont *pFont, int edx, const char *text, const int length, bool bUseSpecialChars)
 {
 	using namespace injector;
 
@@ -51,7 +51,7 @@ int __fastcall CBitMapFont_GetWidthOfString(CBitMapFont *pFont, int edx, const c
 				if (cp == 0x40)
 				{
 					it += 3;
-					special_width = thiscall<int(CBitMapFont *)>::vtbl<30>(pFont);
+					special_width = thiscall<int(CBitmapFont *)>::vtbl<30>(pFont);
 				}
 				else if (cp == 0xA3)
 				{
@@ -72,7 +72,7 @@ int __fastcall CBitMapFont_GetWidthOfString(CBitMapFont *pFont, int edx, const c
 
 					tag[index] = 0;
 
-					special_width = thiscall<int(CBitMapFont *, const char *)>::vtbl<28>(pFont, tag);
+					special_width = thiscall<int(CBitmapFont *, const char *)>::vtbl<28>(pFont, tag);
 				}
 				else if (cp == 0xA4)
 				{
@@ -109,7 +109,7 @@ int __fastcall CBitMapFont_GetWidthOfString(CBitMapFont *pFont, int edx, const c
 								push nextcp;
 								push cp;
 								mov ecx, pset;
-								call eu4_game.pfCBitMapFont_GetKerning;
+								call EU4Game.pfCBitMapFont_GetKerning;
 								movss fkerning, xmm0;
 							}
 

@@ -1,24 +1,12 @@
 #pragma once
 #include <windows.h>
-#include "singleton.hpp"
-#include <string>
 
-class plugin
+class Plugin
 {
-	friend class singleton<plugin>;
-
-	plugin() = default;
-	~plugin() = default;
-	plugin &operator==(const plugin &) = delete;
-	plugin(const plugin &) = delete;
-
-	void patch() const;
-
-	std::string dds_path;
-	std::string dat_path;
+	static void Patch();
 
 public:
-	void init(HMODULE hself);
-	const char *texture_path() const;
-	const char *data_path() const;
+	static void Init(HMODULE hself);
+	static const char *GetTexturePath();
+	static const char *GetTablePath();
 };

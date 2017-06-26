@@ -2,4 +2,10 @@
 #include "stdinc.h"
 #include "../include/injector/assembly.hpp"
 
-void __fastcall ConvertUTF8ToLatin1(const char *, char *);
+class CGlobalFunctions
+{
+public:
+	static void __fastcall ConvertUTF8ToLatin1(const char *, char *);
+	static void Patch();
+};
+

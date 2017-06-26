@@ -59,11 +59,13 @@ public:
 };
 VALIDATE_SIZE(CString, 0x18)
 
-struct game_data
+class EU4Game
 {
+public:
 	std::uintptr_t pfCTextureHandler_LoadTexture;
 	std::uintptr_t pfCTextureHandler_GetTexture;
 	std::uintptr_t pfCTextureHandler_UnloadTexture;
+
 	std::uintptr_t pfCBitMapFont_GetKerning;
 	std::uintptr_t pfConvertUTF8ToLatin1;
 	std::uintptr_t pfCBitMapFont_GetWidthOfString;
@@ -74,7 +76,9 @@ struct game_data
 	char *poriginal_text;
 	char *pword;
 
-	game_data();
+	std::uintptr_t *pfGFXSetTextureCallback;
+
+	EU4Game();
 };
 
-extern game_data eu4_game;
+extern EU4Game game;

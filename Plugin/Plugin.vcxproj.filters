@@ -33,7 +33,7 @@
     <ClCompile Include="eu4.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="positions.cpp">
+    <ClCompile Include="table.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -42,9 +42,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="plugin.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="singleton.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="bitmapfont.h">
@@ -56,13 +53,13 @@
     <ClInclude Include="eu4.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="positions.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="functions.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="pointer.h">
+    <ClInclude Include="texture.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="table.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

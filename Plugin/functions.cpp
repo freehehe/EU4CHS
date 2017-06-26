@@ -1,8 +1,7 @@
 #include "functions.h"
-#include <cstring>
+#include "eu4.h"
 #include "../include/utf8cpp/utf8.h"
 #include <vector>
-#include <iterator>
 #include <string_view>
 
 static const uint8 convert_table[256] = {
@@ -24,7 +23,7 @@ static const uint8 convert_table[256] = {
 	0xf0, 0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7, 0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff
 };
 
-void __fastcall ConvertUTF8ToLatin1(const char *source, char *dest)
+void __fastcall CGlobalFunctions::ConvertUTF8ToLatin1(const char *source, char *dest)
 {
 	static std::vector<uint32> u32sequence;
 
@@ -67,4 +66,9 @@ void __fastcall ConvertUTF8ToLatin1(const char *source, char *dest)
 
 	u32sequence.push_back(0);
 	utf8::utf32to8(u32sequence.begin(), u32sequence.end(), dest);
+}
+
+void CGlobalFunctions::Patch()
+{
+	injector::MakeJMP(game.pfConvertUTF8ToLatin1, ConvertUTF8ToLatin1);
 }

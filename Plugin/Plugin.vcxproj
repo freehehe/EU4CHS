@@ -153,18 +153,17 @@
     <ClCompile Include="eu4.cpp" />
     <ClCompile Include="functions.cpp" />
     <ClCompile Include="plugin.cpp" />
-    <ClCompile Include="positions.cpp" />
+    <ClCompile Include="table.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bitmapfont.h" />
     <ClInclude Include="byte_pattern.h" />
     <ClInclude Include="eu4.h" />
     <ClInclude Include="functions.h" />
-    <ClInclude Include="pointer.h" />
     <ClInclude Include="stdinc.h" />
     <ClInclude Include="plugin.h" />
-    <ClInclude Include="singleton.hpp" />
-    <ClInclude Include="positions.h" />
+    <ClInclude Include="table.h" />
+    <ClInclude Include="texture.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Note.txt" />

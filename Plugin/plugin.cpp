@@ -1,16 +1,11 @@
-﻿#include "stdinc.h"
-#include "plugin.h"
-#include "functions.h"
-#include "bitmapfont.h"
-#include "byte_pattern.h"
-#include "../include/injector/hooking.hpp"
-#include "../include/injector/assembly.hpp"
-#include "../include/injector/calling.hpp"
-#include "../include/utf8cpp/utf8.h"
+﻿#include "plugin.h"
+#include <string>
 #include <cstring>
-#include "eu4.h"
 
-void plugin::init(HMODULE hself)
+static std::string texture_path;
+static std::string table_path;
+
+void Plugin::Init(HMODULE hself)
 {
 	char module_path[512];
 	char filename[512];
@@ -19,26 +14,28 @@ void plugin::init(HMODULE hself)
 
 	std::strcpy(filename, module_path);
 	std::strcpy(std::strrchr(filename, '\\'), "\\eu4chs\\font.dds");
-	this->dds_path = filename;
+	texture_path = filename;
 
 	std::strcpy(filename, module_path);
 	std::strcpy(std::strrchr(filename, '\\'), "\\eu4chs\\font.dat");
-	this->dat_path = filename;
+	table_path = filename;
 
-	this->patch();
+	Patch();
 }
 
-const char *plugin::data_path() const
+const char *Plugin::GetTexturePath()
 {
-	return this->dat_path.c_str();
+	return texture_path.c_str();
 }
 
-const char *plugin::texture_path() const
+const char *Plugin::GetTablePath()
 {
-	return this->dds_path.c_str();
+	return table_path.c_str();
 }
 
-void plugin::patch() const
+void Plugin::Patch()
 {
+
+
 
 }

@@ -2,7 +2,7 @@
 #include "byte_pattern.h"
 #include "../include/injector/injector.hpp"
 
-game_data::game_data()
+EU4Game::EU4Game()
 {
 	g_pattern.set_module();
 
@@ -20,4 +20,4 @@ game_data::game_data()
 	pword= *(char **)(this->pfCBitMapFont_RenderToScreen + 0x10C);
 }
 
-game_data eu4_game;
+EU4Game game;

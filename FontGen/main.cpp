@@ -62,7 +62,7 @@ void enumerate_chars(const char *folder)
 
 		for (auto chr : wbuffer)
 		{
-			//if (chr > 255)
+			if (chr > 255 && chr != 0x2013 && chr != 0x2014 && chr != 0x2018 && chr != 0x2026)
 			{
 				collection.insert(chr);
 			}
@@ -79,7 +79,7 @@ void enumerate_chars(const char *folder)
 
 int main(int argc, char **argv)
 {
-	enumerate_chars(R"(D:\ymls)");
+	enumerate_chars(R"(C:\eu4chs_release\ymls)");
 
 	return 0;
 }
