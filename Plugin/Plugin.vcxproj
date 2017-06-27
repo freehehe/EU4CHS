@@ -147,8 +147,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\include\pattern\byte_pattern.cpp" />
     <ClCompile Include="bitmapfont.cpp" />
-    <ClCompile Include="byte_pattern.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="eu4.cpp" />
     <ClCompile Include="functions.cpp" />
@@ -156,8 +156,8 @@
     <ClCompile Include="table.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\pattern\byte_pattern.h" />
     <ClInclude Include="bitmapfont.h" />
-    <ClInclude Include="byte_pattern.h" />
     <ClInclude Include="eu4.h" />
     <ClInclude Include="functions.h" />
     <ClInclude Include="stdinc.h" />

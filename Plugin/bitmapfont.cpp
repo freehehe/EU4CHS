@@ -6,7 +6,7 @@
 #include "../include/injector/calling.hpp"
 #include "../include/injector/assembly.hpp"
 #include <xmmintrin.h>
-#include "byte_pattern.h"
+#include "../include/pattern/byte_pattern.h"
 
 int __fastcall CBitMapFont_GetWidthOfString(CBitmapFont *pFont, int edx, const char *text, const int length, bool bUseSpecialChars)
 {
