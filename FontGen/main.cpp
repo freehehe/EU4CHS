@@ -113,10 +113,7 @@ void generate_data()
 
 	for (auto &char_array : char_matrix)
 	{
-		for (auto chr : char_array)
-		{
-			fwrite(&chr, 2, 1, hf);
-		}
+		fwrite(char_array.data(), 2, char_array.size(), hf);
 
 		fwrite(L"\n", 2, 1, hf);
 	}
