@@ -17,7 +17,7 @@ static set<uint16_t> collection;
 static vector<char> buffer;
 static vector<uint16_t> wbuffer;
 static vector<vector<uint16_t>> char_matrix(1);
-static vector<pair<uint8_t, uint8_t>> table;
+static vector<pair<uint8_t, uint8_t>> table(0x10000, pair<uint8_t, uint8_t>(63, 63));
 
 void enumerate_chars(const char *folder)
 {
@@ -89,10 +89,6 @@ void enumerate_chars(const char *folder)
 
 void generate_data()
 {
-	pair<uint8_t, uint8_t> default_pos(63, 63);
-
-	table.resize(0x10000, default_pos);
-
 	for (auto chr : collection)
 	{
 		if (char_matrix.back().size() == 64)
