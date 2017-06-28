@@ -8,7 +8,44 @@
 #include <xmmintrin.h>
 #include "../include/pattern/byte_pattern.h"
 
-int __fastcall CBitMapFont_GetWidthOfString(CBitmapFont *pFont, int edx, const char *text, const int length, bool bUseSpecialChars)
+static std::ptrdiff_t seq_len;
+static uint32 cp;
+static CBitMapFontCharacterValues chs_values;
+
+struct CBitmapFont_RenderToScreen_690_12
+{
+	void operator()(injector::reg_pack &regs) const
+	{
+		cp = utf8::unchecked::peek_next(&game.poriginal_text[regs.edi]);
+		regs.eax = cp;
+
+		seq_len = utf8::internal::sequence_length(&game.poriginal_text[regs.edi]);
+		std::memcpy(&game.pword[regs.esi], &game.poriginal_text[regs.edi], seq_len);
+		regs.esi += seq_len;
+
+		if (!CBitmapFont::IsNativeCharacter(cp))
+		{
+			regs.ecx = 0;
+		}
+	}
+};
+
+
+struct CBitmapFont_RenderToScreen__
+{
+	void operator()(injector::reg_pack &regs) const
+	{
+
+	}
+};
+
+
+void CBitmapFont::Patch()
+{
+	injector::MakeJMP(game.pfCBitMapFont_GetWidthOfString, CBitmapFont::GetWidthOfString);
+}
+
+int __fastcall CBitmapFont::GetWidthOfString(CBitmapFont *pFont, int edx, const char *text, const int length, bool bUseSpecialChars)
 {
 	using namespace injector;
 
@@ -31,7 +68,7 @@ int __fastcall CBitMapFont_GetWidthOfString(CBitmapFont *pFont, int edx, const c
 	{
 		uint32 cp = utf8::next(it, endit);
 
-		if (!CBitMapFont_IsNativeCharacter(cp))
+		if (!IsNativeCharacter(cp))
 		{
 			//中文字符
 			vTempWidth += chs_width * (*((memory_pointer_raw(pset) + 0x428).get<float>()));
@@ -98,7 +135,7 @@ int __fastcall CBitMapFont_GetWidthOfString(CBitmapFont *pFont, int edx, const c
 					{
 						uint32 nextcp = utf8::peek_next(it, endit);
 
-						if (CBitMapFont_IsNativeCharacter(nextcp))
+						if (IsNativeCharacter(nextcp))
 						{
 							static void *pfgetkerning = g_pattern.set_pattern("").force_search().get(0).pointer();
 
@@ -109,7 +146,7 @@ int __fastcall CBitMapFont_GetWidthOfString(CBitmapFont *pFont, int edx, const c
 								push nextcp;
 								push cp;
 								mov ecx, pset;
-								call EU4Game.pfCBitMapFont_GetKerning;
+								call game.pfCBitMapFont_GetKerning;
 								movss fkerning, xmm0;
 							}
 
@@ -138,7 +175,7 @@ int __fastcall CBitMapFont_GetWidthOfString(CBitmapFont *pFont, int edx, const c
 	return max(vTempWidth, nWidth);
 }
 
-bool CBitMapFont_IsNativeCharacter(uint32 cp)
+bool CBitmapFont::IsNativeCharacter(uint32 cp)
 {
 	return cp <= 0xFF;
 }

@@ -75,8 +75,9 @@ public:
 
 	char *poriginal_text;
 	char *pword;
+	char *pprocessed_text;
 
-	std::uintptr_t *pfGFXSetTextureCallback;
+	std::uintptr_t pfGFXSetTextureCallback;
 
 	EU4Game();
 };
