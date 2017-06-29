@@ -28,7 +28,7 @@ void enumerate_chars(const char *folder)
 	WIN32_FIND_DATAA fda;
 
 	strcpy(fullpath, folder);
-	PathAppendA(fullpath, "*.yml");
+	PathAppendA(fullpath, "*.???");
 
 	HANDLE hfind = FindFirstFileA(fullpath, &fda);
 
@@ -39,7 +39,7 @@ void enumerate_chars(const char *folder)
 	{
 		auto ext = find(begin(fda.cFileName), end(fda.cFileName), 0) - 4;
 
-		if (_stricmp(ext, ".yml") != 0)
+		if (_stricmp(ext, ".yml") != 0 && _stricmp(ext, ".txt") != 0)
 		{
 			continue;
 		}
@@ -115,7 +115,7 @@ void generate_data()
 	{
 		fwrite(char_array.data(), 2, char_array.size(), hf);
 
-		fwrite(L"\n", 2, 1, hf);
+		fwrite("\n\x00", 2, 1, hf);
 	}
 
 	fclose(hf);

@@ -10,9 +10,9 @@
 
 static std::ptrdiff_t seq_len;
 static uint32 cp;
-static CBitMapFontCharacterValues chs_values;
+static CBitMapFontCharacterValue chs_value;
 
-struct CBitmapFont_RenderToScreen_690_12
+struct CBitmapFont_RenderToScreen_690_13 //1098CA0
 {
 	void operator()(injector::reg_pack &regs) const
 	{
@@ -30,6 +30,63 @@ struct CBitmapFont_RenderToScreen_690_12
 	}
 };
 
+struct CBitmapFont_RenderToScreen_85B_9 //1098E6B
+{
+	void operator()(injector::reg_pack &regs) const
+	{
+		CBitMapFontCharacterSet *pset = *(CBitMapFontCharacterSet **)(regs.ebp - 0x34);
+		CBitMapFontCharacterValue **pvalues = (CBitMapFontCharacterValue **)pset;
+
+		if (CBitmapFont::IsNativeCharacter(regs.eax))
+		{
+			regs.ecx = (uint32)pset->get_field0()[regs.eax];
+		}
+		else
+		{
+			//TODO: Initialize chs_value;
+			chs_value.xadvance = 64;
+			chs_value.kerning = false;
+			regs.ecx = (uint32)&chs_value;
+		}
+	}
+};
+
+struct CBitmapFont_RenderToScreen_6A9_14 //1098CB9
+{
+	void operator()(injector::reg_pack &regs) const
+	{
+		regs.edi += seq_len;
+		seq_len = utf8::internal::sequence_length(&game.poriginal_text[regs.edi]);
+		std::memcpy(&game.pword[regs.esi], &game.poriginal_text[regs.edi], seq_len);
+		regs.esi += seq_len;
+	}
+};
+
+struct CBitmapFont_RenderToScreen_6C1_2C//1098CD1
+{
+	void operator()(injector::reg_pack &regs) const
+	{
+		utf8::unchecked::iterator<char *> oldit(&game.poriginal_text[regs.edi]);
+		utf8::unchecked::iterator<char *> newit(&game.poriginal_text[regs.edi]);
+
+		std::advance(newit, 2);
+
+		std::ptrdiff_t len = newit.base() - oldit.base();
+
+		std::memcpy(&game.pword[regs.esi], &game.poriginal_text[regs.edi], seq_len);
+
+		regs.edi += len;
+		regs.esi += len;
+	}
+};
+
+struct CBitmapFont_RenderToScreen__ //1098D9B
+{
+	void operator()(injector::reg_pack &regs) const
+	{
+
+	}
+};
 
 struct CBitmapFont_RenderToScreen__
 {
@@ -43,6 +100,7 @@ struct CBitmapFont_RenderToScreen__
 void CBitmapFont::Patch()
 {
 	injector::MakeJMP(game.pfCBitMapFont_GetWidthOfString, CBitmapFont::GetWidthOfString);
+	injector::MakeInline<CBitmapFont_RenderToScreen_690_13>(game.pfCBitMapFont_RenderToScreen + 0x690, game.pfCBitMapFont_RenderToScreen + 0x690 + 13);
 }
 
 int __fastcall CBitmapFont::GetWidthOfString(CBitmapFont *pFont, int edx, const char *text, const int length, bool bUseSpecialChars)
@@ -61,8 +119,8 @@ int __fastcall CBitmapFont::GetWidthOfString(CBitmapFont *pFont, int edx, const 
 	const char *it = text;
 	const char *endit = text + real_length;
 
-	CBitMapFontCharacterSet *pset = (memory_pointer_raw(pFont) + 0xB4).get();
-	CBitMapFontCharacterValues **ppvalues = memory_pointer_raw(pset).get();
+	CBitMapFontCharacterSet *pset = pFont->get_fieldB4();
+	CBitMapFontCharacterValue **ppvalues = pset->get_field0();
 
 	while (it < endit)
 	{
@@ -71,7 +129,7 @@ int __fastcall CBitmapFont::GetWidthOfString(CBitmapFont *pFont, int edx, const 
 		if (!IsNativeCharacter(cp))
 		{
 			//中文字符
-			vTempWidth += chs_width * (*((memory_pointer_raw(pset) + 0x428).get<float>()));
+			vTempWidth += chs_width * *pset->get_field428();
 		}
 		else
 		{
@@ -129,7 +187,7 @@ int __fastcall CBitmapFont::GetWidthOfString(CBitmapFont *pFont, int edx, const 
 			{
 				if (ppvalues[cp])
 				{
-					vTempWidth += ppvalues[cp]->xadvance * (*((memory_pointer_raw(pset) + 0x428).get<float>()));
+					vTempWidth += ppvalues[cp]->xadvance * *pset->get_field428();
 
 					if (ppvalues[cp]->kerning && it < endit)
 					{
