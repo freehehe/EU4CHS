@@ -1,6 +1,5 @@
 #pragma once
 #include "stdinc.h"
-#include "../include/injector/assembly.hpp"
 
 class CGlobalFunctions
 {

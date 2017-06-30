@@ -1,6 +1,5 @@
 #include "eu4.h"
 #include "../include/pattern/byte_pattern.h"
-#include "../include/injector/injector.hpp"
 
 EU4Game::EU4Game()
 {

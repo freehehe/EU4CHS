@@ -1,17 +1,12 @@
 #include "plugin.h"
 #include "table.h"
+#include <utility>
 #include <vector>
 #include <fstream>
 
-struct CharPos
-{
-	uint8 row = 63;
-	uint8 column = 63;
-};
+static std::vector<std::pair<uint8,uint8>> table;
 
-static std::vector<CharPos> table;
-
-void CCharTable::read_table(const char *filename)
+void CCharTable::ReadTable(const char *filename)
 {
 	std::ifstream ifs(filename, std::ios::binary);
 
@@ -23,12 +18,12 @@ void CCharTable::read_table(const char *filename)
 	}
 }
 
-unsigned char CCharTable::find_row(uint32 cp)
+unsigned char CCharTable::GetRow(uint32 cp)
 {
-	return table[cp].row;
+	return table[cp].first;
 }
 
-unsigned char CCharTable::find_column(uint32 cp)
+unsigned char CCharTable::GetColumn(uint32 cp)
 {
-	return table[cp].column;
+	return table[cp].second;
 }

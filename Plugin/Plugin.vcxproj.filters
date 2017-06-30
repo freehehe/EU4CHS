@@ -65,6 +65,5 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="Note.txt" />
-    <Text Include="Temp.txt" />
   </ItemGroup>
 </Project>

@@ -167,7 +167,6 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="Note.txt" />
-    <Text Include="Temp.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

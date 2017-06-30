@@ -12,3 +12,12 @@ typedef std::int8_t int8;
 typedef std::int16_t int16;
 typedef std::int32_t int32;
 typedef std::int64_t int64;
+
+struct IncompleteClass
+{
+	template <typename T, std::uintptr_t offset>
+	T *field()
+	{
+		return (T *)((std::uintptr_t)this + offset);
+	}
+};

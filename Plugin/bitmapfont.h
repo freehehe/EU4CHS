@@ -1,5 +1,4 @@
 #pragma once
-#include "stdinc.h"
 #include "eu4.h"
 
 struct CBitMapFontCharacterValue
@@ -15,25 +14,27 @@ struct CBitMapFontCharacterValue
 };
 VALIDATE_SIZE(CBitMapFontCharacterValue,0x10)
 
-struct CBitMapFontCharacterSet
+struct CBitMapFontCharacterSet :IncompleteClass
 {
-	CBitMapFontCharacterValue **get_field0() const
+	CBitMapFontCharacterValue **field0()
 	{
-		return (CBitMapFontCharacterValue **)this;
+		return field<CBitMapFontCharacterValue *, 0>();
 	}
 
-	float *get_field428() const
+	float *field428()
 	{
-		return ((float *)(std::uintptr_t)this + 0x428);
+		return field<float, 0x428>();
 	}
 };
 
-struct CBitmapFont
+struct CBitmapFont :IncompleteClass
 {
-	CBitMapFontCharacterSet *get_fieldB4() const
+	CBitMapFontCharacterSet *fieldB4()
 	{
-		return (CBitMapFontCharacterSet *)((std::uintptr_t)this + 0xB4);
+		return field<CBitMapFontCharacterSet, 0xB4>();
 	}
+
+	CBitMapFontCharacterValue *GetValueByCodePoint(uint32 cp);
 
 	static int __fastcall GetWidthOfString(CBitmapFont *pFont, int edx, const char *text, const int length, bool bUseSpecialChars);
 	static bool IsNativeCharacter(uint32 cp);

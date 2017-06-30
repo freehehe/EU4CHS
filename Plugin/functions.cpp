@@ -1,6 +1,7 @@
 #include "functions.h"
 #include "eu4.h"
 #include "../include/utf8cpp/utf8.h"
+#include "../include/injector/hooking.hpp"
 #include <vector>
 #include <string_view>
 
