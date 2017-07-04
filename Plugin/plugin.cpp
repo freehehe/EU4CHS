@@ -1,6 +1,9 @@
 ﻿#include "plugin.h"
 #include <string>
 #include <cstring>
+#include "bitmapfont.h"
+#include "functions.h"
+#include "table.h"
 
 static std::string texture_path;
 static std::string table_path;
@@ -35,6 +38,7 @@ const char *Plugin::GetTablePath()
 
 void Plugin::Patch()
 {
-
-
+	CCharTable::ReadTable(GetTablePath());
+	CBitmapFont::Patch();
+	CGlobalFunctions::Patch();
 }

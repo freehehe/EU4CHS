@@ -39,7 +39,7 @@ struct CVector4
 	T w;
 };
 
-class CString
+struct CString
 {
 	union
 	{
@@ -51,7 +51,6 @@ class CString
 	unsigned int length;
 	unsigned int capacity;
 
-public:
 	const char *data() const
 	{
 		return capacity > 15 ? heap : sso_head;

@@ -1,7 +1,12 @@
-#pragma once
+﻿#pragma once
 #include "eu4.h"
 
-struct CBitMapFontCharacterValue
+//Mapfont
+//'M' 77
+//(x,y) 字符左上角绝对坐标
+//(w,h) 字符长，宽
+
+struct CBitmapFontCharacterValue
 {
 	int16 x;
 	int16 y;
@@ -12,13 +17,13 @@ struct CBitMapFontCharacterValue
 	int16 xadvance;
 	bool kerning;
 };
-VALIDATE_SIZE(CBitMapFontCharacterValue,0x10)
+VALIDATE_SIZE(CBitmapFontCharacterValue,0x10)
 
-struct CBitMapFontCharacterSet :IncompleteClass
+struct CBitmapFontCharacterSet :IncompleteClass
 {
-	CBitMapFontCharacterValue **field0()
+	CBitmapFontCharacterValue **field0()
 	{
-		return field<CBitMapFontCharacterValue *, 0>();
+		return field<CBitmapFontCharacterValue *, 0>();
 	}
 
 	float *field428()
@@ -29,15 +34,18 @@ struct CBitMapFontCharacterSet :IncompleteClass
 
 struct CBitmapFont :IncompleteClass
 {
-	CBitMapFontCharacterSet *fieldB4()
+	CBitmapFontCharacterSet *fieldB4()
 	{
-		return field<CBitMapFontCharacterSet, 0xB4>();
+		return field<CBitmapFontCharacterSet, 0xB4>();
 	}
 
-	CBitMapFontCharacterValue *GetValueByCodePoint(uint32 cp);
-
 	static int __fastcall GetWidthOfString(CBitmapFont *pFont, int edx, const char *text, const int length, bool bUseSpecialChars);
-	static bool IsNativeCharacter(uint32 cp);
+	static int __fastcall GetHeightOfString(CBitmapFont *pFont, int edx, const CString *, int, int, const CVector2<int> *, bool);
+
+	CBitmapFontCharacterValue *GetValueByCodePoint(uint32 cp);
+
 	static void Patch();
+
+	//RemoveSpecialChars
 };
 

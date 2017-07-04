@@ -154,6 +154,7 @@
     <ClCompile Include="functions.cpp" />
     <ClCompile Include="plugin.cpp" />
     <ClCompile Include="table.cpp" />
+    <ClCompile Include="textbuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\pattern\byte_pattern.h" />
@@ -163,6 +164,7 @@
     <ClInclude Include="stdinc.h" />
     <ClInclude Include="plugin.h" />
     <ClInclude Include="table.h" />
+    <ClInclude Include="textbuffer.h" />
     <ClInclude Include="texture.h" />
   </ItemGroup>
   <ItemGroup>

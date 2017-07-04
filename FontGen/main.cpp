@@ -14,7 +14,6 @@
 using namespace std;
 
 static set<uint16_t> collection;
-static vector<char> buffer;
 static vector<uint16_t> wbuffer;
 static vector<vector<uint16_t>> char_matrix(1);
 static vector<pair<uint8_t, uint8_t>> table(0x10000, pair<uint8_t, uint8_t>(63, 63));
@@ -59,16 +58,17 @@ void enumerate_chars(const char *folder)
 			continue;
 		}
 
-		buffer.assign(istreambuf_iterator<char>(ifs), istreambuf_iterator<char>());
+		istreambuf_iterator<char> itbeg(ifs);
+		istreambuf_iterator<char> itend;
 
-		wbuffer.clear();
-
-		if (!utf8::starts_with_bom(buffer.begin(), buffer.end()))
+		if (!utf8::starts_with_bom(itbeg, itend))
 		{
 			continue;
 		}
 
-		utf8::utf8to16(buffer.begin(), buffer.end(), back_inserter(wbuffer));
+		wbuffer.clear();
+
+		utf8::utf8to16(itbeg, itend, back_inserter(wbuffer));
 
 		for (auto chr : wbuffer)
 		{

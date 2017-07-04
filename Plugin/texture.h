@@ -7,5 +7,7 @@ public:
 	static void *GetTexture(int);
 	static void UnloadTexture(int);
 
+	static void LoadTextureHook();
+
 	static void Patch();
 };

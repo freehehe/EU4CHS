@@ -1,90 +1,23 @@
 ﻿#include "bitmapfont.h"
 #include "table.h"
+#include "functions.h"
 #include "../include/utf8cpp/utf8.h"
 #include "../include/injector/calling.hpp"
 #include "../include/injector/assembly.hpp"
 #include <iterator>
+#include <vector>
+#include <algorithm>
 
-static std::ptrdiff_t seq_len;
-static uint32 cp;
-
-
-struct CBitmapFont_RenderToScreen_690_13 //1098CA0
-{
-	void operator()(injector::reg_pack &regs) const
-	{
-		cp = utf8::unchecked::peek_next(&game.poriginal_text[regs.edi]);
-		regs.eax = cp;
-
-		seq_len = utf8::internal::sequence_length(&game.poriginal_text[regs.edi]);
-		std::memcpy(&game.pword[regs.esi], &game.poriginal_text[regs.edi], seq_len);
-		regs.esi += seq_len;
-
-		if (!CBitmapFont::IsNativeCharacter(cp))
-		{
-			regs.ecx = 0;
-		}
-	}
-};
-
-struct CBitmapFont_RenderToScreen_85B_9 //1098E6B
-{
-	void operator()(injector::reg_pack &regs) const
-	{
-
-	}
-};
-
-struct CBitmapFont_RenderToScreen_6A9_14 //1098CB9
-{
-	void operator()(injector::reg_pack &regs) const
-	{
-		regs.edi += seq_len;
-		seq_len = utf8::internal::sequence_length(&game.poriginal_text[regs.edi]);
-		std::memcpy(&game.pword[regs.esi], &game.poriginal_text[regs.edi], seq_len);
-		regs.esi += seq_len;
-	}
-};
-
-struct CBitmapFont_RenderToScreen_6C1_2C//1098CD1
-{
-	void operator()(injector::reg_pack &regs) const
-	{
-		utf8::unchecked::iterator<char *> oldit(&game.poriginal_text[regs.edi]);
-		utf8::unchecked::iterator<char *> newit(&game.poriginal_text[regs.edi]);
-
-		std::advance(newit, 2);
-
-		std::ptrdiff_t len = newit.base() - oldit.base();
-
-		std::memcpy(&game.pword[regs.esi], &game.poriginal_text[regs.edi], seq_len);
-
-		regs.edi += len;
-		regs.esi += len;
-	}
-};
-
-struct CBitmapFont_RenderToScreen__ //1098D9B
-{
-	void operator()(injector::reg_pack &regs) const
-	{
-
-	}
-};
-
-struct CBitmapFont_RenderToScreen__
-{
-	void operator()(injector::reg_pack &regs) const
-	{
-
-	}
-};
-
+static constexpr float TextureWidth = 4096.0f;
+static constexpr float TextureHeight = 4096.0f;
+static constexpr float CharacterWidth = 64.0f;
+static constexpr float CharacterHeight = 64.0f;
+static constexpr float TextureLines = TextureWidth / CharacterWidth;
+static constexpr float TextureColumns = TextureHeight / CharacterHeight;
 
 void CBitmapFont::Patch()
 {
 	injector::MakeJMP(game.pfCBitMapFont_GetWidthOfString, CBitmapFont::GetWidthOfString);
-	injector::MakeInline<CBitmapFont_RenderToScreen_690_13>(game.pfCBitMapFont_RenderToScreen + 0x690, game.pfCBitMapFont_RenderToScreen + 0x690 + 13);
 }
 
 int __fastcall CBitmapFont::GetWidthOfString(CBitmapFont *pFont, int edx, const char *text, const int length, bool bUseSpecialChars)
@@ -92,22 +25,111 @@ int __fastcall CBitmapFont::GetWidthOfString(CBitmapFont *pFont, int edx, const 
 	static const float default_width = 8.0f;
 	static const int chs_width = 32;
 
+	static std::vector<uint32> wtext;
+
 	float vTempWidth = 0.0f;
 	int nWidth = 0;
 	char tag[128];
 
 	int real_length = length < 0 ? std::strlen(text) : length;
 
-	utf8::unchecked::iterator<const char *> it(text);
-	utf8::unchecked::iterator<const char *> endit(text + real_length);
+	wtext.clear();
+	utf8::utf8to32(text, text + real_length, std::back_inserter(wtext));
 
-	while (it != endit)
+	auto it = wtext.begin();
+
+	while (it != wtext.end())
 	{
 		uint32 cp = *it;
 
-		CBitMapFontCharacterValue *pvalue = pFont->GetValueByCodePoint(cp);
+		CBitmapFontCharacterValue *pvalue = pFont->GetValueByCodePoint(cp);
 
+		if (bUseSpecialChars && CGlobalFunctions::IsNativeCharacter(cp) && (cp == 0xA7 || cp == 0xA3 || cp == 0xA4 || cp == 0x40 || cp == 0x7B))
+		{
+			switch (cp)
+			{
+			case 0xA7:
+				++it;
+				break;
 
+			case 0x40:
+				it += 3;
+				vTempWidth += injector::thiscall<int(CBitmapFont *)>::vtbl<30>(pFont);
+				break;
+
+			case 0xA3:
+			{
+				std::memset(tag, 0, 128);
+
+				++it;
+
+				auto len = std::count_if(it, wtext.end(),
+					[](uint32 cp)
+				{
+					return isalpha(cp) || isdigit(cp) || cp == '_' || cp == '|';
+				});
+
+				utf8::utf32to8(it, it + len, std::begin(tag));
+
+				it += len;
+
+				vTempWidth += injector::thiscall<int(CBitmapFont*, const char *)>::vtbl<28>(pFont, tag);
+			}
+				break;
+
+			case 0xA4:
+				vTempWidth += default_width;
+				break;
+
+			case 0x7B:
+				it += 2;
+				vTempWidth += default_width;
+				break;
+
+			default:
+				break;
+			}
+		}
+		else
+		{
+			CBitmapFontCharacterValue *pvalue = pFont->GetValueByCodePoint(cp);
+
+			if (pvalue)
+			{
+				vTempWidth += pvalue->xadvance * *pFont->fieldB4()->field428();
+
+				if (pvalue->kerning && (it + 1) != wtext.end() && CGlobalFunctions::IsNativeCharacter(cp) && CGlobalFunctions::IsNativeCharacter(*(it + 1)))
+				{
+					uint32 nextcp = *(it + 1);
+					CBitmapFontCharacterSet *pset = pFont->fieldB4();
+					float fkerning;
+
+					_asm
+					{
+						push nextcp;
+						push cp;
+						mov ecx, pset;
+						call game.pfCBitMapFont_GetKerning;
+						movss fkerning, xmm0;
+					}
+
+					vTempWidth += fkerning;
+				}
+
+				if (pvalue->h == 0 || !CGlobalFunctions::IsNativeCharacter(cp))
+				{
+					nWidth = max(vTempWidth, nWidth);
+				}
+			}
+			else
+			{
+				if (cp == 0xA)
+				{
+					nWidth = max(vTempWidth, nWidth);
+					vTempWidth = 0.0f;
+				}
+			}
+		}
 
 		++it;
 	}
@@ -115,23 +137,32 @@ int __fastcall CBitmapFont::GetWidthOfString(CBitmapFont *pFont, int edx, const 
 	return max(vTempWidth, nWidth);
 }
 
-bool CBitmapFont::IsNativeCharacter(uint32 cp)
-{
-	return cp <= 0xFF;
-}
 
-CBitMapFontCharacterValue *CBitmapFont::GetValueByCodePoint(uint32 cp)
+CBitmapFontCharacterValue *CBitmapFont::GetValueByCodePoint(uint32 cp)
 {
-	static CBitMapFontCharacterValue chs_value;
+	static CBitmapFontCharacterValue chs_value;
 
-	if (IsNativeCharacter(cp))
+	if (CGlobalFunctions::IsNativeCharacter(cp))
 	{
 		return this->fieldB4()->field0()[cp];
 	}
 	else
 	{
-		//TODO: Initialize chs_value;
-		//CHS character is a individual word
+		chs_value.x = CCharTable::GetColumn(cp) * CharacterWidth;
+		chs_value.y = CCharTable::GetRow(cp) * CharacterHeight;
+		chs_value.w = CharacterWidth;
+		chs_value.h = CharacterHeight;
+		chs_value.xoff = 0;
+		chs_value.yoff = 0;
+		chs_value.xadvance = 0;
+		chs_value.kerning = false;
+
+		switch (cp)
+		{
+		default:
+			break;
+		}
+
 		return &chs_value;
 	}
 }

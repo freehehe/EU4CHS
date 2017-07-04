@@ -36,6 +36,9 @@
     <ClCompile Include="..\include\pattern\byte_pattern.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="textbuffer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="plugin.h">
@@ -60,6 +63,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\include\pattern\byte_pattern.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="textbuffer.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
