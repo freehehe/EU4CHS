@@ -44,7 +44,7 @@ int __fastcall CBitmapFont::GetWidthOfString(CBitmapFont *pFont, int edx, const 
 
 		CBitmapFontCharacterValue *pvalue = pFont->GetValueByCodePoint(cp);
 
-		if (bUseSpecialChars && CGlobalFunctions::IsNativeCharacter(cp) && (cp == 0xA7 || cp == 0xA3 || cp == 0xA4 || cp == 0x40 || cp == 0x7B))
+		if (bUseSpecialChars && (cp == 0xA7 || cp == 0xA3 || cp == 0xA4 || cp == 0x40 || cp == 0x7B))
 		{
 			switch (cp)
 			{
