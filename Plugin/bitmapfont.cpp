@@ -8,12 +8,12 @@
 #include <vector>
 #include <algorithm>
 
-static constexpr float TextureWidth = 4096.0f;
-static constexpr float TextureHeight = 4096.0f;
-static constexpr float CharacterWidth = 64.0f;
-static constexpr float CharacterHeight = 64.0f;
-static constexpr float TextureLines = TextureWidth / CharacterWidth;
-static constexpr float TextureColumns = TextureHeight / CharacterHeight;
+static const float TextureWidth = 4096.0f;
+static const float TextureHeight = 4096.0f;
+static const float CharacterWidth = 64.0f;
+static const float CharacterHeight = 64.0f;
+static const float TextureLines = TextureWidth / CharacterWidth;
+static const float TextureColumns = TextureHeight / CharacterHeight;
 
 void CBitmapFont::Patch()
 {

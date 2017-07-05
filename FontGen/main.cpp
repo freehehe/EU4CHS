@@ -134,7 +134,7 @@ void generate_data()
 
 int main(int argc, char **argv)
 {
-	enumerate_chars(R"(C:\eu4chs_release\ymls)");
+	enumerate_chars("(C:\\eu4chs_release\\ymls)");
 	generate_data();
 
 	return 0;

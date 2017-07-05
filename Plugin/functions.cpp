@@ -29,7 +29,9 @@ void __fastcall CGlobalFunctions::ConvertUTF8ToLatin1(const char *source, char *
 {
 	static std::vector<uint32> u32sequence;	
 
-	ConvertUTF8ToUCS4(source, u32sequence);
+	std::string_view source_view(source);
+	u32sequence.clear();
+	utf8::utf8to32(source_view.begin(), source_view.end(), u32sequence);
 
 	for (uint32 &cp : u32sequence)
 	{
@@ -70,15 +72,6 @@ void __fastcall CGlobalFunctions::ConvertUTF8ToLatin1(const char *source, char *
 bool CGlobalFunctions::IsNativeCharacter(uint32 cp)
 {
 	return cp <= 0xFF;
-}
-
-void CGlobalFunctions::ConvertUTF8ToUCS4(const char *source, std::vector<uint32> &dest)
-{
-	std::string_view source_view(source);
-
-	dest.clear();
-
-	utf8::utf8to32(source_view.begin(), source_view.end(), std::back_inserter(dest));
 }
 
 void CGlobalFunctions::Patch()

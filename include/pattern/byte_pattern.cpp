@@ -296,7 +296,11 @@ void byte_pattern::bm_search()
 
 	std::ptrdiff_t index;
 
+	//operator[] in debug build is really slow!
 	auto pattern_length = this->_pattern.size();
+	auto pattern_it = this->_pattern.data();
+	auto bc_it = this->_bmbc.data();
+	auto gs_it = this->_bmgs.data();
 
 	__try
 	{
@@ -304,7 +308,7 @@ void byte_pattern::bm_search()
 		{
 			for (index = pattern_length - 1; index >= 0; --index)
 			{
-				if (!this->_pattern[index].match(range_begin[index]))
+				if (!pattern_it[index].match(range_begin[index]))
 				{
 					break;
 				}
@@ -317,7 +321,7 @@ void byte_pattern::bm_search()
 			}
 			else
 			{
-				range_begin += std::max(index - this->_bmbc[range_begin[index]], this->_bmgs[index]);
+				range_begin += std::max(index - bc_it[range_begin[index]], gs_it[index]);
 			}
 		}
 	}
