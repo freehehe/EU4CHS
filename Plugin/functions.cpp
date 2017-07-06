@@ -31,7 +31,7 @@ void __fastcall CGlobalFunctions::ConvertUTF8ToLatin1(const char *source, char *
 
 	std::string_view source_view(source);
 	u32sequence.clear();
-	utf8::utf8to32(source_view.begin(), source_view.end(), std::back_inserter(u32sequence));
+	utf8::unchecked::utf8to32(source_view.begin(), source_view.end(), std::back_inserter(u32sequence));
 
 	for (uint32 &cp : u32sequence)
 	{

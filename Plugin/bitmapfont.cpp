@@ -15,10 +15,6 @@ static const float CharacterHeight = 64.0f;
 static const float TextureLines = TextureWidth / CharacterWidth;
 static const float TextureColumns = TextureHeight / CharacterHeight;
 
-void CBitmapFont::Patch()
-{
-	injector::MakeJMP(game.pfCBitMapFont_GetWidthOfString, CBitmapFont::GetWidthOfString);
-}
 
 int __fastcall CBitmapFont::GetWidthOfString(CBitmapFont *pFont, int edx, const char *text, const int length, bool bUseSpecialChars)
 {
@@ -34,7 +30,7 @@ int __fastcall CBitmapFont::GetWidthOfString(CBitmapFont *pFont, int edx, const 
 	int real_length = length < 0 ? std::strlen(text) : length;
 
 	wtext.clear();
-	utf8::utf8to32(text, text + real_length, std::back_inserter(wtext));
+	utf8::unchecked::utf8to32(text, text + real_length, std::back_inserter(wtext));
 
 	auto it = wtext.begin();
 
@@ -69,7 +65,7 @@ int __fastcall CBitmapFont::GetWidthOfString(CBitmapFont *pFont, int edx, const 
 					return isalpha(cp) || isdigit(cp) || cp == '_' || cp == '|';
 				});
 
-				utf8::utf32to8(it, it + len, std::begin(tag));
+				utf8::unchecked::utf32to8(it, it + len, std::begin(tag));
 
 				it += len;
 
@@ -109,7 +105,7 @@ int __fastcall CBitmapFont::GetWidthOfString(CBitmapFont *pFont, int edx, const 
 						push nextcp;
 						push cp;
 						mov ecx, pset;
-						call game.pfCBitMapFont_GetKerning;
+						call game.pfCBitmapFont_GetKerning;
 						movss fkerning, xmm0;
 					}
 
@@ -165,4 +161,20 @@ CBitmapFontCharacterValue *CBitmapFont::GetValueByCodePoint(uint32 cp)
 
 		return &chs_value;
 	}
+}
+
+struct CBitmapFont_RenderToScreen_1098CA0_12
+{
+	void operator()(injector::reg_pack &regs) const
+	{
+		char *source_it = game.poriginal_text + regs.esi;
+		char *dest_it = game.pword + regs.edi;
+
+		regs.edi = dest_it - game.pword;
+	}
+};
+
+void CBitmapFont::Patch()
+{
+	injector::MakeJMP(game.pfCBitmapFont_GetWidthOfString, CBitmapFont::GetWidthOfString);
 }

@@ -65,18 +65,16 @@ public:
 	std::uintptr_t pfCTextureHandler_GetTexture;
 	std::uintptr_t pfCTextureHandler_UnloadTexture;
 
-	std::uintptr_t pfCBitMapFont_GetKerning;
+	std::uintptr_t pfCBitmapFont_GetKerning;
 	std::uintptr_t pfConvertUTF8ToLatin1;
-	std::uintptr_t pfCBitMapFont_GetWidthOfString;
-	std::uintptr_t pfCBitMapFont_GetHeightOfString;
-	std::uintptr_t pfCBitMapFont_RenderToScreen;
-	std::uintptr_t pfCBitMapFont_RenderToTexture;
+	std::uintptr_t pfCBitmapFont_GetWidthOfString;
+	std::uintptr_t pfCBitmapFont_GetHeightOfString;
+	std::uintptr_t pfCBitmapFont_RenderToScreen;
+	std::uintptr_t pfCBitmapFont_RenderToTexture;
 
 	char *poriginal_text;
 	char *pword;
 	char *pprocessed_text;
-
-	std::uintptr_t pfGFXSetTextureCallback;
 
 	EU4Game();
 };
