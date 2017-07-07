@@ -15,7 +15,6 @@ static const float CharacterHeight = 64.0f;
 static const float TextureLines = TextureWidth / CharacterWidth;
 static const float TextureColumns = TextureHeight / CharacterHeight;
 
-
 int __fastcall CBitmapFont::GetWidthOfString(CBitmapFont *pFont, int edx, const char *text, const int length, bool bUseSpecialChars)
 {
 	static const float default_width = 8.0f;

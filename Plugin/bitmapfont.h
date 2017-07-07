@@ -40,7 +40,6 @@ struct CBitmapFont :IncompleteClass
 	}
 
 	static int __fastcall GetWidthOfString(CBitmapFont *pFont, int edx, const char *text, const int length, bool bUseSpecialChars);
-	static int __fastcall GetHeightOfString(CBitmapFont *pFont, int edx, const CString *, int, int, const CVector2<int> *, bool);
 
 	CBitmapFontCharacterValue *GetValueByCodePoint(uint32 cp);
 

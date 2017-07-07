@@ -10,4 +10,3 @@ struct CGlobalFunctions
 
 	static void Patch();
 };
-
