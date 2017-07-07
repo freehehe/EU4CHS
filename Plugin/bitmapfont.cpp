@@ -55,7 +55,7 @@ int __fastcall CBitmapFont::GetWidthOfString(CBitmapFont *pFont, int edx, const 
 
 			case 0xA3:
 			{
-				std::memset(tag, 0, 128);
+				std::fill(std::begin(tag), std::end(tag), 0);
 
 				++it;
 
@@ -94,7 +94,7 @@ int __fastcall CBitmapFont::GetWidthOfString(CBitmapFont *pFont, int edx, const 
 			{
 				vTempWidth += pvalue->xadvance * *pFont->fieldB4()->field428();
 
-				if (pvalue->kerning && (it + 1) != wtext.end() && CGlobalFunctions::IsNativeCharacter(cp) && CGlobalFunctions::IsNativeCharacter(*(it + 1)))
+				if (pvalue->kerning && (it + 1) != wtext.end() && CGlobalFunctions::IsNativeCharacter(*(it + 1)))
 				{
 					uint32 nextcp = *(it + 1);
 					CBitmapFontCharacterSet *pset = pFont->fieldB4();
@@ -162,17 +162,6 @@ CBitmapFontCharacterValue *CBitmapFont::GetValueByCodePoint(uint32 cp)
 		return &chs_value;
 	}
 }
-
-struct CBitmapFont_RenderToScreen_1098CA0_12
-{
-	void operator()(injector::reg_pack &regs) const
-	{
-		char *source_it = game.poriginal_text + regs.esi;
-		char *dest_it = game.pword + regs.edi;
-
-		regs.edi = dest_it - game.pword;
-	}
-};
 
 void CBitmapFont::Patch()
 {

@@ -149,6 +149,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\include\pattern\byte_pattern.cpp" />
+    <ClCompile Include="52.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="bitmapfont.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="eu4.cpp" />
