@@ -15,11 +15,11 @@ static const float CharacterHeight = 64.0f;
 static const float TextureLines = TextureWidth / CharacterWidth;
 static const float TextureColumns = TextureHeight / CharacterHeight;
 
+static const float default_width = 8.0f;
+static const int chs_width = 32;
+
 int __fastcall CBitmapFont::GetWidthOfString(CBitmapFont *pFont, int edx, const char *text, const int length, bool bUseSpecialChars)
 {
-	static const float default_width = 8.0f;
-	static const int chs_width = 32;
-
 	static std::vector<uint32> wtext;
 
 	float vTempWidth = 0.0f;
@@ -58,11 +58,7 @@ int __fastcall CBitmapFont::GetWidthOfString(CBitmapFont *pFont, int edx, const 
 
 				++it;
 
-				auto len = std::count_if(it, wtext.end(),
-					[](uint32 cp)
-				{
-					return isalpha(cp) || isdigit(cp) || cp == '_' || cp == '|';
-				});
+				auto len = std::count_if(it, wtext.end(), CGlobalFunctions::IsTextIconChar);
 
 				utf8::unchecked::utf32to8(it, it + len, std::begin(tag));
 
@@ -132,7 +128,6 @@ int __fastcall CBitmapFont::GetWidthOfString(CBitmapFont *pFont, int edx, const 
 	return max(vTempWidth, nWidth);
 }
 
-
 CBitmapFontCharacterValue *CBitmapFont::GetValueByCodePoint(uint32 cp)
 {
 	static CBitmapFontCharacterValue chs_value;
@@ -143,15 +138,17 @@ CBitmapFontCharacterValue *CBitmapFont::GetValueByCodePoint(uint32 cp)
 	}
 	else
 	{
+		//可能要根据字号计算某些数值
 		chs_value.x = CCharTable::GetColumn(cp) * CharacterWidth;
 		chs_value.y = CCharTable::GetRow(cp) * CharacterHeight;
 		chs_value.w = CharacterWidth;
 		chs_value.h = CharacterHeight;
 		chs_value.xoff = 0;
 		chs_value.yoff = 0;
-		chs_value.xadvance = 0;
+		chs_value.xadvance = chs_width;
 		chs_value.kerning = false;
 
+		//可能有些字符的数值需要调整
 		switch (cp)
 		{
 		default:
@@ -165,4 +162,15 @@ CBitmapFontCharacterValue *CBitmapFont::GetValueByCodePoint(uint32 cp)
 void CBitmapFont::Patch()
 {
 	injector::MakeJMP(game.pfCBitmapFont_GetWidthOfString, CBitmapFont::GetWidthOfString);
+}
+
+__declspec(naked) bool is_naive_char(uint32 cp)
+{
+	__asm
+	{
+		mov eax, [esp + 4];
+		and eax, 0xFFFFFF00;
+		setz al;
+		ret;
+	}
 }

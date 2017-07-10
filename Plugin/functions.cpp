@@ -2,6 +2,7 @@
 #include "eu4.h"
 #include "../include/utf8cpp/utf8.h"
 #include "../include/injector/hooking.hpp"
+#include <cctype>
 #include <vector>
 #include <string_view>
 #include <iterator>
@@ -72,6 +73,11 @@ void __fastcall CGlobalFunctions::ConvertUTF8ToLatin1(const char *source, char *
 bool CGlobalFunctions::IsNativeCharacter(uint32 cp)
 {
 	return cp <= 0xFF;
+}
+
+bool CGlobalFunctions::IsTextIconChar(uint32 cp)
+{
+	return isalpha(cp) || isdigit(cp) || cp == '_' || cp == '|';
 }
 
 void CGlobalFunctions::Patch()
