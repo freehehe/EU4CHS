@@ -39,12 +39,9 @@ struct CBitmapFont :IncompleteClass
 		return field<CBitmapFontCharacterSet, 0xB4>();
 	}
 
+	CBitmapFontCharacterValue *GetValueByCodePoint(uint32 cp);
 	static int __fastcall GetWidthOfString(CBitmapFont *pFont, int edx, const char *text, const int length, bool bUseSpecialChars);
 
-	CBitmapFontCharacterValue *GetValueByCodePoint(uint32 cp);
-
 	static void Patch();
-
-	//RemoveSpecialChars
 };
 
