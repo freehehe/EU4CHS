@@ -161,6 +161,7 @@ CBitmapFontCharacterValue *CBitmapFont::GetValueByCodePoint(uint32 cp)
 
 static uint32 code_point;
 static std::ptrdiff_t cp_len;
+static void *ret_addr;
 
 struct CBitmapFont_RenderToScreen_0x690_13
 {
