@@ -6,6 +6,7 @@
 #include <cstring>
 #include <cstdio>
 #include <iterator>
+#include <iostream>
 #include "../include/utf8cpp/utf8.h"
 
 #include <Shlwapi.h>
@@ -13,9 +14,9 @@
 
 using namespace std;
 
-static set<uint16_t> collection;
-static vector<uint16_t> wbuffer;
-static vector<vector<uint16_t>> char_matrix(1);
+static set<uint32_t> collection;
+static vector<uint32_t> wbuffer;
+static vector<vector<uint32_t>> char_matrix(1);
 static vector<pair<uint8_t, uint8_t>> table(0x10000, pair<uint8_t, uint8_t>(63, 63));
 
 void enumerate_chars(const char *folder)
@@ -58,18 +59,10 @@ void enumerate_chars(const char *folder)
 			continue;
 		}
 
-		istreambuf_iterator<char> itbeg(ifs);
-		istreambuf_iterator<char> itend;
-
-		if (!utf8::starts_with_bom(itbeg, itend))
-		{
-			continue;
-		}
-
 		wbuffer.clear();
 
-		utf8::utf8to16(itbeg, itend, back_inserter(wbuffer));
-
+		utf8::unchecked::utf8to32(istreambuf_iterator<char>(ifs), istreambuf_iterator<char>(), back_inserter(wbuffer));
+		
 		for (auto chr : wbuffer)
 		{
 			if (chr > 255 && chr != 0x2013 && chr != 0x2014 && chr != 0x2018 && chr != 0x2026)
@@ -102,25 +95,28 @@ void generate_data()
 		table[chr].second = char_matrix.back().size() - 1;
 	}
 
-	FILE *hf = fopen("C:\\eu4chs_release\\font\\eu4chs.txt", "wb");
+	wbuffer.clear();
 
-	if (!hf)
+	wbuffer.push_back(0xFEFF);
+
+	for (auto &line : char_matrix)
+	{
+		copy(line.begin(), line.end(), back_inserter(wbuffer));
+		wbuffer.push_back('\n');
+	}
+
+	ofstream ofs("C:\\eu4chs.txt", ios::trunc);
+
+	if (!ofs)
 	{
 		return;
 	}
 
-	fwrite("\xFF\xFE", 2, 1, hf);
+	utf8::unchecked::utf32to8(wbuffer.begin(), wbuffer.end(), ostreambuf_iterator<char>(ofs));
 
-	for (auto &char_array : char_matrix)
-	{
-		fwrite(char_array.data(), 2, char_array.size(), hf);
+	ofs.close();
 
-		fwrite("\n\x00", 2, 1, hf);
-	}
-
-	fclose(hf);
-
-	hf = fopen("C:\\eu4chs_release\\font\\eu4chs.dat", "wb");
+	FILE *hf = fopen("C:\\eu4chs.dat", "wb");
 
 	if (!hf)
 	{
@@ -134,7 +130,7 @@ void generate_data()
 
 int main(int argc, char **argv)
 {
-	enumerate_chars("(C:\\eu4chs_release\\ymls)");
+	enumerate_chars("C:\\ymls");
 	generate_data();
 
 	return 0;

@@ -168,7 +168,7 @@ namespace utf8
         template <typename octet_iterator, typename u32bit_iterator>
         u32bit_iterator utf8to32 (octet_iterator start, octet_iterator end, u32bit_iterator result)
         {
-            while (start < end)
+            while (start != end)
                 (*result++) = utf8::unchecked::next(start);
 
             return result;
