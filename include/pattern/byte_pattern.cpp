@@ -180,6 +180,7 @@ void byte_pattern::transform_pattern(const char *pattern_literal)
 	}
 
 	this->bm_preprocess();
+	this->force_search();
 }
 
 void byte_pattern::executable_range(pattern_match module)

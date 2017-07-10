@@ -2,6 +2,7 @@
 #include "eu4.h"
 #include "../include/utf8cpp/utf8.h"
 #include "../include/injector/hooking.hpp"
+#include "../include//pattern/byte_pattern.h"
 #include <vector>
 #include <string_view>
 #include <iterator>

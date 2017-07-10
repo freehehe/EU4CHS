@@ -132,7 +132,6 @@ int __fastcall CBitmapFont::GetWidthOfString(CBitmapFont *pFont, int edx, const 
 	return max(vTempWidth, nWidth);
 }
 
-
 CBitmapFontCharacterValue *CBitmapFont::GetValueByCodePoint(uint32 cp)
 {
 	static CBitmapFontCharacterValue chs_value;
@@ -162,7 +161,62 @@ CBitmapFontCharacterValue *CBitmapFont::GetValueByCodePoint(uint32 cp)
 	}
 }
 
+static uint32 code_point;
+static std::ptrdiff_t cp_len;
+
+struct CBitmapFont_RenderToScreen_0x690_13
+{
+	void operator()(injector::reg_pack &regs) const
+	{
+		char *source = game.poriginal_text + regs.edi;
+		char *dest = game.pword + regs.esi;
+
+		cp_len = utf8::internal::sequence_length(source);
+
+		code_point = utf8::unchecked::peek_next(dest);
+
+		regs.eax = code_point;
+
+		utf8::unchecked::append(code_point, dest);
+
+		regs.edi += (cp_len - 1);
+		regs.esi += cp_len;
+
+		if (!CGlobalFunctions::IsNativeCharacter(code_point))
+		{
+			regs.ecx = 0;
+		}
+	}
+};
+
+struct CBitmapFont_RenderToScreen_0x7B_7
+{
+	void operator()(injector::reg_pack &regs) const
+	{
+		regs.edx = *(uint32 *)(regs.ebp - 0x10);
+
+	}
+};
+
+struct CBitmapFont_RenderToScreen_85B_9
+{
+	void operator()(injector::reg_pack &regs) const
+	{
+		CBitmapFont *pfont = *(CBitmapFont **)(regs.ebp - 0x10);
+		regs.ecx = (uint32)pfont->GetValueByCodePoint(code_point);
+	}
+};
+
+struct CBitmapFont_RenderToScreen_OFF_SIZE
+{
+	void operator()(injector::reg_pack &regs) const
+	{
+
+	}
+};
+
 void CBitmapFont::Patch()
 {
+	injector::MakeInline<CBitmapFont_RenderToScreen_0x690_13>(game.pfCBitmapFont_RenderToScreen + 0x690, game.pfCBitmapFont_RenderToScreen + 0x690 + 13);
 	injector::MakeJMP(game.pfCBitmapFont_GetWidthOfString, CBitmapFont::GetWidthOfString);
 }

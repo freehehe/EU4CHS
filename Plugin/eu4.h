@@ -61,9 +61,8 @@ VALIDATE_SIZE(CString, 0x18)
 class EU4Game
 {
 public:
-	std::uintptr_t pfCTextureHandler_LoadTexture;
+	std::uintptr_t pfCTextureHandler_AddTexture;
 	std::uintptr_t pfCTextureHandler_GetTexture;
-	std::uintptr_t pfCTextureHandler_UnloadTexture;
 
 	std::uintptr_t pfCBitmapFont_GetKerning;
 	std::uintptr_t pfConvertUTF8ToLatin1;
@@ -71,6 +70,9 @@ public:
 	std::uintptr_t pfCBitmapFont_GetHeightOfString;
 	std::uintptr_t pfCBitmapFont_RenderToScreen;
 	std::uintptr_t pfCBitmapFont_RenderToTexture;
+
+	std::uintptr_t *pfGFXDraw;
+	std::uintptr_t *pfGFXSetTexture;
 
 	char *poriginal_text;
 	char *pword;
