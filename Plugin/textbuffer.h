@@ -4,7 +4,7 @@
 
 struct CTextBuffer: IncompleteClass
 {
-	const CString *field_1C()
+	CString *field_1C()
 	{
 		return field<CString, 0x1C>();
 	}

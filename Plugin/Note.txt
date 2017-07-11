@@ -1,4 +1,13 @@
-﻿CBitmapFont::RenderToScreen : 0x1098610
+﻿A3 £ 英镑标记
+£IconName
+
+A4 ¤ 货币标记
+单独使用，显示为金币图标
+
+A7 § 节标记
+§Y|Yellow Text!§
+
+CBitmapFont::RenderToScreen : 0x1098610
 
 0x1098CA0 : CBitmapFont::RenderToScreen + 0x690 + 13
 0x1098D1B : CBitmapFont::RenderToScreen + 0x7B + 7

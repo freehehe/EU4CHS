@@ -58,9 +58,8 @@ struct CString
 };
 VALIDATE_SIZE(CString, 0x18)
 
-class EU4Game
+struct EU4Game
 {
-public:
 	std::uintptr_t pfCTextureHandler_AddTexture;
 	std::uintptr_t pfCTextureHandler_GetTexture;
 

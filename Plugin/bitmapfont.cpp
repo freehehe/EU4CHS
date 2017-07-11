@@ -43,6 +43,7 @@ int __fastcall CBitmapFont::GetWidthOfString(CBitmapFont *pFont, int edx, const 
 		{
 			switch (cp)
 			{
+#error Fix cases here
 			case 0xA7:
 				++it;
 				break;
@@ -64,7 +65,7 @@ int __fastcall CBitmapFont::GetWidthOfString(CBitmapFont *pFont, int edx, const 
 
 				it += len;
 
-				vTempWidth += injector::thiscall<int(CBitmapFont*, const char *)>::vtbl<28>(pFont, tag);
+				vTempWidth += injector::thiscall<int(CBitmapFont *, const char *)>::vtbl<28>(pFont, tag);
 			}
 				break;
 
@@ -89,6 +90,7 @@ int __fastcall CBitmapFont::GetWidthOfString(CBitmapFont *pFont, int edx, const 
 			{
 				vTempWidth += pvalue->xadvance * *pFont->fieldB4()->field428();
 
+				//或者可以省掉naive char判定
 				if (pvalue->kerning && (it + 1) != wtext.end() && CGlobalFunctions::IsNativeCharacter(*(it + 1)))
 				{
 					uint32 nextcp = *(it + 1);
@@ -188,23 +190,19 @@ struct CBitmapFont_RenderToScreen_0x690_13
 	}
 };
 
-struct CBitmapFont_RenderToScreen_0x7B_7
+__declspec(naked) void CBitmapFont_RenderToScreen_OFF_SIZE()
 {
-	void operator()(injector::reg_pack &regs) const
+	__asm
 	{
-		regs.edx = *(uint32 *)(regs.ebp - 0x10);
-
+		pop ret_addr;
+		cmp code_point, 0xA7;
+		cmove ecx, 0x10;
+		add ret_addr, ecx;
+		jmp ret_addr;
 	}
-};
+}
 
-struct CBitmapFont_RenderToScreen_85B_9
-{
-	void operator()(injector::reg_pack &regs) const
-	{
-		CBitmapFont *pfont = *(CBitmapFont **)(regs.ebp - 0x10);
-		regs.ecx = (uint32)pfont->GetValueByCodePoint(code_point);
-	}
-};
+
 
 struct CBitmapFont_RenderToScreen_OFF_SIZE
 {
