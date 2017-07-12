@@ -1,11 +1,12 @@
 ﻿A3 £ 英镑标记
+£IconName£
 £IconName
 
 A4 ¤ 货币标记
 单独使用，显示为金币图标
 
 A7 § 节标记
-§Y|Yellow Text!§
+§YYellow Text§!
 
 CBitmapFont::RenderToScreen : 0x1098610
 

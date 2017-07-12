@@ -195,14 +195,9 @@ __declspec(naked) void CBitmapFont_RenderToScreen_OFF_SIZE()
 	__asm
 	{
 		pop ret_addr;
-		cmp code_point, 0xA7;
-		cmove ecx, 0x10;
-		add ret_addr, ecx;
-		jmp ret_addr;
+
 	}
 }
-
-
 
 struct CBitmapFont_RenderToScreen_OFF_SIZE
 {
@@ -216,15 +211,4 @@ void CBitmapFont::Patch()
 {
 	injector::MakeInline<CBitmapFont_RenderToScreen_0x690_13>(game.pfCBitmapFont_RenderToScreen + 0x690, game.pfCBitmapFont_RenderToScreen + 0x690 + 13);
 	injector::MakeJMP(game.pfCBitmapFont_GetWidthOfString, CBitmapFont::GetWidthOfString);
-}
-
-__declspec(naked) bool is_naive_char(uint32 cp)
-{
-	__asm
-	{
-		mov eax, [esp + 4];
-		and eax, 0xFFFFFF00;
-		setz al;
-		ret;
-	}
 }

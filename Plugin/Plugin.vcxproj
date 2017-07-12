@@ -157,6 +157,7 @@
     <ClCompile Include="table.cpp" />
     <ClCompile Include="textbuffer.cpp" />
     <ClCompile Include="texture.cpp" />
+    <ClCompile Include="vfs.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\pattern\byte_pattern.h" />
@@ -168,6 +169,7 @@
     <ClInclude Include="table.h" />
     <ClInclude Include="textbuffer.h" />
     <ClInclude Include="texture.h" />
+    <ClInclude Include="vfs.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Note.txt" />
