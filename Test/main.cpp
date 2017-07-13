@@ -4,13 +4,18 @@
 #include <unordered_map>
 #include <iostream>
 
-//pair[vfspath, fullpath]
+//pair[vfspath, ourvfspath]
+//D:\Steam\steamapps\common\Europa Universalis IV
+//D:\Steam\steamapps\common\Europa Universalis IV\scripts\eu4chs
+//D:\Steam\steamapps\common\Europa Universalis IV\scripts\eu4chs.asi
+
 static std::unordered_map<std::string_view, std::string> files;
-static std::string ourroot; //Should be: C:/gameroot/scripts/test/
-static std::string gameroot; //Should be: C:/gameroot/
+static std::string ourroot;
+static std::string gameroot;
 
 //From: localisation\xxx.xxx
 //To: scripts\eu4chs\localisation\xxx.xxx
+//Additional: scripts\eu4chs\
 
 const char *MakeOurPath(const char *vfspath)
 {
@@ -40,7 +45,6 @@ void EnumerateFolder(const char *folder)
 	{
 		if (fda.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 		{
-			//文件夹
 			if (fda.cFileName[0] == '.')
 			{
 				continue;
@@ -54,11 +58,10 @@ void EnumerateFolder(const char *folder)
 		}
 		else
 		{
-			//文件
 			filename = folder;
 			filename += '\\';
 			filename += fda.cFileName;
-			files.emplace(std::string_view(filename.data() + gameroot.length()), filename);
+			files.emplace(filename.c_str() + ourroot.length(), filename.c_str() + gameroot.length());
 		}
 	} while (FindNextFileA(hFind, &fda));
 }
@@ -73,7 +76,7 @@ void EnumerateOurFiles()
 
 	GetModuleFileNameA(NULL, buffer, 512);
 
-	*(std::strrchr(buffer, '\\') + 1) = 0;
+	*(std::strrchr(buffer, '\\')) = 0;
 
 	gameroot = buffer;
 
@@ -82,7 +85,7 @@ void EnumerateOurFiles()
 	*std::strrchr(buffer, '.') = 0;
 
 	ourroot = buffer;
-	
+
 	EnumerateFolder(ourroot.c_str());
 }
 

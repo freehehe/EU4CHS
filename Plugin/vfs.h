@@ -3,7 +3,7 @@
 class VFS
 {
 public:
-	static const char *MakeOurPath(const char *vfspath);
+	static void EnumrateFolder(const char *folder);
 	static void EnumerateOurFiles();
 	static void Patch();
 };

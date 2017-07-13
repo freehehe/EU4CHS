@@ -73,6 +73,9 @@ struct EU4Game
 	std::uintptr_t *pfGFXDraw;
 	std::uintptr_t *pfGFXSetTexture;
 
+	std::uintptr_t pfVFSOpenFile;
+	std::uintptr_t pfPHYSFS_OpenRead;
+
 	char *poriginal_text;
 	char *pword;
 	char *pprocessed_text;

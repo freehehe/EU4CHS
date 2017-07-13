@@ -1,23 +1,33 @@
 #include "vfs.h"
+#include "eu4.h"
 #include <windows.h>
 #include <string>
 #include <string_view>
 #include <unordered_map>
 
-static std::unordered_map<std::string_view, std::string> paths;
+#include "../include/injector/hooking.hpp"
+#include "../include/injector/assembly.hpp"
+#include "../include/injector/calling.hpp"
 
-//From: localisation\xxx
-//To: scripts\eu4chs\localisation\xxx
+//pair[vfspath, ourvfspath]
+//ourvfspath=vfspath+"scripts\eu4chs\"
 
-const char *VFS::MakeOurPath(const char *vfspath)
+static std::unordered_map<std::string_view, std::string> file_list;
+static std::string our_path_prefix; //scripts\eu4chs\
+
+void *VFSOpenFile_0x8D(const char *vfspath)
 {
-	std::string result("scripts\\eu4chs\\");
-	result += vfspath;
+	auto it = file_list.find(vfspath);
 
+	if (it != file_list.end())
+	{
+		vfspath = it->second.c_str();
+	}
 
-}
+	return injector::cstd<void *(const char *)>::call(game.pfPHYSFS_OpenRead, vfspath);
+};
 
-void VFS::EnumerateOurFiles()
+void VFS::Patch()
 {
-	HFIND
+	injector::MakeCALL(game.pfVFSOpenFile + 0x8D, VFSOpenFile_0x8D);
 }
