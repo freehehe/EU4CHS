@@ -1,6 +1,6 @@
 #pragma once
 
-class VirtualFS
+class VFS
 {
 public:
 	static const char *MakeOurPath(const char *vfspath);

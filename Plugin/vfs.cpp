@@ -1,14 +1,15 @@
 #include "vfs.h"
+#include <windows.h>
 #include <string>
 #include <string_view>
 #include <unordered_map>
 
 static std::unordered_map<std::string_view, std::string> paths;
 
-//From: \Europa Universalis IV\localisation\
-//To: \Europa Universalis IV\scripts\eu4chs\localisation\
+//From: localisation\xxx
+//To: scripts\eu4chs\localisation\xxx
 
-const char *VirtualFS::MakeOurPath(const char *vfspath)
+const char *VFS::MakeOurPath(const char *vfspath)
 {
 	std::string result("scripts\\eu4chs\\");
 	result += vfspath;
@@ -16,7 +17,7 @@ const char *VirtualFS::MakeOurPath(const char *vfspath)
 
 }
 
-void VirtualFS::EnumerateOurFiles()
+void VFS::EnumerateOurFiles()
 {
-
+	HFIND
 }
