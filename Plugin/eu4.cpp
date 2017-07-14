@@ -13,6 +13,8 @@ EU4Game::EU4Game()
 	this->pfCBitmapFont_GetHeightOfString;
 	this->pfCBitmapFont_RenderToScreen = g_pattern.set_pattern("55 8B EC 6A FF 68 ? ? ? ? 64 A1 00 00 00 00 50 64 89 25 00 00 00 00 81 EC 1C 06 00 00").get(0).address();
 	this->pfCBitmapFont_RenderToTexture = g_pattern.set_pattern("55 8B EC 6A FF 68 ? ? ? ? 64 A1 00 00 00 00 50 64 89 25 00 00 00 00 81 EC 54 05 00 00").get(0).address();
+	
+	this->pfPHYSFS_OpenRead = GetProcAddress(default_module, "PHYSFS_OpenRead");
 
 	poriginal_text = *(char **)(this->pfCBitmapFont_RenderToScreen + 0xD1);
 	pprocessed_text = *(char **)(this->pfCBitmapFont_RenderToScreen + 0xFB);

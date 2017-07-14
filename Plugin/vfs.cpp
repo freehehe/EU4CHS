@@ -1,25 +1,100 @@
+#include "plugin.h"
 #include "vfs.h"
 #include "eu4.h"
 #include <windows.h>
 #include <string>
 #include <string_view>
-#include <unordered_map>
+#include <functional>
+#include <map>
+#include <algorithm>
 
 #include "../include/injector/hooking.hpp"
 #include "../include/injector/assembly.hpp"
 #include "../include/injector/calling.hpp"
 
-//pair[vfspath, ourvfspath]
-//ourvfspath=vfspath+"scripts\eu4chs\"
+static std::map<std::size_t, std::string> files;
+static std::string ourroot;
+static std::string gameroot;
 
-static std::unordered_map<std::string_view, std::string> file_list;
-static std::string our_path_prefix; //scripts\eu4chs\
+void VFS::EnumerateFolder(const std::string &folder)
+{
+	WIN32_FIND_DATAA fda;
+
+	std::string vfspath;
+	std::string ourvfspath;
+	std::string subfolder;
+	std::string filename;
+	std::string search_name;
+
+	search_name = folder;
+
+	search_name += "/*";
+
+	HANDLE hFind = FindFirstFileA(search_name.c_str(), &fda);
+
+	if (hFind == INVALID_HANDLE_VALUE)
+	{
+		return;
+	}
+
+	do
+	{
+		if (fda.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+		{
+			if (fda.cFileName[0] == '.')
+			{
+				continue;
+			}
+
+			subfolder = folder;
+			subfolder += '/';
+			subfolder += fda.cFileName;
+
+			EnumerateFolder(subfolder);
+		}
+		else
+		{
+			filename = folder;
+			filename += '/';
+			filename += fda.cFileName;
+			vfspath = filename.data() + ourroot.length() + 1;
+			ourvfspath = filename.data() + gameroot.length() + 1;
+
+			files.emplace(std::hash<std::string_view>()(vfspath), ourvfspath);
+
+		}
+	} while (FindNextFileA(hFind, &fda));
+}
+
+void VFS::EnumerateOurFiles()
+{
+	char buffer[512];
+
+	files.clear();
+
+	GetModuleFileNameA(Plugin::GetEXEHandle(), buffer, 512);
+
+	*(std::strrchr(buffer, '\\')) = 0;
+
+	gameroot = buffer;
+
+	GetModuleFileNameA(Plugin::GetASIHandle(), buffer, 512);
+
+	*std::strrchr(buffer, '.') = 0;
+
+	ourroot = buffer;
+
+	std::replace(gameroot.begin(), gameroot.end(), '\\', '/');
+	std::replace(ourroot.begin(), ourroot.end(), '\\', '/');
+
+	EnumerateFolder(ourroot);
+}
 
 void *VFSOpenFile_0x8D(const char *vfspath)
 {
-	auto it = file_list.find(vfspath);
+	auto it = files.find(std::hash<std::string_view>()(vfspath));
 
-	if (it != file_list.end())
+	if (it != files.end())
 	{
 		vfspath = it->second.c_str();
 	}

@@ -7,6 +7,10 @@ class Plugin
 
 public:
 	static void Init(HMODULE hself);
+
+	static HMODULE GetASIHandle();
+	static HMODULE GetEXEHandle();
+
 	static const char *GetTexturePath();
 	static const char *GetTablePath();
 };
