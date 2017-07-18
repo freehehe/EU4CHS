@@ -1,15 +1,16 @@
-﻿A3 £ 英镑标记
-£IconName£
-£IconName
-
-A4 ¤ 货币标记
-单独使用，显示为金币图标
-
-A7 § 节标记
-§YYellow Text§!
+﻿0x00000161
+0x00002013
+0x00002014
+0x00002018
+0x00002019
+0x0000201c
+0x0000201d
+0x00002026
 
 CBitmapFont::RenderToScreen : 0x1098610
 
 0x1098CA0 : CBitmapFont::RenderToScreen + 0x690 + 13
 0x1098D1B : CBitmapFont::RenderToScreen + 0x7B + 7
 0x1098E6B : CBitmapFont::RenderToScreen + 0x85B + 9
+0x1098EDE : CBitmapFont::RenderToScreen + 0x8CE + 20
+0x1098F0A : CBitmapFont::RenderToScreen + 0x8FA + 11

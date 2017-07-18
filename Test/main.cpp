@@ -5,108 +5,39 @@
 #include <iostream>
 #include <algorithm>
 #include <map>
+#include <fstream>
+#include <set>
+#include <iterator>
+#include "../include/utf8cpp/utf8.h"
 
-//pair[vfspath, ourvfspath]
-//C:/games/eu4/
-//C:/games/eu4/scripts/eu4chs/
-//C:/games/eu4/scripts/eu4chs.asi
+using namespace std;
+using namespace utf8::unchecked;
 
-static std::map<std::size_t, std::string> files;
-static std::string ourroot;
-static std::string gameroot;
-
-//From: localisation\xxx.xxx
-//To: scripts\eu4chs\localisation\xxx.xxx
-//Additional: scripts\eu4chs\
-
-const char *MakeOurPath(const char *vfspath)
+void fuck(const char *file)
 {
-	auto it = files.find(std::hash<std::string_view>()(vfspath));
+	vector<uint32_t> wbuffer;
+	set<uint32_t> wset;
 
-	return (it == files.end()) ? vfspath : it->second.c_str();
-}
+	ifstream ifs(file);
 
-void EnumerateFolder(const std::string &folder)
-{
-	WIN32_FIND_DATAA fda;
-
-	std::string vfspath;
-	std::string ourvfspath;
-	std::string subfolder;
-	std::string filename;
-	std::string search_name;
-
-	search_name = folder;
-
-	search_name += "/*";
-
-	HANDLE hFind = FindFirstFileA(search_name.c_str(), &fda);
-
-	if (hFind == INVALID_HANDLE_VALUE)
+	if (!ifs)
 	{
 		return;
 	}
 
-	do
-	{
-		if (fda.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-		{
-			if (fda.cFileName[0] == '.')
-			{
-				continue;
-			}
+	istreambuf_iterator<char> bufit(ifs);
+	istreambuf_iterator<char> bufend;
 
-			subfolder = folder;
-			subfolder += '/';
-			subfolder += fda.cFileName;
+	utf8to32(bufit, bufend, back_inserter(wbuffer));
 
-			EnumerateFolder(subfolder);
-		}
-		else
-		{
-			filename = folder;
-			filename += '/';
-			filename += fda.cFileName;
-			vfspath = filename.data() + ourroot.length() + 1;
-			ourvfspath = filename.data() + gameroot.length() + 1;
+	wset.insert(wbuffer.begin(), wbuffer.end());
 
-			files.emplace(std::hash<std::string_view>()(vfspath), ourvfspath);
-
-		}
-	} while (FindNextFileA(hFind, &fda));
+	cout << *wset.begin();
 }
 
-void EnumerateOurFiles()
-{
-	char buffer[512];
-
-	files.clear();
-
-	HMODULE hself = GetModuleHandleA(NULL);
-
-	GetModuleFileNameA(NULL, buffer, 512);
-
-	*(std::strrchr(buffer, '\\')) = 0;
-
-	gameroot = buffer;
-
-	GetModuleFileNameA(hself, buffer, 512);
-
-	*std::strrchr(buffer, '.') = 0;
-
-	ourroot = buffer;
-
-	std::replace(gameroot.begin(), gameroot.end(), '\\', '/');
-	std::replace(ourroot.begin(), ourroot.end(), '\\', '/');
-
-	EnumerateFolder(ourroot);
-}
 
 int main()
 {
-	EnumerateOurFiles();
-
-	std::cout << MakeOurPath("include/QtCore/QVector") << std::endl;
-	std::cout << MakeOurPath("include/qtcore/QVector") << std::endl;
+	fuck("C:\\allin1.yml");
 	return 0;
 }

@@ -18,6 +18,10 @@ static const float TextureColumns = TextureHeight / CharacterHeight;
 static const float default_width = 8.0f;
 static const int chs_width = 32;
 
+static uint32 woriginal_text[3072];
+static uint32 wword[256];
+static uint32 wprocessed_text[3132];
+
 int __fastcall CBitmapFont::GetWidthOfString(CBitmapFont *pFont, int edx, const char *text, const int length, bool bUseSpecialChars)
 {
 	static std::vector<uint32> wtext;
@@ -43,7 +47,6 @@ int __fastcall CBitmapFont::GetWidthOfString(CBitmapFont *pFont, int edx, const 
 		{
 			switch (cp)
 			{
-#error Fix cases here
 			case 0xA7:
 				++it;
 				break;
@@ -90,7 +93,6 @@ int __fastcall CBitmapFont::GetWidthOfString(CBitmapFont *pFont, int edx, const 
 			{
 				vTempWidth += pvalue->xadvance * *pFont->fieldB4()->field428();
 
-				//或者可以省掉naive char判定
 				if (pvalue->kerning && (it + 1) != wtext.end() && CGlobalFunctions::IsNativeCharacter(*(it + 1)))
 				{
 					uint32 nextcp = *(it + 1);
@@ -102,7 +104,7 @@ int __fastcall CBitmapFont::GetWidthOfString(CBitmapFont *pFont, int edx, const 
 						push nextcp;
 						push cp;
 						mov ecx, pset;
-						call game.pfCBitmapFont_GetKerning;
+						call game.pfCBitmapFontCharacterSet_GetKerning;
 						movss fkerning, xmm0;
 					}
 
@@ -162,6 +164,7 @@ CBitmapFontCharacterValue *CBitmapFont::GetValueByCodePoint(uint32 cp)
 }
 
 static uint32 code_point;
+static uint32 next_code_point;
 static std::ptrdiff_t cp_len;
 static void *ret_addr;
 
@@ -174,7 +177,8 @@ struct CBitmapFont_RenderToScreen_0x690_13
 
 		cp_len = utf8::internal::sequence_length(source);
 
-		code_point = utf8::unchecked::peek_next(dest);
+		code_point = utf8::unchecked::next(source);
+		next_code_point = utf8::unchecked::next(source);
 
 		regs.eax = code_point;
 
@@ -189,6 +193,52 @@ struct CBitmapFont_RenderToScreen_0x690_13
 		}
 	}
 };
+
+struct CBitmapFont_RenderToScreen_0x85B_9
+{
+	void operator()(injector::reg_pack &regs) const
+	{
+		CBitmapFont *_this = *(CBitmapFont **)(regs.ebp - 0x10);
+
+		regs.ecx = (uint32)_this->GetValueByCodePoint(code_point);
+	}
+};
+
+__declspec(naked) void CBitmapFont_RenderToScreen_0x8CE_20()
+{
+	__asm
+	{
+		pop ret_addr;
+		cmp next_code_point, 0xFF;
+		ja no_kerning;
+		push next_code_point;
+		push code_point;
+		mov ecx, [ebp - 0x34];
+		call game.pfCBitmapFontCharacterSet_GetKerning;
+		jmp j_ret;
+
+	no_kerning:
+		xorps xmm0, xmm0;
+
+	j_ret:
+		jmp ret_addr;
+	}
+}
+
+__declspec(naked) void CBitmapFont_RenderToScreen_0x8FA_11()
+{
+	__asm
+	{
+		pop ret_addr;
+
+
+
+	j_newline:
+
+	j_chs:
+		jmp ret_addr;
+	}
+}
 
 __declspec(naked) void CBitmapFont_RenderToScreen_OFF_SIZE()
 {
@@ -209,6 +259,5 @@ struct CBitmapFont_RenderToScreen_OFF_SIZE
 
 void CBitmapFont::Patch()
 {
-	injector::MakeInline<CBitmapFont_RenderToScreen_0x690_13>(game.pfCBitmapFont_RenderToScreen + 0x690, game.pfCBitmapFont_RenderToScreen + 0x690 + 13);
 	injector::MakeJMP(game.pfCBitmapFont_GetWidthOfString, CBitmapFont::GetWidthOfString);
 }

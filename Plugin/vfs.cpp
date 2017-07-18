@@ -83,6 +83,7 @@ void VFS::EnumerateOurFiles()
 	*std::strrchr(buffer, '.') = 0;
 
 	ourroot = buffer;
+	ourroot += "\\vfsroot";
 
 	std::replace(gameroot.begin(), gameroot.end(), '\\', '/');
 	std::replace(ourroot.begin(), ourroot.end(), '\\', '/');
