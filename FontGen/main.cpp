@@ -65,7 +65,34 @@ void enumerate_chars(const char *folder)
 		
 		for (auto chr : wbuffer)
 		{
-			if (chr > 255)
+			if (chr > 255 &&
+				chr != 0x00000152 &&
+				chr != 0x00000153 &&
+				chr != 0x00000160 &&
+				chr != 0x00000161 &&
+				chr != 0x00000178 &&
+				chr != 0x0000017d &&
+				chr != 0x0000017e &&
+				chr != 0x00000192 &&
+				chr != 0x000002c6 &&
+				chr != 0x000002dc &&
+				chr != 0x00002013 &&
+				chr != 0x00002014 &&
+				chr != 0x00002018 &&
+				chr != 0x00002019 &&
+				chr != 0x0000201a &&
+				chr != 0x0000201c &&
+				chr != 0x0000201d &&
+				chr != 0x0000201e &&
+				chr != 0x00002020 &&
+				chr != 0x00002021 &&
+				chr != 0x00002022 &&
+				chr != 0x00002026 &&
+				chr != 0x00002030 &&
+				chr != 0x00002039 &&
+				chr != 0x0000203a &&
+				chr != 0x000020ac &&
+				chr != 0x00002122)
 			{
 				collection.insert(chr);
 			}

@@ -10,12 +10,12 @@
 #include "../include/injector/calling.hpp"
 
 std::vector<char> u8sequence;
-std::vector<char> latin1s(0x110000);
-std::vector<std::pair<std::uint32_t, char>> result(0x10FFFF);
+std::vector<char> latin1s(0x10000);
+std::vector<std::pair<std::uint32_t, char>> result(0xFFFF);
 
 void UTF8ToLatin1View()
 {
-	for (std::uint32_t cp = 1; cp < 0x110000; ++cp)
+	for (std::uint32_t cp = 1; cp < 0x10000; ++cp)
 	{
 		utf8::unchecked::append(cp, back_inserter(u8sequence));
 	}
@@ -37,27 +37,15 @@ void UTF8ToLatin1View()
 	{
 		return (p.first > 255) && (p.second == '?');
 	}), result.end());
-
-	std::ofstream ofs("out.txt");
-
-	if (!ofs)
-	{
-		return;
-	}
-
-	for (auto &p : result)
-	{
-		ofs << p.first << ' ' << (int)p.second << '\n';
-	}
 }
 
 BOOL WINAPI DllMain(HMODULE module, DWORD reason, void *reserved)
 {
 	if (reason == DLL_PROCESS_ATTACH)
 	{
-		//Plugin::Init(module);
+		Plugin::Init(module);
 
-		UTF8ToLatin1View();
+		//UTF8ToLatin1View();
 	}
 
 	return TRUE;

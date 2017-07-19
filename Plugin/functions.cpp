@@ -44,24 +44,34 @@ void __fastcall CGlobalFunctions::ConvertUTF8ToLatin1(const char *source, char *
 		{
 			switch (cp)
 			{
-			case 0x2013:
-				cp = 0x96;
-				break;
-
-			case 0x2014:
-				cp = 0x97;
-				break;
-
-			case 0x2018:
-				cp = 0x91;
-				break;
-
-			case 0x2026:
-				cp = 0x85;
-				break;
-
-			default:
-				break;
+			case 0x00000152: cp = 0x8c; break;
+			case 0x00000153: cp = 0x9c; break;
+			case 0x00000160: cp = 0x8a; break;
+			case 0x00000161: cp = 0x9a; break;
+			case 0x00000178: cp = 0x9f; break;
+			case 0x0000017d: cp = 0x8e; break;
+			case 0x0000017e: cp = 0x9e; break;
+			case 0x00000192: cp = 0x83; break;
+			case 0x000002c6: cp = 0x88; break;
+			case 0x000002dc: cp = 0x98; break;
+			case 0x00002013: cp = 0x96; break;
+			case 0x00002014: cp = 0x97; break;
+			case 0x00002018: cp = 0x91; break;
+			case 0x00002019: cp = 0x92; break;
+			case 0x0000201a: cp = 0x82; break;
+			case 0x0000201c: cp = 0x93; break;
+			case 0x0000201d: cp = 0x94; break;
+			case 0x0000201e: cp = 0x84; break;
+			case 0x00002020: cp = 0x86; break;
+			case 0x00002021: cp = 0x87; break;
+			case 0x00002022: cp = 0x95; break;
+			case 0x00002026: cp = 0x85; break;
+			case 0x00002030: cp = 0x89; break;
+			case 0x00002039: cp = 0x8b; break;
+			case 0x0000203a: cp = 0x9b; break;
+			case 0x000020ac: cp = 0x80; break;
+			case 0x00002122: cp = 0x99; break;
+			default: break;
 			}
 		}
 	}
