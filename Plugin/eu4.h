@@ -74,7 +74,7 @@ struct EU4Game
 	std::uintptr_t *pfGFXSetTexture;
 
 	std::uintptr_t pfVFSOpenFile;
-	void *pfPHYSFS_OpenRead;
+	void *pfPHYSFS_openRead;
 
 	char *poriginal_text;
 	char *pword;

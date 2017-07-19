@@ -65,7 +65,7 @@ void enumerate_chars(const char *folder)
 		
 		for (auto chr : wbuffer)
 		{
-			if (chr > 255 && chr != 0x2013 && chr != 0x2014 && chr != 0x2018 && chr != 0x2026)
+			if (chr > 255)
 			{
 				collection.insert(chr);
 			}
@@ -111,6 +111,8 @@ void generate_data()
 	{
 		return;
 	}
+
+	ofs << "\xEF\xBB\xBF";
 
 	utf8::unchecked::utf32to8(wbuffer.begin(), wbuffer.end(), ostreambuf_iterator<char>(ofs));
 

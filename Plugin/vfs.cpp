@@ -100,7 +100,7 @@ void *VFSOpenFile_0x8D(const char *vfspath)
 		vfspath = it->second.c_str();
 	}
 
-	return injector::cstd<void *(const char *)>::call(game.pfPHYSFS_OpenRead, vfspath);
+	return injector::cstd<void *(const char *)>::call(game.pfPHYSFS_openRead, vfspath);
 };
 
 void VFS::Patch()
