@@ -1,4 +1,5 @@
 #pragma once
+#include "stdinc.h"
 
 class CTextureHandler
 {

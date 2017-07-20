@@ -1,5 +1,5 @@
+#include "stdinc.h"
 #include "eu4.h"
-#include "../include/pattern/byte_pattern.h"
 
 EU4Game::EU4Game()
 {

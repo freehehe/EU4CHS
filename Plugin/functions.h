@@ -1,6 +1,5 @@
 #pragma once
 #include "stdinc.h"
-#include <vector>
 
 struct CGlobalFunctions
 {

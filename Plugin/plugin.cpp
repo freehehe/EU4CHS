@@ -1,10 +1,9 @@
-﻿#include "plugin.h"
+﻿#include "stdinc.h"
+#include "plugin.h"
 #include "bitmapfont.h"
 #include "functions.h"
 #include "table.h"
 #include "vfs.h"
-#include <string>
-#include <cstring>
 
 static std::string texture_path;
 static std::string table_path;

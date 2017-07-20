@@ -1,16 +1,7 @@
+#include "stdinc.h"
 #include "plugin.h"
 #include "vfs.h"
 #include "eu4.h"
-#include <windows.h>
-#include <string>
-#include <string_view>
-#include <functional>
-#include <map>
-#include <algorithm>
-
-#include "../include/injector/hooking.hpp"
-#include "../include/injector/assembly.hpp"
-#include "../include/injector/calling.hpp"
 
 static std::map<std::size_t, std::string> files;
 static std::string ourroot;

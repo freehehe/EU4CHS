@@ -1,10 +1,7 @@
-#include "plugin.h"
+#include "stdinc.h"
 #include "table.h"
-#include <utility>
-#include <vector>
-#include <fstream>
 
-static std::vector<std::pair<uint8,uint8>> table;
+static std::vector<std::pair<uint8, uint8>> table;
 
 void CCharTable::ReadTable(const char *filename)
 {

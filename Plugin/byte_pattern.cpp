@@ -1,8 +1,5 @@
-﻿#define NOMINMAX
+﻿#include "stdinc.h"
 #include "byte_pattern.h"
-#include <windows.h>
-#include <array>
-#include <algorithm>
 
 extern const HMODULE default_module = GetModuleHandleA(NULL);
 byte_pattern g_pattern;
@@ -322,7 +319,7 @@ void byte_pattern::bm_search()
 			}
 			else
 			{
-				range_begin += std::max(index - bc_it[range_begin[index]], gs_it[index]);
+				range_begin += max(index - bc_it[range_begin[index]], gs_it[index]);
 			}
 		}
 	}

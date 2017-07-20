@@ -1,12 +1,8 @@
-﻿#include "bitmapfont.h"
+﻿#include "stdinc.h"
+#include "bitmapfont.h"
 #include "table.h"
 #include "functions.h"
-#include "../include/utf8cpp/utf8.h"
-#include "../include/injector/calling.hpp"
-#include "../include/injector/assembly.hpp"
-#include <iterator>
-#include <vector>
-#include <algorithm>
+#include "eu4.h"
 
 static const float TextureWidth = 4096.0f;
 static const float TextureHeight = 4096.0f;

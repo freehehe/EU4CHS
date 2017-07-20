@@ -80,6 +80,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <TargetExt>.asi</TargetExt>
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -113,14 +114,14 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;PLUGIN_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <PrecompiledHeaderFile>stdinc.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -148,20 +149,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\include\pattern\byte_pattern.cpp" />
     <ClCompile Include="bitmapfont.cpp" />
+    <ClCompile Include="byte_pattern.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="eu4.cpp" />
     <ClCompile Include="functions.cpp" />
     <ClCompile Include="plugin.cpp" />
+    <ClCompile Include="stdinc.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="table.cpp" />
     <ClCompile Include="textbuffer.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="vfs.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\pattern\byte_pattern.h" />
     <ClInclude Include="bitmapfont.h" />
+    <ClInclude Include="byte_pattern.h" />
     <ClInclude Include="eu4.h" />
     <ClInclude Include="functions.h" />
     <ClInclude Include="stdinc.h" />

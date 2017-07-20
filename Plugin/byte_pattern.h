@@ -1,10 +1,5 @@
 #pragma once
-#include <windows.h>
-#include <cstdint>
-#include <cstddef>
-#include <vector>
-#include <array>
-#include <utility>
+#include "stdinc.h"
 
 extern const HMODULE default_module;
 

@@ -1,5 +1,5 @@
 #pragma once
-#include <windows.h>
+#include "stdinc.h"
 
 class Plugin
 {

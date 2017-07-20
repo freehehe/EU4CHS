@@ -1,5 +1,5 @@
 #pragma once
-#include <string>
+#include "stdinc.h"
 
 class VFS
 {

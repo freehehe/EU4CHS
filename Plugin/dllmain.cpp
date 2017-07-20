@@ -1,23 +1,16 @@
+#include "stdinc.h"
 #include "plugin.h"
 #include "eu4.h"
-#include <vector>
-#include <iterator>
-#include <iostream>
-#include <utility>
-#include <fstream>
-#include <algorithm>
-#include "../include/utf8cpp/utf8.h"
-#include "../include/injector/calling.hpp"
-
-std::vector<char> u8sequence;
-std::vector<char> latin1s(0x10000);
-std::vector<std::pair<std::uint32_t, char>> result(0xFFFF);
 
 void UTF8ToLatin1View()
 {
+	std::vector<char> u8sequence;
+	std::vector<char> latin1s(0x10000);
+	std::vector<std::pair<std::uint32_t, char>> result(0xFFFF);
+
 	for (std::uint32_t cp = 1; cp < 0x10000; ++cp)
 	{
-		utf8::unchecked::append(cp, back_inserter(u8sequence));
+		utf8::unchecked::append(cp, std::back_inserter(u8sequence));
 	}
 
 	u8sequence.push_back(0);
@@ -32,11 +25,12 @@ void UTF8ToLatin1View()
 		result[index].second = latin1s[index];
 	}
 
-	result.erase(std::remove_if(result.begin(), result.end(), 
-		[](std::pair<std::uint32_t, char> &p)
-	{
-		return (p.first > 255) && (p.second == '?');
-	}), result.end());
+	result.erase(std::remove_if(result.begin(), result.end(),
+		[](std::pair<std::uint32_t, char> &p) {
+		return (p.first > 255) && (p.second == '?'); }),
+		result.end());
+
+	std::cout << result.size();
 }
 
 BOOL WINAPI DllMain(HMODULE module, DWORD reason, void *reserved)
