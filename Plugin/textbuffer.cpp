@@ -1,7 +1,7 @@
 #include "stdinc.h"
 #include "textbuffer.h"
 
-std::ptrdiff_t GetLengthOfPreviousCodePoint(char *p)
+static std::ptrdiff_t GetLengthOfPreviousCodePoint(char *p)
 {
 	char *p2 = p;
 

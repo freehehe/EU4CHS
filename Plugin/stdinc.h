@@ -19,7 +19,6 @@
 #include "../include/injector/hooking.hpp"
 #include "../include/injector/calling.hpp"
 #include "../include/injector/assembly.hpp"
-#include "byte_pattern.h"
 
 #define VALIDATE_SIZE(type,size) static_assert(sizeof(type)==size);
 
