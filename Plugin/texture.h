@@ -1,14 +1,12 @@
 #pragma once
 #include "stdinc.h"
 
-class CTextureHandler
+class CTexture
 {
 public:
-	static int LoadTexture();
-	static void *GetTexture(int);
-	static void UnloadTexture(int);
-
-	static void LoadTextureHook();
+	static void *GetCHSTexture();
+	static void LoadTextureCallback();
+	static void UnloadTextureCallback();
 
 	static void Patch();
 };

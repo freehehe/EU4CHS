@@ -1,4 +1,5 @@
 #pragma once
+#include "stdinc.h"
 #include "eu4.h"
 
 struct CTextBuffer: IncompleteClass

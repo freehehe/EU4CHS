@@ -15,6 +15,7 @@
 #include <utility>
 #include <cstring>
 #include <cctype>
+#include <optional>
 #include "../include/utf8cpp/utf8.h"
 #include "../include/injector/hooking.hpp"
 #include "../include/injector/calling.hpp"
@@ -76,6 +77,12 @@ struct CVector4
 	T y;
 	T z;
 	T w;
+};
+
+struct CCursorPosition
+{
+	uint16 row;
+	uint16 column;
 };
 
 struct CString
