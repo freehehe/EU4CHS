@@ -82,7 +82,7 @@ void VFS::EnumerateOurFiles()
 	EnumerateFolder(ourroot);
 }
 
-void *VFSOpenFile_0x8D(const char *vfspath)
+static void *VFSOpenFile_0x8D(const char *vfspath)
 {
 	auto it = files.find(std::hash<std::string_view>()(vfspath));
 

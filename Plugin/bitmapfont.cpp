@@ -14,10 +14,6 @@ static const float TextureColumns = TextureHeight / CharacterHeight;
 static const float default_width = 8.0f;
 static const int chs_width = 32;
 
-static uint32 woriginal_text[3072];
-static uint32 wword[256];
-static uint32 wprocessed_text[3132];
-
 int __fastcall CBitmapFont::GetWidthOfString(CBitmapFont *pFont, int edx, const char *text, const int length, bool bUseSpecialChars)
 {
 	static std::vector<uint32> wtext;

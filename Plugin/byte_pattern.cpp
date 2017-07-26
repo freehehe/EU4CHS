@@ -254,37 +254,7 @@ void byte_pattern::bm_preprocess()
 	}
 
 	//Good suffix
-	std::ptrdiff_t m = this->_pattern.size();
-
-	this->_bmgs.resize(m, 1);
-
-	std::vector<std::ptrdiff_t> suffix(m);
-
-	suffix[m - 1] = m;
-
-	for (auto i = m - 2; i >= 0; --i)
-	{
-		auto q = i;
-
-		while (q >= 0 && this->_pattern[q] == this->_pattern[m - 1 - i + q])
-			--q;
-
-		suffix[i] = i - q;
-	}
-
-	for (auto i = 0; i < m; ++i)
-		this->_bmgs[i] = m;
-
-	auto j = 0;
-
-	for (auto i = m - 1; i >= 0; --i)
-		if (suffix[i] == i + 1)
-			for (; j < m - 1 - i; ++j)
-				if (this->_bmgs[j] == m)
-					this->_bmgs[j] = m - 1 - i;
-
-	for (auto i = 0; i <= m - 2; ++i)
-		this->_bmgs[m - 1 - suffix[i]] = m - 1 - i;
+	this->_bmgs.resize(this->_pattern.size(), 1);
 }
 
 void byte_pattern::bm_search()
@@ -294,19 +264,13 @@ void byte_pattern::bm_search()
 
 	std::ptrdiff_t index;
 
-	//operator[] in debug build is really slow!
-	auto pattern_length = this->_pattern.size();
-	auto pattern_it = this->_pattern.data();
-	auto bc_it = this->_bmbc.data();
-	auto gs_it = this->_bmgs.data();
-
 	__try
 	{
 		while (range_begin <= range_end)
 		{
-			for (index = pattern_length - 1; index >= 0; --index)
+			for (index = this->_pattern.size() - 1; index >= 0; --index)
 			{
-				if (!pattern_it[index].match(range_begin[index]))
+				if (!this->_pattern[index].match(range_begin[index]))
 				{
 					break;
 				}
@@ -315,11 +279,11 @@ void byte_pattern::bm_search()
 			if (index == -1)
 			{
 				this->_result.emplace_back(range_begin);
-				range_begin += pattern_length;
+				range_begin += this->_pattern.size();
 			}
 			else
 			{
-				range_begin += max(index - bc_it[range_begin[index]], gs_it[index]);
+				range_begin += max(index - this->_bmbc[range_begin[index]], this->_bmgs[index]);
 			}
 		}
 	}
