@@ -1,4 +1,4 @@
-﻿#include <windows.h>
+﻿#include <filesystem>
 #include <string>
 #include <string_view>
 #include <unordered_map>
@@ -8,36 +8,29 @@
 #include <fstream>
 #include <set>
 #include <iterator>
-#include "../include/utf8cpp/utf8.h"
+#include <string_view>
 
 using namespace std;
-using namespace utf8::unchecked;
+using namespace std::experimental;
 
-void fuck(const char *file)
+void fuck(const char *folder)
 {
-	vector<uint32_t> wbuffer;
-	set<uint32_t> wset;
+	filesystem::v1::recursive_directory_iterator recur_it(folder);
+	std::string_view root(folder);
 
-	ifstream ifs(file);
-
-	if (!ifs)
+	while (recur_it != filesystem::v1::recursive_directory_iterator())
 	{
-		return;
+		if (filesystem::is_regular_file(recur_it->path()))
+		{
+			cout << recur_it->path().string().data() + root.length() + 1 << '\n';
+		}
+
+		++recur_it;
 	}
-
-	istreambuf_iterator<char> bufit(ifs);
-	istreambuf_iterator<char> bufend;
-
-	utf8to32(bufit, bufend, back_inserter(wbuffer));
-
-	wset.insert(wbuffer.begin(), wbuffer.end());
-
-	cout << *wset.begin();
 }
-
 
 int main()
 {
-	fuck("C:\\allin1.yml");
+	fuck(R"(C:\Program Files\Git)");
 	return 0;
 }

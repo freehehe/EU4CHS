@@ -17,6 +17,7 @@
 #include <cstring>
 #include <cctype>
 #include <optional>
+#include <filesystem>
 #include "../include/utf8cpp/utf8.h"
 #include "../include/injector/hooking.hpp"
 #include "../include/injector/calling.hpp"

@@ -9,52 +9,29 @@ static std::string gameroot;
 
 void VFS::EnumerateFolder(const std::string &folder)
 {
-	WIN32_FIND_DATAA fda;
-
 	std::string vfspath;
 	std::string ourvfspath;
-	std::string subfolder;
-	std::string filename;
-	std::string search_name;
 
-	search_name = folder;
+	std::experimental::filesystem::recursive_directory_iterator recur_it(folder);
+	std::string_view root(folder);
 
-	search_name += "/*";
-
-	HANDLE hFind = FindFirstFileA(search_name.c_str(), &fda);
-
-	if (hFind == INVALID_HANDLE_VALUE)
+	while (recur_it != std::experimental::filesystem::recursive_directory_iterator())
 	{
-		return;
-	}
-
-	do
-	{
-		if (fda.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+		if (std::experimental::filesystem::is_regular_file(recur_it->path()))
 		{
-			if (fda.cFileName[0] == '.')
-			{
-				continue;
-			}
+			const std::string &full_path = recur_it->path().string();
 
-			subfolder = folder;
-			subfolder += '/';
-			subfolder += fda.cFileName;
+			vfspath = full_path.data() + ourroot.length() + 1;
+			ourvfspath = full_path.data() + gameroot.length() + 1;
 
-			EnumerateFolder(subfolder);
-		}
-		else
-		{
-			filename = folder;
-			filename += '/';
-			filename += fda.cFileName;
-			vfspath = filename.data() + ourroot.length() + 1;
-			ourvfspath = filename.data() + gameroot.length() + 1;
+			std::replace(vfspath.begin(), vfspath.end(), '\\', '/');
+			std::replace(ourvfspath.begin(), ourvfspath.end(), '\\', '/');
 
 			files.emplace(std::hash<std::string_view>()(vfspath), ourvfspath);
-
 		}
-	} while (FindNextFileA(hFind, &fda));
+
+		++recur_it;
+	}
 }
 
 void VFS::EnumerateOurFiles()
@@ -75,9 +52,6 @@ void VFS::EnumerateOurFiles()
 
 	ourroot = buffer;
 	ourroot += "\\vfsroot";
-
-	std::replace(gameroot.begin(), gameroot.end(), '\\', '/');
-	std::replace(ourroot.begin(), ourroot.end(), '\\', '/');
 
 	EnumerateFolder(ourroot);
 }
