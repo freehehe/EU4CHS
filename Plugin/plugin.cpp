@@ -28,8 +28,6 @@ void Plugin::Init(HMODULE hself)
 	std::strcpy(std::strrchr(filename, '\\'), "\\eu4chs\\font.dat");
 	table_path = filename;
 
-	VFS::EnumerateOurFiles();
-
 	Patch();
 }
 
@@ -55,8 +53,5 @@ const char *Plugin::GetTablePath()
 
 void Plugin::Patch()
 {
-	CCharTable::ReadTable(GetTablePath());
-	CBitmapFont::Patch();
-	CGlobalFunctions::Patch();
 	VFS::Patch();
 }

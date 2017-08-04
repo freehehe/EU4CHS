@@ -42,7 +42,7 @@ BOOL WINAPI DllMain(HMODULE module, DWORD reason, void *reserved)
 	{
 		//Plugin::Init(module);
 
-		UTF8ToLatin1View();
+		//UTF8ToLatin1View();
 	}
 
 	return TRUE;
