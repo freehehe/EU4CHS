@@ -96,7 +96,7 @@ int __fastcall CBitmapFont::GetWidthOfString(CBitmapFont *pFont, int edx, const 
 						push nextcp;
 						push cp;
 						mov ecx, pset;
-						call game.pfCBitmapFontCharacterSet_GetKerning;
+						call game_meta.pfCBitmapFontCharacterSet_GetKerning;
 						movss fkerning, xmm0;
 					}
 
@@ -164,8 +164,8 @@ struct CBitmapFont_RenderToScreen_0x690_13
 {
 	void operator()(injector::reg_pack &regs) const
 	{
-		char *source = game.poriginal_text + regs.edi;
-		char *dest = game.pword + regs.esi;
+		char *source = game_meta.pOriginalText + regs.edi;
+		char *dest = game_meta.pWord + regs.esi;
 
 		cp_len = utf8::internal::sequence_length(source);
 
@@ -206,7 +206,7 @@ __declspec(naked) void CBitmapFont_RenderToScreen_0x8CE_20()
 		push next_code_point;
 		push code_point;
 		mov ecx, [ebp - 0x34];
-		call game.pfCBitmapFontCharacterSet_GetKerning;
+		call game_meta.pfCBitmapFontCharacterSet_GetKerning;
 		jmp j_ret;
 
 	no_kerning:
@@ -251,5 +251,5 @@ struct CBitmapFont_RenderToScreen_OFF_SIZE
 
 void CBitmapFont::Patch()
 {
-	injector::MakeJMP(game.pfCBitmapFont_GetWidthOfString, CBitmapFont::GetWidthOfString);
+	injector::MakeJMP(game_meta.pfCBitmapFont_GetWidthOfString, CBitmapFont::GetWidthOfString);
 }

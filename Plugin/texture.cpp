@@ -2,24 +2,27 @@
 #include "texture.h"
 #include "eu4.h"
 
-static std::map<std::size_t, void *> textures;
+static std::size_t refcount;
 static void *hTexture;
 
 void CTexture::LoadTextureCallback()
 {
-	if (!hTexture)
+	if (refcount == 0)
 	{
 
 	}
+
+	++refcount;
 }
 
 void CTexture::UnloadTextureCallback()
 {
-	if (hTexture)
+	if (refcount == 1)
 	{
 
-		hTexture = nullptr;
 	}
+
+	--refcount;
 }
 
 void *CTexture::GetCHSTexture()

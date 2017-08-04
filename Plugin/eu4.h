@@ -1,7 +1,7 @@
 #pragma once
 #include "stdinc.h"
 
-struct EU4Game
+struct EU4Meta
 {
 	std::uintptr_t pfCTextureHandler_AddTexture;
 	std::uintptr_t pfCTextureHandler_GetTexture;
@@ -22,11 +22,11 @@ struct EU4Game
 	std::uintptr_t pfVFSOpenFile;
 	void *pfPHYSFS_openRead;
 
-	char *poriginal_text;
-	char *pword;
-	char *pprocessed_text;
+	char *pOriginalText;
+	char *pWord;
+	char *pProcessedText;
 
-	EU4Game();
+	EU4Meta();
 };
 
-extern EU4Game game;
+extern EU4Meta game_meta;

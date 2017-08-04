@@ -48,10 +48,10 @@ void VFS::EnumerateOurFiles()
 
 	GetModuleFileNameA(Plugin::GetASIHandle(), buffer, 512);
 
-	*std::strrchr(buffer, '.') = 0;
+	*(std::strrchr(buffer, '\\') + 1) = 0;
 
 	ourroot = buffer;
-	ourroot += "\\vfsroot";
+	ourroot += "eu4chs\\vfsroot";
 
 	EnumerateFolder(ourroot);
 }
@@ -65,10 +65,10 @@ static void *VFSOpenFile_0x8D(const char *vfspath)
 		vfspath = it->second.c_str();
 	}
 
-	return injector::cstd<void *(const char *)>::call(game.pfPHYSFS_openRead, vfspath);
+	return injector::cstd<void *(const char *)>::call(game_meta.pfPHYSFS_openRead, vfspath);
 };
 
 void VFS::Patch()
 {
-	injector::MakeCALL(game.pfVFSOpenFile + 0x8D, VFSOpenFile_0x8D);
+	injector::MakeCALL(game_meta.pfVFSOpenFile + 0x8D, VFSOpenFile_0x8D);
 }
