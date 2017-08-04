@@ -93,5 +93,5 @@ bool CGlobalFunctions::IsTextIconChar(uint32 cp)
 
 void CGlobalFunctions::Patch()
 {
-	injector::MakeJMP(game.pfConvertUTF8ToLatin1, ConvertUTF8ToLatin1);
+	injector::MakeJMP(game_meta.pfConvertUTF8ToLatin1, ConvertUTF8ToLatin1);
 }

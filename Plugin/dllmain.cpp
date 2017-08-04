@@ -18,7 +18,7 @@ void UTF8ToLatin1View()
 
 	u8sequence.push_back(0);
 
-	injector::fastcall<void(const char *, unsigned char *)>::call(game.pfConvertUTF8ToLatin1, u8sequence.data(), latin1s.data());
+	injector::fastcall<void(const char *, unsigned char *)>::call(game_meta.pfConvertUTF8ToLatin1, u8sequence.data(), latin1s.data());
 
 	latin1s.pop_back();
 

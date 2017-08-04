@@ -19,6 +19,8 @@ static vector<uint32_t> wbuffer;
 static vector<vector<uint32_t>> char_matrix(1);
 static vector<pair<uint8_t, uint8_t>> table(0x10000, pair<uint8_t, uint8_t>(63, 63));
 
+#error rewrite with std::filesystem
+
 void enumerate_chars(const char *folder)
 {
 	ifstream ifs;

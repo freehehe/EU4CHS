@@ -1,7 +1,7 @@
 ﻿#include "stdinc.h"
 #include "byte_pattern.h"
 
-extern const HMODULE default_module = GetModuleHandleA(NULL);
+extern const HMODULE pattern_default_module = GetModuleHandleA(NULL);
 byte_pattern g_pattern;
 
 byte_pattern::byte_pattern(const char *pattern_literal)
@@ -9,44 +9,46 @@ byte_pattern::byte_pattern(const char *pattern_literal)
 	this->initialize(pattern_literal);
 }
 
-byte_pattern::byte_pattern(pattern_match module, const char *pattern_literal)
+byte_pattern::byte_pattern(memory_pointer module, const char *pattern_literal)
 {
 	this->initialize(module, pattern_literal);
 }
 
-byte_pattern::byte_pattern(pattern_match range_begin, pattern_match range_end, const char *pattern_literal)
+byte_pattern::byte_pattern(memory_pointer range_begin, memory_pointer range_end, const char *pattern_literal)
 {
 	this->initialize(range_begin, range_end, pattern_literal);
 }
 
 void byte_pattern::initialize(const char *pattern_literal)
 {
-	this->executable_range(default_module);
+	this->get_module_range(pattern_default_module);
 	this->transform_pattern(pattern_literal);
 	this->do_search();
 }
 
-void byte_pattern::initialize(pattern_match module, const char *pattern_literal)
+void byte_pattern::initialize(memory_pointer module, const char *pattern_literal)
 {
-	this->executable_range(module);
+	this->get_module_range(module);
 	this->transform_pattern(pattern_literal);
 	this->do_search();
 }
 
-void byte_pattern::initialize(pattern_match range_begin, pattern_match range_end, const char *pattern_literal)
+void byte_pattern::initialize(memory_pointer range_begin, memory_pointer range_end, const char *pattern_literal)
 {
 	this->set_range(range_begin, range_end);
 	this->transform_pattern(pattern_literal);
 	this->do_search();
 }
 
-const pattern_match &byte_pattern::get(std::size_t index) const
+const memory_pointer &byte_pattern::get(std::size_t index) const
 {
 	return this->_result[index];
 }
 
 byte_pattern &byte_pattern::set_pattern(const char *pattern_literal)
 {
+	this->_result.clear();
+	this->_processed = false;
 	this->transform_pattern(pattern_literal);
 
 	return *this;
@@ -60,14 +62,14 @@ byte_pattern &byte_pattern::set_pattern(const void *data, std::size_t size)
 	return *this;
 }
 
-byte_pattern &byte_pattern::set_module(pattern_match module)
+byte_pattern &byte_pattern::set_module(memory_pointer module)
 {
-	this->executable_range(module);
+	this->get_module_range(module);
 
 	return *this;
 }
 
-byte_pattern &byte_pattern::set_range(pattern_match beg, pattern_match end)
+byte_pattern &byte_pattern::set_range(memory_pointer beg, memory_pointer end)
 {
 	this->_range = { beg.address(), end.address() };
 
@@ -136,14 +138,6 @@ void byte_pattern::transform_pattern(const char *pattern_literal)
 			{
 				this->_pattern.emplace_back();
 			}
-			else if (temp_string[0] == '?' && is_digit(temp_string[1]))
-			{
-				this->_pattern.emplace_back(tol(temp_string[1]), pattern_byte::match_method::LOW_FOUR);
-			}
-			else if (temp_string[1] == '?' && is_digit(temp_string[0]))
-			{
-				this->_pattern.emplace_back(tol(temp_string[0]), pattern_byte::match_method::HIGH_FOUR);
-			}
 			else if (is_digit(temp_string[0]) && is_digit(temp_string[1]))
 			{
 				this->_pattern.emplace_back((tol(temp_string[0]) << 4) | tol(temp_string[1]));
@@ -177,10 +171,9 @@ void byte_pattern::transform_pattern(const char *pattern_literal)
 	}
 
 	this->bm_preprocess();
-	this->force_search();
 }
 
-void byte_pattern::executable_range(pattern_match module)
+void byte_pattern::get_module_range(memory_pointer module)
 {
 	static auto getSection = [](const PIMAGE_NT_HEADERS nt_headers, unsigned section) -> PIMAGE_SECTION_HEADER
 	{
@@ -255,6 +248,7 @@ void byte_pattern::bm_preprocess()
 
 	//Good suffix
 	this->_bmgs.resize(this->_pattern.size(), 1);
+
 }
 
 void byte_pattern::bm_search()

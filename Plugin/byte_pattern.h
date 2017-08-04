@@ -1,7 +1,7 @@
 #pragma once
 #include "stdinc.h"
 
-extern const HMODULE default_module;
+#error may have bugs
 
 class pattern_byte
 {
@@ -9,8 +9,6 @@ public:
 	enum class match_method :std::uint8_t
 	{
 		WILDCARD,
-		HIGH_FOUR,
-		LOW_FOUR,
 		EXACT
 	};
 
@@ -51,12 +49,6 @@ public:
 		case match_method::EXACT:
 			return this->_value == byte;
 
-		case match_method::HIGH_FOUR:
-			return this->_value == (byte >> 4u);
-
-		case match_method::LOW_FOUR:
-			return this->_value == (byte & 0x0Fu);
-
 		case match_method::WILDCARD:
 			return true;
 
@@ -90,7 +82,7 @@ private:
 	match_method _method;
 };
 
-class pattern_match
+class memory_pointer
 {
 	union
 	{
@@ -99,12 +91,12 @@ class pattern_match
 	};
 
 public:
-	pattern_match(void* pointer)
+	memory_pointer(void *pointer)
 		: _pointer(pointer)
 	{
 	}
 
-	pattern_match(std::uintptr_t address)
+	memory_pointer(std::uintptr_t address)
 		: _address(address)
 	{
 	}
@@ -125,7 +117,7 @@ class byte_pattern
 {
 	std::pair<std::uintptr_t, std::uintptr_t> _range;
 	std::vector<pattern_byte> _pattern;
-	std::vector<pattern_match> _result;
+	std::vector<memory_pointer> _result;
 
 	bool _processed = false;
 
@@ -133,11 +125,11 @@ class byte_pattern
 	std::vector<std::ptrdiff_t> _bmgs;
 
 	void transform_pattern(const char *pattern_literal);
-	void executable_range(pattern_match module);
+	void get_module_range(memory_pointer module);
 
 	void initialize(const char *pattern_literal);
-	void initialize(pattern_match module, const char *pattern_literal);
-	void initialize(pattern_match range_begin, pattern_match range_end, const char *pattern_literal);
+	void initialize(memory_pointer module, const char *pattern_literal);
+	void initialize(memory_pointer range_begin, memory_pointer range_end, const char *pattern_literal);
 	void do_search();
 
 	void bm_preprocess();
@@ -145,15 +137,15 @@ class byte_pattern
 
 public:
 	explicit byte_pattern(const char *pattern_literal);
-	explicit byte_pattern(pattern_match module = default_module, const char *pattern_literal = nullptr);
-	byte_pattern(pattern_match range_begin, pattern_match range_end, const char *pattern_literal = nullptr);
+	explicit byte_pattern(memory_pointer module = pattern_default_module, const char *pattern_literal = nullptr);
+	byte_pattern(memory_pointer range_begin, memory_pointer range_end, const char *pattern_literal = nullptr);
 
-	const pattern_match &get(std::size_t index) const;
+	const memory_pointer &get(std::size_t index) const;
 
 	byte_pattern &set_pattern(const char *pattern_literal);
 	byte_pattern &set_pattern(const void *data, std::size_t size);
-	byte_pattern &set_module(pattern_match module = default_module);
-	byte_pattern &set_range(pattern_match beg, pattern_match end);
+	byte_pattern &set_module(memory_pointer module = pattern_default_module);
+	byte_pattern &set_range(memory_pointer beg, memory_pointer end);
 	byte_pattern &force_search();
 
 	std::size_t size() const;
@@ -173,4 +165,5 @@ public:
 	bool check_address(std::uintptr_t address) const;
 };
 
+extern const HMODULE pattern_default_module;
 extern byte_pattern g_pattern;
