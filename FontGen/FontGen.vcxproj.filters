@@ -20,6 +20,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="Extra.txt" />
+    <Text Include="3500chs.txt" />
+    <Text Include="52addchar.txt" />
   </ItemGroup>
 </Project>
