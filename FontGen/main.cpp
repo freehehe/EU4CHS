@@ -19,8 +19,6 @@ static vector<uint32_t> wbuffer;
 static vector<vector<uint32_t>> char_matrix(1);
 static vector<pair<uint8_t, uint8_t>> table(0x10000, pair<uint8_t, uint8_t>(63, 63));
 
-#error rewrite with std::filesystem
-
 void enumerate_chars(const char *folder)
 {
 	ifstream ifs;
@@ -134,7 +132,7 @@ void generate_data()
 		wbuffer.push_back('\n');
 	}
 
-	ofstream ofs("C:\\eu4chs.txt", ios::trunc);
+	ofstream ofs("C:/eu4chs_release/font/eu4chs.txt", ios::trunc);
 
 	if (!ofs)
 	{
@@ -147,7 +145,7 @@ void generate_data()
 
 	ofs.close();
 
-	FILE *hf = fopen("C:\\eu4chs.dat", "wb");
+	FILE *hf = fopen("C:/eu4chs_release/font/eu4chs.dat", "wb");
 
 	if (!hf)
 	{
@@ -161,7 +159,7 @@ void generate_data()
 
 int main(int argc, char **argv)
 {
-	enumerate_chars("C:\\ymls");
+	enumerate_chars("C:/eu4chs_release/ymls");
 	generate_data();
 
 	return 0;

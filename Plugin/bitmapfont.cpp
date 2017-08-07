@@ -222,15 +222,18 @@ __declspec(naked) void CBitmapFont_RenderToScreen_0x8FA_11()
 	__asm
 	{
 		pop ret_addr;
+		cmp code_point, 0xFF;
+		ja j_break;
+		cmp [ecx]CBitmapFontCharacterValue.h, 0;
+		jmp ret_addr;
 
-
-
-	j_newline:
-
-	j_chs:
+	j_break:
+		add ret_addr, 6;
 		jmp ret_addr;
 	}
 }
+
+
 
 __declspec(naked) void CBitmapFont_RenderToScreen_OFF_SIZE()
 {

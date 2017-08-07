@@ -1,7 +1,7 @@
 #pragma once
 #include "stdinc.h"
 
-#error may have bugs
+extern const HMODULE pattern_default_module;
 
 class pattern_byte
 {
@@ -111,6 +111,17 @@ public:
 	{
 		return reinterpret_cast<T *>(this->address(offset));
 	}
+
+	operator std::uintptr_t() const
+	{
+		return _address;
+	}
+
+	template <typename T>
+	operator T *() const
+	{
+		return _pointer;
+	}
 };
 
 class byte_pattern
@@ -165,5 +176,5 @@ public:
 	bool check_address(std::uintptr_t address) const;
 };
 
-extern const HMODULE pattern_default_module;
+
 extern byte_pattern g_pattern;

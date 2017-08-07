@@ -5,6 +5,8 @@
 static std::size_t refcount;
 static void *hTexture;
 
+static struct CTextureHandler instance;
+
 void CTexture::LoadTextureCallback()
 {
 	if (refcount == 0)

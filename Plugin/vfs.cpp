@@ -70,5 +70,6 @@ static void *VFSOpenFile_0x8D(const char *vfspath)
 
 void VFS::Patch()
 {
+	EnumerateOurFiles();
 	injector::MakeCALL(game_meta.pfVFSOpenFile + 0x8D, VFSOpenFile_0x8D);
 }

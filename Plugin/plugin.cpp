@@ -53,5 +53,6 @@ const char *Plugin::GetTablePath()
 
 void Plugin::Patch()
 {
+	CGlobalFunctions::Patch();
 	VFS::Patch();
 }
