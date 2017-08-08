@@ -11,6 +11,7 @@ public:
 	static HMODULE GetASIHandle();
 	static HMODULE GetEXEHandle();
 
-	static const char *GetTexturePath();
+	static const char *GetFontPath();
+	static const char *GetMapFontPath();
 	static const char *GetTablePath();
 };

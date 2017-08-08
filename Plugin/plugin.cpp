@@ -5,8 +5,10 @@
 #include "table.h"
 #include "vfs.h"
 
-static std::string texture_path;
+static std::string font_path;
+static std::string mapfont_path;
 static std::string table_path;
+
 static HMODULE hasi;
 static HMODULE hexe;
 
@@ -22,7 +24,11 @@ void Plugin::Init(HMODULE hself)
 
 	std::strcpy(filename, module_path);
 	std::strcpy(std::strrchr(filename, '\\'), "\\eu4chs\\font.dds");
-	texture_path = filename;
+	font_path = filename;
+
+	std::strcpy(filename, module_path);
+	std::strcpy(std::strrchr(filename, '\\'), "\\eu4chs\\mapfont.dds");
+	mapfont_path = filename;
 
 	std::strcpy(filename, module_path);
 	std::strcpy(std::strrchr(filename, '\\'), "\\eu4chs\\font.dat");
@@ -41,10 +47,16 @@ HMODULE Plugin::GetEXEHandle()
 	return hexe;
 }
 
-const char *Plugin::GetTexturePath()
+const char *Plugin::GetFontPath()
 {
-	return texture_path.c_str();
+	return font_path.c_str();
 }
+
+const char *Plugin::GetMapFontPath()
+{
+	return mapfont_path.c_str();
+}
+
 
 const char *Plugin::GetTablePath()
 {

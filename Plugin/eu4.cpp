@@ -9,7 +9,7 @@ EU4Meta::EU4Meta()
 	this->pfCTextureHandler_AddTexture = g_pattern.set_pattern("83 EC 40 53 56 8B F1 32 DB 57 89 75 E8").force_search().get(0).address(-0x18);
 	this->pfCTextureHandler_GetTexture;
 
-	this->pfLoadDDS = g_pattern.set_pattern("83 EC 40 53 56 8B F1 32 DB 57 89 75 E8").force_search().get(0).address();
+	this->pfLoadDDSTextureFromMemory = g_pattern.set_pattern().force_search().get(0).address();
 
 	this->pfCBitmapFontCharacterSet_GetKerning = g_pattern.set_pattern("55 8B EC 56 8B F1 0F B6 4D 08").force_search().get(0).address();
 	this->pfCBitmapFont_GetWidthOfString = g_pattern.set_pattern("55 8B EC 83 E4 F8 81 EC 8C 00 00 00").force_search().get(0).address();

@@ -152,7 +152,7 @@ void PO2YML::WriteYMLs(const std::string &out_folder) const
 		for (auto &meta : file.second)
 		{
 			ofs << '#' << meta.second._name << ':' << meta.second._paradox_flag << ' ' << '"' << meta.second._original << '"' << '\n';
-			ofs << ' ' << meta.second._name << ':' << meta.second._paradox_flag << ' ' << '"' << meta.second._translated << '"' << "\n\n";
+			ofs << ' ' << meta.second._name << ':' << meta.second._paradox_flag << ' ' << '"' << meta.second._translated << '"' << '\n';
 		}
 	}
 }
@@ -173,7 +173,7 @@ void PO2YML::WriteYML(const std::string &out_folder) const
 		for (auto &meta : file.second)
 		{
 			ofs << '#' << meta.second._name << ':' << meta.second._paradox_flag << ' ' << '"' << meta.second._original << '"' << '\n';
-			ofs << ' ' << meta.second._name << ':' << meta.second._paradox_flag << ' ' << '"' << meta.second._translated << '"' << "\n\n";
+			ofs << ' ' << meta.second._name << ':' << meta.second._paradox_flag << ' ' << '"' << meta.second._translated << '"' << '\n';
 		}
 	}
 }
