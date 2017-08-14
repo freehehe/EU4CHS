@@ -81,6 +81,25 @@ void __fastcall CGlobalFunctions::ConvertUTF8ToLatin1(const char *source, char *
 	utf8::utf32to8(u32sequence.begin(), u32sequence.end(), dest);
 }
 
+void CGlobalFunctions::ConvertLatin1ToUTF8(const char *source, char *dest)
+{
+	static std::vector<uint32> s_buffer;
+
+	s_buffer.clear();
+
+	const unsigned char *it = reinterpret_cast<const unsigned char *>(source);
+
+	while (it != 0)
+	{
+		s_buffer.push_back(*it);
+		++it;
+	}
+
+	s_buffer.push_back(0);
+
+	utf8::unchecked::utf32to8(s_buffer.begin(), s_buffer.end(), dest);
+}
+
 bool CGlobalFunctions::IsNativeCharacter(uint32 cp)
 {
 	return cp <= 0xFF;

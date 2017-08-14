@@ -2,34 +2,21 @@
 #include "texture.h"
 #include "eu4.h"
 
-static std::size_t refcount;
-static void *hTexture;
-
-static struct CTextureHandler instance;
+static LPDIRECT3DTEXTURE9 hTexture;
 
 void CTexture::LoadTextureCallback()
 {
-	if (refcount == 0)
-	{
 
-	}
-
-	++refcount;
 }
 
 void CTexture::UnloadTextureCallback()
 {
-	if (refcount == 1)
-	{
-
-	}
-
-	--refcount;
+	hTexture->Release();
 }
 
-void *CTexture::GetCHSTexture()
+void *CTexture::()
 {
-	return hTexture;
+
 }
 
 void CTexture::Patch()

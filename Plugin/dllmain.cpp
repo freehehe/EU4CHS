@@ -1,7 +1,9 @@
-#include "stdinc.h"
+﻿#include "stdinc.h"
 #include "plugin.h"
 #include "eu4.h"
+#include "byte_pattern.h"
 
+//开发用 - 把ucs2字符集跑一遍生成转换表
 void UTF8ToLatin1View()
 {
 	std::vector<char> u8sequence; 

@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "stdinc.h"
 #include "eu4.h"
 
 //Mapfont
@@ -34,6 +35,10 @@ struct CBitmapFontCharacterSet :IncompleteClass
 
 struct CBitmapFont :IncompleteClass
 {
+	//field_9C : path name like gfx/fonts/vic18
+
+	//field_30->field_334 pointer to CTextureHandler
+
 	CBitmapFontCharacterSet *fieldB4()
 	{
 		return field<CBitmapFontCharacterSet, 0xB4>();

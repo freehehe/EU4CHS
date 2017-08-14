@@ -277,7 +277,7 @@ void byte_pattern::bm_search()
 			}
 			else
 			{
-				range_begin += max(index - this->_bmbc[range_begin[index]], this->_bmgs[index]);
+				range_begin += std::max(index - this->_bmbc[range_begin[index]], this->_bmgs[index]);
 			}
 		}
 	}

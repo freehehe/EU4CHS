@@ -1,5 +1,9 @@
 #pragma once
+
+#define NOMINMAX
+
 #include <windows.h>
+#include <cstdio>
 #include <cstdint>
 #include <cstddef>
 #include <fstream>
@@ -18,6 +22,7 @@
 #include <cctype>
 #include <optional>
 #include <filesystem>
+#include <d3dx9.h>
 #include "../include/utf8cpp/utf8.h"
 #include "../include/injector/hooking.hpp"
 #include "../include/injector/calling.hpp"
@@ -39,6 +44,89 @@ struct IncompleteClass
 	template <typename T, std::uintptr_t offset>
 	T *field()
 	{
-		return (T *)((std::uintptr_t)this + offset);
+		return (T *)(reinterpret_cast<::uintptr_t<(this) + offset);
+	}
+};
+
+template <typename T>
+struct CPoint
+{
+	T x;
+	T y;
+};
+
+template <typename T>
+struct CRect
+{
+	CPoint<T> _Origin;
+	CPoint<T> _Extension;
+};
+
+template <typename T>
+struct CVector2
+{
+	T x;
+	T y;
+};
+
+template <typename T>
+struct CVector3
+{
+	T x;
+	T y;
+	T z;
+};
+
+template <typename T>
+struct CVector4
+{
+	T x;
+	T y;
+	T z;
+	T w;
+};
+
+struct CCursorPosition
+{
+	uint16 row;
+	uint16 column;
+};
+
+struct CString
+{
+	union
+	{
+		char *heap;
+		char sso_head[4];
+	};
+
+	char sso_rest[12];
+	unsigned int length;
+	unsigned int capacity;
+
+	const char *data() const
+	{
+		return capacity > 15 ? heap : sso_head;
+	}
+};
+VALIDATE_SIZE(CString, 0x18)
+
+template <typename T>
+struct CArray
+{
+	T *_Myfirst;
+	T *_Mylast;
+	T *_Myend;
+};
+
+template <typename T>
+class CSingleton
+{
+public:
+	static T &Instance()
+	{
+		static T _instance;
+
+		return _instance;
 	}
 };

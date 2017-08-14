@@ -1,4 +1,10 @@
-﻿
+﻿CTexturehandler::LoadTexture
+
+
+bool __fastcall Gfx_Util::LoadTextureFromMemory(SLoadTextureData *, const char *, const void *, int, const SLoadTextureSettings *)
+void LoadDDSTextureFromMemory(SLoadTextureData *, const unsigned char *, int, const SLoadTextureSettings *)
+GfxCreateTexture
+GfxDestroyTexture
 
 CBitmapFont::RenderToScreen : 0x1098610
 
