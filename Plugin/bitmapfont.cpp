@@ -105,14 +105,14 @@ int __fastcall CBitmapFont::GetWidthOfString(CBitmapFont *pFont, int edx, const 
 
 				if (pvalue->h == 0 || !CGlobalFunctions::IsNativeCharacter(cp))
 				{
-					nWidth = max(vTempWidth, nWidth);
+					nWidth = std::max(vTempWidth, (float)nWidth);
 				}
 			}
 			else
 			{
 				if (cp == 0xA)
 				{
-					nWidth = max(vTempWidth, nWidth);
+					nWidth = std::max(vTempWidth, (float)nWidth);
 					vTempWidth = 0.0f;
 				}
 			}
@@ -121,7 +121,7 @@ int __fastcall CBitmapFont::GetWidthOfString(CBitmapFont *pFont, int edx, const 
 		++it;
 	}
 
-	return max(vTempWidth, nWidth);
+	return std::max(vTempWidth, (float)nWidth);
 }
 
 CBitmapFontCharacterValue *CBitmapFont::GetValueByCodePoint(uint32 cp)

@@ -71,9 +71,5 @@ VALIDATE_SIZE(STextureDescription, 0x1C)
 class CTexture
 {
 public:
-	static void *GetCHSTexture();
-	static void LoadTextureCallback();
-	static void UnloadTextureCallback();
-
 	static void Patch();
 };

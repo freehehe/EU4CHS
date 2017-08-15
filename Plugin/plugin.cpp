@@ -28,7 +28,7 @@ void Plugin::Init(HMODULE hself)
 	font_path = filename;
 
 	std::strcpy(filename, module_path);
-	std::strcpy(std::strrchr(filename, '\\'), "\\eu4chs\\mapfont_chs.dds");
+	std::strcpy(std::strrchr(filename, '\\'), "\\eu4chs\\mapfont.dds");
 	mapfont_path = filename;
 
 	std::strcpy(filename, module_path);

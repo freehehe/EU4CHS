@@ -1,3 +1,6 @@
+//Core code from Hooking.Patterns
+//https://github.com/ThirteenAG/Hooking.Patterns
+
 #pragma once
 #include "stdinc.h"
 

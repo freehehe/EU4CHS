@@ -9,6 +9,8 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include <tuple>
+#include <utility>
 #include <map>
 #include <unordered_map>
 #include <string>

@@ -13,7 +13,7 @@ struct EU4Meta
 
 	std::uintptr_t pfCTextBuffer_GetCharacterAt;
 
-	IDirect3DDevice9 *pDevice;
+	std::uintptr_t pMasterContext;
 
 	std::uintptr_t *pfGFXDraw;
 	std::uintptr_t *pfGFXSetTexture;
