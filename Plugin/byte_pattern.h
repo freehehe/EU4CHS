@@ -132,6 +132,7 @@ class byte_pattern
 	std::pair<std::uintptr_t, std::uintptr_t> _range;
 	std::vector<pattern_byte> _pattern;
 	std::vector<memory_pointer> _result;
+	std::string _literal;
 
 	bool _processed = false;
 

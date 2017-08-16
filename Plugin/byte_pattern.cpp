@@ -42,6 +42,15 @@ void byte_pattern::initialize(memory_pointer range_begin, memory_pointer range_e
 
 const memory_pointer &byte_pattern::get(std::size_t index) const
 {
+	if (index >= this->_result.size())
+	{
+		std::stringstream sstr;
+
+		sstr << "Processing pattern: " << this->_literal << "\nTrying to access index " << index << " but got " << this->_result.size() << " results.\nProgram will crash.";
+
+		MessageBoxA(NULL, sstr.str().c_str(), "byte_pattern: too few results.", MB_OK);
+	}
+
 	return this->_result[index];
 }
 
@@ -113,6 +122,8 @@ void byte_pattern::transform_pattern(const char *pattern_literal)
 	};
 
 	std::array<char, 2> temp_string{ 0, 0 };
+
+	this->_literal = pattern_literal;
 
 	this->_pattern.clear();
 
