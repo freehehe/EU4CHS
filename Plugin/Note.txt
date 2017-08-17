@@ -1,15 +1,10 @@
-﻿CTexturehandler::LoadTexture
-
-
-bool __fastcall Gfx_Util::LoadTextureFromMemory(SLoadTextureData *, const char *, const void *, int, const SLoadTextureSettings *)
-void LoadDDSTextureFromMemory(SLoadTextureData *, const unsigned char *, int, const SLoadTextureSettings *)
-GfxCreateTexture
-GfxDestroyTexture
-
-CBitmapFont::RenderToScreen : 0x1098610
+﻿CBitmapFont::RenderToScreen : 0x1098610
 
 0x1098CA0 : CBitmapFont::RenderToScreen + 0x690 + 13
 0x1098D1B : CBitmapFont::RenderToScreen + 0x7B + 7
 0x1098E6B : CBitmapFont::RenderToScreen + 0x85B + 9
 0x1098EDE : CBitmapFont::RenderToScreen + 0x8CE + 20
 0x1098F0A : CBitmapFont::RenderToScreen + 0x8FA + 11
+
+SMasterContextDX9 *0xB226D48
+TextureGFX * 0x9E19230

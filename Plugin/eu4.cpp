@@ -21,10 +21,7 @@ EU4Meta::EU4Meta()
 
 	this->pfPHYSFS_openRead = GetProcAddress(pattern_default_module, "PHYSFS_openRead");
 
-	//SMasterContext
-	//field0 - LPDIRECT3D9
-	//field4 - LPDIRECT3DDevice9
-	this->pMasterContext = *g_pattern.set_pattern("6A 38 6A 00 89 3D").force_search().get(0).pointer<std::uintptr_t>(6);
+	this->ppMasterContext = g_pattern.set_pattern("6A 38 6A 00 89 3D").force_search().get(0).pointer<SMasterContextDX9 *>(6);
 }
 
 EU4Meta game_meta;

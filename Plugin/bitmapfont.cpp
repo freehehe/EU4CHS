@@ -83,12 +83,12 @@ int __fastcall CBitmapFont::GetWidthOfString(CBitmapFont *pFont, int edx, const 
 
 			if (pvalue)
 			{
-				vTempWidth += pvalue->xadvance * *pFont->fieldB4()->field428();
+				vTempWidth += pvalue->xadvance * *pFont->field_B4()->field_428();
 
 				if (pvalue->kerning && (it + 1) != wtext.end() && CGlobalFunctions::IsNativeCharacter(*(it + 1)))
 				{
 					uint32 nextcp = *(it + 1);
-					CBitmapFontCharacterSet *pset = pFont->fieldB4();
+					CBitmapFontCharacterSet *pset = pFont->field_B4();
 					float fkerning;
 
 					_asm
@@ -130,7 +130,7 @@ CBitmapFontCharacterValue *CBitmapFont::GetValueByCodePoint(uint32 cp)
 
 	if (CGlobalFunctions::IsNativeCharacter(cp))
 	{
-		return this->fieldB4()->field0()[cp];
+		return this->field_B4()->field_0()[cp];
 	}
 	else
 	{
@@ -213,7 +213,7 @@ __declspec(naked) void CBitmapFont_RenderToScreen_0x8CE_20()
 		xorps xmm0, xmm0;
 
 	j_ret:
-		jmp ret_addr;
+	    jmp ret_addr;
 	}
 }
 

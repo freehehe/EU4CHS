@@ -13,10 +13,10 @@ struct EU4Meta
 
 	std::uintptr_t pfCTextBuffer_GetCharacterAt;
 
-	std::uintptr_t pMasterContext;
+	SMasterContextDX9 **ppMasterContext;
 
 	std::uintptr_t *pfGFXDraw;
-	std::uintptr_t *pfGFXSetTexture;
+	std::uintptr_t *pfGFXSetTextures;
 
 	std::uintptr_t pfVFSOpenFile;
 	void *pfPHYSFS_openRead;

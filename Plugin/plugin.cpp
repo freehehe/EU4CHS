@@ -66,8 +66,8 @@ const char *Plugin::GetTablePath()
 
 void Plugin::Patch()
 {
-	CGlobalFunctions::Patch();
-	VFS::Patch();
+	//CGlobalFunctions::Patch();
+	//VFS::Patch();
 
 	//贴图大小检测
 	injector::WriteMemory<uint32_t>(g_pattern.set_module(pattern_default_module).set_pattern("81 FE 00 00 00 01").force_search().get(0).pointer(2), 0x7FFFFFFFu, true);

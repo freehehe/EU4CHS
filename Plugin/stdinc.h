@@ -47,7 +47,7 @@ struct IncompleteClass
 	template <typename T, std::uintptr_t offset>
 	T *field()
 	{
-		return (T *)(reinterpret_cast<::uintptr_t<(this) + offset);
+		return (T *)(reinterpret_cast<std::uintptr_t>(this) + offset);
 	}
 };
 
@@ -132,4 +132,28 @@ public:
 
 		return _instance;
 	}
+};
+
+struct TextureGFX
+{
+    LPDIRECT3DTEXTURE9 field_0 = nullptr;
+    bool field_4 = false;
+    DWORD field_8 = 0;
+    int field_C = 0;
+    int field_10 = 0;
+    int field_14 = 0;
+};
+VALIDATE_SIZE(TextureGFX, 0x18)
+
+struct SMasterContextDX9 : public IncompleteClass
+{
+    LPDIRECT3D9 *GetDXObject()
+    {
+        return field<LPDIRECT3D9, 0>();
+    }
+
+    LPDIRECT3DDEVICE9 *GetDXDevice()
+    {
+        return field<LPDIRECT3DDEVICE9, 4>();
+    }
 };

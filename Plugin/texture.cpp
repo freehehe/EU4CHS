@@ -19,7 +19,7 @@ __declspec(naked) void GetDeviceHook()
 		mov ppObject, edi;
 		lea eax, [edi + 4];
 		mov ppDevice, eax;
-		mov eax, game_meta.pMasterContext;
+		mov eax, game_meta.ppMasterContext;
 		mov [eax], edi;
 		jmp retAddress;
 	}
@@ -31,6 +31,7 @@ void LoadTextureHook()
 	{
 		D3DXCreateTextureFromFileA(*ppDevice, Plugin::GetFontPath(), &hFontTexture);
 		D3DXCreateTextureFromFileA(*ppDevice, Plugin::GetMapFontPath(), &hMapFontTexture);
+		D3DXCreateTexture(*ppDevice, 256, 256, 1, 0, D3DFORMAT, D3DPOOL_DEFAULT, NULL);
 	}
 
 	++refCount;
@@ -49,5 +50,6 @@ void UnloadTextureHook()
 
 void CTexture::Patch()
 {
-	
+	injector::MakeNOP(game_meta.MasterContextInitHookAddress, 6);
+	injector::MakeCALL(game_meta.MasterContextInitHookAddress, GetDeviceHook);
 }
