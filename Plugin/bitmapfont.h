@@ -22,10 +22,7 @@ VALIDATE_SIZE(CBitmapFontCharacterValue,0x10)
 
 struct CBitmapFontCharacterSet :IncompleteClass
 {
-    CBitmapFontCharacterValue **field_0()
-    {
-        return field<CBitmapFontCharacterValue *, 0>();
-    }
+    CBitmapFontCharacterValue *GetValueByCodePoint(uint32 cp);
 
     float *field_428()
     {
@@ -37,19 +34,22 @@ struct CBitmapFont :IncompleteClass
 {
     //field_9C : font name like gfx/fonts/vic18
 
-    CBitmapFontCharacterSet *field_B4()
+    CBitmapFontCharacterSet *GetCharacterSet()
     {
         return field<CBitmapFontCharacterSet, 0xB4>();
     }
 
-    const CString *field_9C()
+    const CString *GetFontName()
     {
         return field<const CString, 0x9C>();
     }
 
-    CBitmapFontCharacterValue *GetValueByCodePoint(uint32 cp);
-    static int __fastcall GetWidthOfString(CBitmapFont *pFont, int edx, const char *text, const int length, bool bUseSpecialChars);
+    CBitmapFontCharacterValue *GetValueByCodePoint(uint32 cp)
+    {
+        return GetCharacterSet()->GetValueByCodePoint(cp);
+    }
 
+    static int __fastcall GetWidthOfString(CBitmapFont *pFont, int edx, const char *text, const int length, bool bUseSpecialChars);
     static void Patch();
 };
 

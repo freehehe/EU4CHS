@@ -1,17 +1,22 @@
 #pragma once
 #include "stdinc.h"
 
-class Plugin
+class CPlugin
 {
-	static void Patch();
+    std::experimental::filesystem::path _font_path;
+    std::experimental::filesystem::path _mapfont_path;
+    std::experimental::filesystem::path _table_path;
+    std::experimental::filesystem::path _vfs_dir;
+    std::experimental::filesystem::path _game_dir;
+
+    void Patch();
 
 public:
-	static void Init(HMODULE hself);
+    void Init(HMODULE hself);
 
-	static HMODULE GetASIHandle();
-	static HMODULE GetEXEHandle();
-
-	static const char *GetFontPath();
-	static const char *GetMapFontPath();
-	static const char *GetTablePath();
+    const std::experimental::filesystem::path &GetFontPath() const;
+    const std::experimental::filesystem::path &GetMapFontPath() const;
+    const std::experimental::filesystem::path &GetTablePath() const;
+    const std::experimental::filesystem::path &GetVFSDirectory() const;
+    const std::experimental::filesystem::path &GetGameDirectory() const;
 };

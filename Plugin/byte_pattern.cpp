@@ -46,7 +46,7 @@ const memory_pointer &byte_pattern::get(std::size_t index) const
 	{
 		std::stringstream sstr;
 
-		sstr << "Processing pattern: " << this->_literal << "\nTrying to access index " << index << " but got " << this->_result.size() << " results.\nProgram will crash.";
+		sstr << "Processing pattern: " << this->_literal << "\nTrying to access index " << index << " but got " << this->_result.size() << " results.\nGame will crash.";
 
 		MessageBoxA(NULL, sstr.str().c_str(), "byte_pattern: too few results.", MB_OK);
 	}

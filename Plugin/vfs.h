@@ -1,10 +1,11 @@
 #pragma once
 #include "stdinc.h"
 
-class VFS
+class CVFSManager
 {
+    std::unordered_map<std::size_t, std::string> files;
+
 public:
-	static void EnumerateFolder(const std::string &folder);
-	static void EnumerateOurFiles();
-	static void Patch();
+	void EnumerateOurFiles();
+	void Patch();
 };

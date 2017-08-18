@@ -1,12 +1,13 @@
 #pragma once
 #include "stdinc.h"
+#include "eu4.h"
 
-struct CGlobalFunctions
+namespace Functions
 {
-	static void __fastcall ConvertUTF8ToLatin1(const char *source, char *dest);
-	static void ConvertLatin1ToUTF8(const char *source, char *dest);
-	static bool IsNativeCharacter(uint32 cp);
-	static bool IsTextIconChar(uint32 cp);
+	void __fastcall ConvertUTF8ToLatin1(const char *source, char *dest);
+	void ConvertLatin1ToUTF8(const char *source, char *dest);
+	bool IsNativeCharacter(uint32 cp);
+	bool IsTextIconChar(uint32 cp);
 
-	static void Patch();
+	void Patch();
 };

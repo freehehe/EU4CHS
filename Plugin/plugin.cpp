@@ -2,73 +2,63 @@
 #include "plugin.h"
 #include "bitmapfont.h"
 #include "functions.h"
-#include "table.h"
+#include "chsfont.h"
 #include "vfs.h"
 #include "byte_pattern.h"
 
-static std::string font_path;
-static std::string mapfont_path;
-static std::string table_path;
-
-static HMODULE hasi;
-static HMODULE hexe;
-
-void Plugin::Init(HMODULE hself)
+void CPlugin::Init(HMODULE hself)
 {
-	char module_path[512];
-	char filename[512];
+    std::experimental::filesystem::path plugin_dir;
 
-	hexe = GetModuleHandleA(NULL);
-	hasi = hself;
+    char module_path[512];
 
-	GetModuleFileNameA(hself, module_path, 512);
+    GetModuleFileNameA(hself, module_path, 512);
+    plugin_dir = std::experimental::filesystem::path(module_path).root_directory();
 
-	std::strcpy(filename, module_path);
-	std::strcpy(std::strrchr(filename, '\\'), "\\eu4chs\\font.dds");
-	font_path = filename;
+    _font_path = plugin_dir / "eu4chs/font.dds";
+    _mapfont_path = plugin_dir / "eu4chs/mapfont.dds";
+    _table_path = plugin_dir / "eu4chs/font.dat";
+    _vfs_dir = plugin_dir / "eu4chs/vfsroot/";
 
-	std::strcpy(filename, module_path);
-	std::strcpy(std::strrchr(filename, '\\'), "\\eu4chs\\mapfont.dds");
-	mapfont_path = filename;
+    GetModuleFileNameA(GetModuleHandle(NULL), module_path, 512);
+    _game_dir = std::experimental::filesystem::path(module_path).root_directory();
 
-	std::strcpy(filename, module_path);
-	std::strcpy(std::strrchr(filename, '\\'), "\\eu4chs\\font.dat");
-	table_path = filename;
-
-	Patch();
+    CSingleton<CVFSManager>::Instance().EnumerateOurFiles();
+    CSingleton<CChsFont>::Instance().ReadTable(_table_path);
+    Patch();
 }
 
-HMODULE Plugin::GetASIHandle()
+const std::experimental::filesystem::path &CPlugin::GetFontPath() const
 {
-	return hasi;
+    return _font_path;
 }
 
-HMODULE Plugin::GetEXEHandle()
+const std::experimental::filesystem::path &CPlugin::GetMapFontPath() const
 {
-	return hexe;
+    return _mapfont_path;
 }
 
-const char *Plugin::GetFontPath()
+const std::experimental::filesystem::path &CPlugin::GetTablePath() const
 {
-	return font_path.c_str();
+    return _table_path;
 }
 
-const char *Plugin::GetMapFontPath()
+const std::experimental::filesystem::path &CPlugin::GetVFSDirectory() const
 {
-	return mapfont_path.c_str();
+    return _vfs_dir;
+}
+
+const std::experimental::filesystem::path & CPlugin::GetGameDirectory() const
+{
+    return _game_dir;
 }
 
 
-const char *Plugin::GetTablePath()
+void CPlugin::Patch()
 {
-	return table_path.c_str();
-}
+    //CBitmapFont::Patch();
+    //Functions::Patch();
 
-void Plugin::Patch()
-{
-	//CGlobalFunctions::Patch();
-	//VFS::Patch();
-
-	//贴图大小检测
-	injector::WriteMemory<uint32_t>(g_pattern.set_module(pattern_default_module).set_pattern("81 FE 00 00 00 01").force_search().get(0).pointer(2), 0x7FFFFFFFu, true);
+    //贴图大小检测
+    //injector::WriteMemory<uint32_t>(g_pattern.set_module(pattern_default_module).set_pattern("81 FE 00 00 00 01").force_search().get(0).pointer(2), 0x7FFFFFFFu, true);
 }

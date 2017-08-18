@@ -3,73 +3,38 @@
 #include "vfs.h"
 #include "eu4.h"
 
-static std::map<std::size_t, std::string> files;
-static std::string ourroot;
-static std::string gameroot;
-
-void VFS::EnumerateFolder(const std::string &folder)
+void CVFSManager::EnumerateOurFiles()
 {
-	std::string vfspath;
-	std::string ourvfspath;
+    std::string gameroot = CSingleton<CPlugin>::Instance().GetGameDirectory().string();
+    std::string ourroot = CSingleton<CPlugin>::Instance().GetVFSDirectory().string();
 
-	std::experimental::filesystem::recursive_directory_iterator recur_it(folder);
-	std::string_view root(folder);
+    std::string vfspath;
+    std::string ourvfspath;
+    std::string full_path;
 
-	while (recur_it != std::experimental::filesystem::recursive_directory_iterator())
-	{
-		if (std::experimental::filesystem::is_regular_file(recur_it->path()))
-		{
-			const std::string &full_path = recur_it->path().string();
+    std::experimental::filesystem::recursive_directory_iterator recur_it(ourroot);
 
-			vfspath = full_path.data() + ourroot.length() + 1;
-			ourvfspath = full_path.data() + gameroot.length() + 1;
+    while (recur_it != std::experimental::filesystem::recursive_directory_iterator())
+    {
+        if (std::experimental::filesystem::is_regular_file(recur_it->path()))
+        {
+            full_path = recur_it->path().string();
 
-			std::replace(vfspath.begin(), vfspath.end(), '\\', '/');
-			std::replace(ourvfspath.begin(), ourvfspath.end(), '\\', '/');
+            vfspath = full_path.data() + ourroot.length() + 1;
+            ourvfspath = full_path.data() + gameroot.length() + 1;
 
-			files.emplace(std::hash<std::string_view>()(vfspath), ourvfspath);
-		}
+            std::replace(vfspath.begin(), vfspath.end(), '\\', '/');
+            std::replace(ourvfspath.begin(), ourvfspath.end(), '\\', '/');
 
-		++recur_it;
-	}
+            files.emplace(std::hash<std::string_view>()(vfspath), ourvfspath);
+        }
+
+        ++recur_it;
+    }
+
 }
 
-void VFS::EnumerateOurFiles()
+void CVFSManager::Patch()
 {
-	char buffer[512];
 
-	files.clear();
-
-	GetModuleFileNameA(Plugin::GetEXEHandle(), buffer, 512);
-
-	*(std::strrchr(buffer, '\\')) = 0;
-
-	gameroot = buffer;
-
-	GetModuleFileNameA(Plugin::GetASIHandle(), buffer, 512);
-
-	*(std::strrchr(buffer, '\\') + 1) = 0;
-
-	ourroot = buffer;
-	ourroot += "eu4chs\\vfsroot";
-
-	EnumerateFolder(ourroot);
-}
-
-static void *VFSOpenFile_0x8D(const char *vfspath)
-{
-	auto it = files.find(std::hash<std::string_view>()(vfspath));
-
-	if (it != files.end())
-	{
-		vfspath = it->second.c_str();
-	}
-
-	return injector::cstd<void *(const char *)>::call(game_meta.pfPHYSFS_openRead, vfspath);
-};
-
-void VFS::Patch()
-{
-	EnumerateOurFiles();
-	injector::MakeCALL(game_meta.pfVFSOpenFile + 0x8D, VFSOpenFile_0x8D);
 }

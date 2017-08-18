@@ -30,22 +30,16 @@
     <ClCompile Include="eu4.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="table.cpp">
+    <ClCompile Include="stdinc.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="textbuffer.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="texture.cpp">
+    <ClCompile Include="byte_pattern.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="vfs.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="stdinc.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="byte_pattern.cpp">
+    <ClCompile Include="chsfont.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -65,19 +59,13 @@
     <ClInclude Include="functions.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="texture.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="table.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="textbuffer.h">
+    <ClInclude Include="byte_pattern.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="vfs.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="byte_pattern.h">
+    <ClInclude Include="chsfont.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
