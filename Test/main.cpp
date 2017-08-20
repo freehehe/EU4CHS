@@ -1,9 +1,14 @@
-﻿#include "fntParser.h"
+﻿#include "NonLatinFont.h"
+#include <iostream>
 
 int main()
 {
-    fntParser parser;
+    NonLatinFont font;
 
-    parser.parseFile("example.fnt");
-	return 0;
+    font.InitWithFile("C:/font/normal.bin");
+
+    std::cout << font.GetKerning(L'a', L'a') << '\n';
+    std::cout << font.GetValue(L'c')->_xadvance << std::endl;
+    font.LoadTexturesDX9();
+    return 0;
 }

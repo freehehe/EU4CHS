@@ -168,12 +168,12 @@
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="eu4.cpp" />
     <ClCompile Include="functions.cpp" />
+    <ClCompile Include="NonLatinFont.cpp" />
     <ClCompile Include="plugin.cpp" />
     <ClCompile Include="stdinc.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="chsfont.cpp" />
     <ClCompile Include="vfs.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -181,9 +181,9 @@
     <ClInclude Include="byte_pattern.h" />
     <ClInclude Include="eu4.h" />
     <ClInclude Include="functions.h" />
+    <ClInclude Include="NonLatinFont.h" />
     <ClInclude Include="stdinc.h" />
     <ClInclude Include="plugin.h" />
-    <ClInclude Include="chsfont.h" />
     <ClInclude Include="vfs.h" />
   </ItemGroup>
   <ItemGroup>

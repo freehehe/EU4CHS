@@ -74,8 +74,8 @@ struct CString
     };
 
     char sso_rest[12];
-    unsigned int length;
-    unsigned int capacity;
+    std::size_t length;
+    std::size_t capacity;
 
     const char *data() const
     {
@@ -91,8 +91,6 @@ struct CArray
     T *_Mylast;
     T *_Myend;
 };
-
-
 
 struct TextureGFX
 {
@@ -115,6 +113,51 @@ struct SMasterContextDX9 : public IncompleteClass
     LPDIRECT3DDEVICE9 *GetDXDevice()
     {
         return field<LPDIRECT3DDEVICE9, 4>();
+    }
+};
+
+struct EU4CharacterValues
+{
+    int16 x;
+    int16 y;
+    int16 w;
+    int16 h;
+    int16 xoff;
+    int16 yoff;
+    int16 xadvance;
+    bool kerning;
+};
+VALIDATE_SIZE(EU4CharacterValues, 0x10)
+
+struct CBitmapFontCharacterSet :IncompleteClass
+{
+    EU4CharacterValues **GetValues()
+    {
+        return field<EU4CharacterValues *, 0>();
+    }
+
+    float *GetScaleX()
+    {
+        return field<float, 0x428>();
+    }
+};
+
+struct CBitmapFont :IncompleteClass
+{
+    CBitmapFontCharacterSet *GetCharacterSet()
+    {
+        return field<CBitmapFontCharacterSet, 0xB4>();
+    }
+
+    const CString *GetFontName()
+    {
+        //e.g.  gfx/fonts/vic18
+        return field<const CString, 0x9C>();
+    }
+
+    EU4CharacterValues *GetValueByCodePoint(uint32 cp)
+    {
+        return GetCharacterSet()->GetValues()[cp];
     }
 };
 
@@ -141,6 +184,8 @@ struct EU4Meta
     char *pOriginalText;
     char *pWord;
     char *pProcessedText;
+
+    std::uintptr_t pfWriteVariable;
 
     EU4Meta();
 };

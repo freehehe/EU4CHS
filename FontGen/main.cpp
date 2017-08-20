@@ -17,7 +17,6 @@ using namespace std;
 static set<uint32_t> collection;
 static vector<uint32_t> wbuffer;
 static vector<vector<uint32_t>> char_matrix(1);
-static vector<pair<uint8_t, uint8_t>> table(0x10000, pair<uint8_t, uint8_t>(63, 63));
 
 void enumerate_chars(const char *folder)
 {
@@ -107,19 +106,16 @@ void enumerate_chars(const char *folder)
 	collection.erase(0xFEFF);
 }
 
-void generate_data()
+void generate_table()
 {
 	for (auto chr : collection)
 	{
-		if (char_matrix.back().size() == 64)
+		if (char_matrix.back().size() == 128)
 		{
 			char_matrix.emplace_back();
 		}
 
 		char_matrix.back().emplace_back(chr);
-
-		table[chr].first = char_matrix.size() - 1;
-		table[chr].second = char_matrix.back().size() - 1;
 	}
 
 	wbuffer.clear();
@@ -139,28 +135,15 @@ void generate_data()
 		return;
 	}
 
-	ofs << "\xEF\xBB\xBF";
-
 	utf8::unchecked::utf32to8(wbuffer.begin(), wbuffer.end(), ostreambuf_iterator<char>(ofs));
 
 	ofs.close();
-
-	FILE *hf = fopen("C:/eu4chs_release/font/eu4chs.dat", "wb");
-
-	if (!hf)
-	{
-		return;
-	}
-
-	fwrite(table.data(), 2, 0x10000, hf);
-
-	fclose(hf);
 }
 
 int main(int argc, char **argv)
 {
 	enumerate_chars("C:/eu4chs_release/ymls");
-	generate_data();
+	generate_table();
 
 	return 0;
 }

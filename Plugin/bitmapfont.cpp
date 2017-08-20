@@ -1,158 +1,124 @@
 ﻿#include "stdinc.h"
 #include "bitmapfont.h"
-#include "table.h"
 #include "functions.h"
 #include "eu4.h"
+#include "NonLatinFont.h"
 
-static const float TextureWidth = 4096.0f;
-static const float TextureHeight = 4096.0f;
-static const float CharacterWidth = 64.0f;
-static const float CharacterHeight = 64.0f;
-static const float TextureLines = TextureWidth / CharacterWidth;
-static const float TextureColumns = TextureHeight / CharacterHeight;
-
-static const float default_width = 8.0f;
-static const int chs_width = 32;
-
-CBitmapFontCharacterValue *CBitmapFontCharacterSet::GetValueByCodePoint(uint32 cp)
+namespace BitmapFont
 {
-    static CBitmapFontCharacterValue chs_value;
+    static const float fIconWidth = 8.0f;
 
-    if (Functions::IsNativeCharacter(cp))
+    static NonLatinFont normalFont, mapFont;
+
+    int __fastcall GetWidthOfString(CBitmapFont *pFont, int edx, const char *text, const int length, bool bUseSpecialChars)
     {
-        return field<CBitmapFontCharacterValue *, 0>()[cp];
-    }
-    else
-    {
-        //可能要根据字号计算某些数值
-        chs_value.x = CSingleton<CChsFont>::Instance().GetColumn(cp) * CharacterWidth;
-        chs_value.y = CSingleton<CChsFont>::Instance().GetRow(cp) * CharacterHeight;
-        chs_value.w = CharacterWidth;
-        chs_value.h = CharacterHeight;
-        chs_value.xoff = 0;
-        chs_value.yoff = 0;
-        chs_value.xadvance = chs_width;
-        chs_value.kerning = false;
+        static std::vector<uint32> wtext;
 
-        //可能有些字符的数值需要调整
-        switch (cp)
+        float vTempWidth = 0.0f;
+        int nWidth = 0;
+        char tag[128];
+
+        int real_length = length < 0 ? std::strlen(text) : length;
+
+        wtext.clear();
+        utf8::unchecked::utf8to32(text, text + real_length, std::back_inserter(wtext));
+
+        auto it = wtext.begin();
+
+        while (it != wtext.end())
         {
-        default:
-            break;
-        }
+            uint32 cp = *it;
 
-        return &chs_value;
-    }
-}
+            EU4CharacterValues *pvalue = pFont->GetValueByCodePoint(cp);
 
-int __fastcall CBitmapFont::GetWidthOfString(CBitmapFont *pFont, int edx, const char *text, const int length, bool bUseSpecialChars)
-{
-    static std::vector<uint32> wtext;
-
-    float vTempWidth = 0.0f;
-    int nWidth = 0;
-    char tag[128];
-
-    int real_length = length < 0 ? std::strlen(text) : length;
-
-    wtext.clear();
-    utf8::unchecked::utf8to32(text, text + real_length, std::back_inserter(wtext));
-
-    auto it = wtext.begin();
-
-    while (it != wtext.end())
-    {
-        uint32 cp = *it;
-
-        CBitmapFontCharacterValue *pvalue = pFont->GetValueByCodePoint(cp);
-
-        if (bUseSpecialChars && (cp == 0xA7 || cp == 0xA3 || cp == 0xA4 || cp == 0x40 || cp == 0x7B))
-        {
-            switch (cp)
+            if (bUseSpecialChars && (cp == 0xA7 || cp == 0xA3 || cp == 0xA4 || cp == 0x40 || cp == 0x7B))
             {
-            case 0xA7:
-                ++it;
-                break;
-
-            case 0x40:
-                it += 3;
-                vTempWidth += injector::thiscall<int(CBitmapFont *)>::vtbl<30>(pFont);
-                break;
-
-            case 0xA3:
-            {
-                std::fill(std::begin(tag), std::end(tag), 0);
-
-                ++it;
-
-                auto len = std::count_if(it, wtext.end(), Functions::IsTextIconChar);
-
-                utf8::unchecked::utf32to8(it, it + len, std::begin(tag));
-
-                it += len;
-
-                vTempWidth += injector::thiscall<int(CBitmapFont *, const char *)>::vtbl<28>(pFont, tag);
-            }
-                break;
-
-            case 0xA4:
-                vTempWidth += default_width;
-                break;
-
-            case 0x7B:
-                it += 2;
-                vTempWidth += default_width;
-                break;
-
-            default:
-                break;
-            }
-        }
-        else
-        {
-            CBitmapFontCharacterValue *pvalue = pFont->GetValueByCodePoint(cp);
-
-            if (pvalue)
-            {
-                vTempWidth += pvalue->xadvance * *pFont->GetCharacterSet()->field_428();
-
-                if (pvalue->kerning && (it + 1) != wtext.end() && Functions::IsNativeCharacter(*(it + 1)))
+                switch (cp)
                 {
-                    uint32 nextcp = *(it + 1);
-                    CBitmapFontCharacterSet *pset = pFont->GetCharacterSet();
-                    float fkerning;
+                case 0xA7:
+                    ++it;
+                    break;
 
-                    _asm
-                    {
-                        push nextcp;
-                        push cp;
-                        mov ecx, pset;
-                        call game_meta.pfCBitmapFontCharacterSet_GetKerning;
-                        movss fkerning, xmm0;
-                    }
+                case 0x40:
+                    it += 3;
+                    vTempWidth += injector::thiscall<int(CBitmapFont *)>::vtbl<30>(pFont);
+                    break;
 
-                    vTempWidth += fkerning;
+                case 0xA3:
+                {
+                    std::fill(std::begin(tag), std::end(tag), 0);
+
+                    ++it;
+
+                    auto len = std::count_if(it, wtext.end(), Functions::IsTextIconChar);
+
+                    utf8::unchecked::utf32to8(it, it + len, std::begin(tag));
+
+                    it += len;
+
+                    vTempWidth += injector::thiscall<int(CBitmapFont *, const char *)>::vtbl<28>(pFont, tag);
                 }
+                break;
 
-                if (pvalue->h == 0 || !Functions::IsNativeCharacter(cp))
-                {
-                    nWidth = std::max(vTempWidth, (float)nWidth);
+                case 0xA4:
+                    vTempWidth += fIconWidth;
+                    break;
+
+                case 0x7B:
+                    it += 2;
+                    vTempWidth += fIconWidth;
+                    break;
+
+                default:
+                    break;
                 }
             }
             else
             {
-                if (cp == 0xA)
+                EU4CharacterValues *pvalue = pFont->GetValueByCodePoint(cp);
+
+                if (pvalue)
                 {
-                    nWidth = std::max(vTempWidth, (float)nWidth);
-                    vTempWidth = 0.0f;
+                    vTempWidth += pvalue->xadvance * *pFont->GetCharacterSet()->GetScaleX();
+
+                    if (pvalue->kerning && (it + 1) != wtext.end() && Functions::IsNativeCharacter(*(it + 1)))
+                    {
+                        uint32 nextcp = *(it + 1);
+                        CBitmapFontCharacterSet *pset = pFont->GetCharacterSet();
+                        float fkerning;
+
+                        _asm
+                        {
+                            push nextcp;
+                            push cp;
+                            mov ecx, pset;
+                            call game_meta.pfCBitmapFontCharacterSet_GetKerning;
+                            movss fkerning, xmm0;
+                        }
+
+                        vTempWidth += fkerning;
+                    }
+
+                    if (pvalue->h == 0 || !Functions::IsNativeCharacter(cp))
+                    {
+                        nWidth = std::max(vTempWidth, (float)nWidth);
+                    }
+                }
+                else
+                {
+                    if (cp == 0xA)
+                    {
+                        nWidth = std::max(vTempWidth, (float)nWidth);
+                        vTempWidth = 0.0f;
+                    }
                 }
             }
+
+            ++it;
         }
 
-        ++it;
+        return std::max(vTempWidth, (float)nWidth);
     }
-
-    return std::max(vTempWidth, (float)nWidth);
 }
 
 static uint32 code_point;
@@ -224,7 +190,7 @@ __declspec(naked) void CBitmapFont_RenderToScreen_0x8FA_11()
         pop ret_addr;
         cmp code_point, 0xFF;
         ja j_break;
-        cmp [ecx]CBitmapFontCharacterValue.h, 0;
+        cmp[ecx]EU4CharacterValues.h, 0;
         jmp ret_addr;
 
     j_break:
@@ -252,7 +218,7 @@ struct CBitmapFont_RenderToScreen_OFF_SIZE
     }
 };
 
-void CBitmapFont::Patch()
+void BitmapFont::Patch()
 {
 
 }

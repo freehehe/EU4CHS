@@ -39,7 +39,7 @@
     <ClCompile Include="vfs.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="chsfont.cpp">
+    <ClCompile Include="NonLatinFont.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -65,7 +65,7 @@
     <ClInclude Include="vfs.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="chsfont.h">
+    <ClInclude Include="NonLatinFont.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

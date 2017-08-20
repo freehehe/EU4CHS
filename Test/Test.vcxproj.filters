@@ -18,18 +18,13 @@
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="fntParser.cpp">
+    <ClCompile Include="NonLatinFont.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="fntParser.h">
+    <ClInclude Include="NonLatinFont.h">
       <Filter>头文件</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="example.fnt">
-      <Filter>资源文件</Filter>
-    </None>
   </ItemGroup>
 </Project>
