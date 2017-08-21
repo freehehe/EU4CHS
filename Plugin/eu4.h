@@ -159,7 +159,23 @@ struct CBitmapFont :IncompleteClass
     {
         return GetCharacterSet()->GetValues()[cp];
     }
+
+    int *GetTextureID()
+    {
+        return field<int, 0x4E0>();
+    }
 };
+
+class CTextureHandler;
+struct CGraphics :public IncompleteClass
+{
+    CTextureHandler *GetTextureHandler()
+    {
+        return field<CTextureHandler, 0x334>();
+    }
+};
+
+//CCreateChecksumTask
 
 struct EU4Meta
 {
@@ -186,6 +202,8 @@ struct EU4Meta
     char *pProcessedText;
 
     std::uintptr_t pfWriteVariable;
+
+    CGraphics *pGraphics;
 
     EU4Meta();
 };

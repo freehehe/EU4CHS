@@ -1,7 +1,7 @@
 #pragma once
 #include "stdinc.h"
 
-class CVFSManager
+class VFSManager
 {
     std::unordered_map<std::size_t, std::string> files;
 

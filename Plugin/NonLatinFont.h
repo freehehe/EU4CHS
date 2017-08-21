@@ -39,7 +39,7 @@ class NonLatinFont
     void SortData();
 
 public:
-    static const std::uint32_t invalid_replacement = L'艚';
+    static const std::uint32_t invalid_replacement = L'？';
 
     NonLatinFont();
 

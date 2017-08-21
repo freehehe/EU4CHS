@@ -3,7 +3,7 @@
 #include "vfs.h"
 #include "eu4.h"
 
-void CVFSManager::EnumerateOurFiles()
+void VFSManager::EnumerateOurFiles()
 {
     std::string gameroot = CSingleton<CPlugin>::Instance().GetGameDirectory().string();
     std::string ourroot = CSingleton<CPlugin>::Instance().GetVFSDirectory().string();
@@ -34,7 +34,7 @@ void CVFSManager::EnumerateOurFiles()
 
 }
 
-void CVFSManager::Patch()
+void VFSManager::Patch()
 {
 
 }

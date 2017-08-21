@@ -1,4 +1,5 @@
 ﻿#include "stdinc.h"
+#include "plugin.h"
 #include "bitmapfont.h"
 #include "functions.h"
 #include "eu4.h"
@@ -9,6 +10,8 @@ namespace BitmapFont
     static const float fIconWidth = 8.0f;
 
     static NonLatinFont normalFont, mapFont;
+
+    std::optional<int> hNormalFont, hMapFont;
 
     int __fastcall GetWidthOfString(CBitmapFont *pFont, int edx, const char *text, const int length, bool bUseSpecialChars)
     {
@@ -217,9 +220,21 @@ namespace BitmapFont
         }
     };
 
+    static void AfterDeviceCreate()
+    {
+        normalFont.LoadTexturesDX9();
+        mapFont.LoadTexturesDX9();
+    }
+
+    static void BeforeDeviceRelease()
+    {
+        normalFont.UnloadTexturesDX9();
+        normalFont.UnloadTexturesDX9();
+    }
+
     void Patch()
     {
-        normalFont.InitWithFile("134.fnt");
-        std::cout << normalFont.GetValue(5)->kerning;
+        normalFont.InitWithFile(CSingleton<CPlugin>::Instance().GetFontPath());
+        mapFont.InitWithFile(CSingleton<CPlugin>::Instance().GetMapFontPath());
     }
 }
