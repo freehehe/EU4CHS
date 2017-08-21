@@ -4,6 +4,12 @@
 using namespace std;
 using namespace std::experimental;
 
+NonLatinFont::NonLatinFont()
+{
+    _values.reserve(30000);
+    _kernings.reserve(300);
+}
+
 void NonLatinFont::ReadInfoBlock(FILE * file)
 {
     uint32_t block_size;
@@ -106,7 +112,7 @@ void NonLatinFont::ReadCharsBlock(FILE * file)
 
         uint32_t unicode = binary.code;
 
-        _values.emplace(unicode, values);
+        _values.emplace_back(unicode, values);
     }
 }
 
@@ -135,7 +141,7 @@ void NonLatinFont::ReadKerningsBlock(FILE * file)
         cp._first = binary.first;
         cp._second = binary.second;
 
-        _kernings.emplace(cp._packed, binary.value);
+        _kernings.emplace_back(cp._packed, binary.value);
     }
 }
 
@@ -147,8 +153,23 @@ void NonLatinFont::SetKernings()
 
         cp._packed = kp.first;
 
-        _values.find(cp._first)->second._value.kerning = true;
+        find_if(_values.begin(),_values.end(),
+            [cp](const pair<uint32, CharacterValues> &entry)
+        {
+            return entry.first == cp._first;
+        })->second._value.kerning = true;
     }
+}
+
+void NonLatinFont::SortData()
+{
+    sort(_values.begin(), _values.end(), 
+        [](pair<uint32_t, CharacterValues> &left, pair<uint32_t, CharacterValues> &right)
+    {
+        return left.first < right.first;
+    });
+
+    sort(_kernings.begin(), _kernings.end());
 }
 
 void NonLatinFont::InitWithFile(const std::experimental::filesystem::path &fntname)
@@ -193,6 +214,7 @@ void NonLatinFont::InitWithFile(const std::experimental::filesystem::path &fntna
     fclose(iFile);
 
     SetKernings();
+    SortData();
 }
 
 void NonLatinFont::LoadTexturesDX9()
@@ -203,8 +225,7 @@ void NonLatinFont::LoadTexturesDX9()
     {
         TextureGFX gfx;
 
-        D3DXCreateTextureFromFileA(NULL, (_workingdir / name).string().c_str(), &gfx.field_0);
-
+        D3DXCreateTextureFromFileA(*(*game_meta.ppMasterContext)->GetDXDevice(), (_workingdir / name).string().c_str(), &gfx.field_0);
         _textures.emplace_back(gfx);
     }
 }
@@ -217,35 +238,69 @@ void NonLatinFont::UnloadTexturesDX9()
     }
 }
 
-std::int16_t NonLatinFont::GetKerning(uint32_t first, uint32_t second) const
+std::int16_t NonLatinFont::GetKerning(uint32_t first, uint32_t second)
 {
     UnicodeCharPair duochar;
 
     duochar._first = first;
     duochar._second = second;
 
-    auto it = _kernings.find(duochar._packed);
-
-    if (it == _kernings.end())
+    auto it = lower_bound(_kernings.begin(), _kernings.end(), duochar._packed,
+        [duochar](const pair<uint64_t, int16_t> &entry, uint64_t pack)
     {
-        return 0;
-    }
-    else
+        return entry.first == pack;
+    });
+
+    if (it != _kernings.end() && it->first == duochar._packed)
     {
         return it->second;
     }
+    else
+    {
+        return 0;
+    }
 }
 
-const EU4CharacterValues * NonLatinFont::GetValue(uint32_t unicode) const
+EU4CharacterValues * NonLatinFont::GetValue(uint32_t unicode)
 {
-    auto it = _values.find(unicode);
+    auto it = lower_bound(_values.begin(), _values.end(), unicode,
+        [](const pair<uint32, CharacterValues> &entry, uint32_t code)
+    {
+        return entry.first == code;
+    });
 
-    if (it != _values.end())
+    if (it != _values.end() && it->first == unicode)
     {
         return &it->second._value;
     }
     else
     {
-        return &_values.find(invalid_replacement)->second._value;
+        return &lower_bound(_values.begin(), _values.end(), invalid_replacement,
+            [](const pair<uint32, CharacterValues> &entry, uint32_t code)
+        {
+            return entry.first == code;
+        })->second._value;
+    }
+}
+
+TextureGFX * NonLatinFont::GetTexture(std::uint32_t unicode)
+{
+    auto it = lower_bound(_values.begin(), _values.end(), unicode,
+        [](const pair<uint32, CharacterValues> &entry, uint32_t code)
+    {
+        return entry.first == code;
+    });
+
+    if (it != _values.end() && it->first == unicode)
+    {
+        return &_textures[it->second._page];
+    }
+    else
+    {
+        return &_textures[lower_bound(_values.begin(), _values.end(), invalid_replacement,
+            [](const pair<uint32, CharacterValues> &entry, uint32_t code)
+        {
+            return entry.first == code;
+        })->second._page];
     }
 }

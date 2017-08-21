@@ -119,106 +119,107 @@ namespace BitmapFont
 
         return std::max(vTempWidth, (float)nWidth);
     }
-}
 
-static uint32 code_point;
-static uint32 next_code_point;
-static std::ptrdiff_t cp_len;
-static void *ret_addr;
+    static uint32 code_point;
+    static uint32 next_code_point;
+    static std::ptrdiff_t cp_len;
+    static void *ret_addr;
 
-struct CBitmapFont_RenderToScreen_0x690_13
-{
-    void operator()(injector::reg_pack &regs) const
+    struct CBitmapFont_RenderToScreen_0x690_13
     {
-        char *source = game_meta.pOriginalText + regs.edi;
-        char *dest = game_meta.pWord + regs.esi;
-
-        cp_len = utf8::internal::sequence_length(source);
-
-        code_point = utf8::unchecked::next(source);
-        next_code_point = utf8::unchecked::next(source);
-
-        regs.eax = code_point;
-
-        utf8::unchecked::append(code_point, dest);
-
-        regs.edi += (cp_len - 1);
-        regs.esi += cp_len;
-
-        if (!Functions::IsNativeCharacter(code_point))
+        void operator()(injector::reg_pack &regs) const
         {
-            regs.ecx = 0;
+            char *source = game_meta.pOriginalText + regs.edi;
+            char *dest = game_meta.pWord + regs.esi;
+
+            cp_len = utf8::internal::sequence_length(source);
+
+            code_point = utf8::unchecked::next(source);
+            next_code_point = utf8::unchecked::next(source);
+
+            regs.eax = code_point;
+
+            utf8::unchecked::append(code_point, dest);
+
+            regs.edi += (cp_len - 1);
+            regs.esi += cp_len;
+
+            if (!Functions::IsNativeCharacter(code_point))
+            {
+                regs.ecx = 0;
+            }
+        }
+    };
+
+    struct CBitmapFont_RenderToScreen_0x85B_9
+    {
+        void operator()(injector::reg_pack &regs) const
+        {
+            CBitmapFont *_this = *(CBitmapFont **)(regs.ebp - 0x10);
+
+            regs.ecx = (uint32)_this->GetValueByCodePoint(code_point);
+        }
+    };
+
+    __declspec(naked) void CBitmapFont_RenderToScreen_0x8CE_20()
+    {
+        __asm
+        {
+            pop ret_addr;
+            cmp next_code_point, 0xFF;
+            ja no_kerning;
+            push next_code_point;
+            push code_point;
+            mov ecx, [ebp - 0x34];
+            call game_meta.pfCBitmapFontCharacterSet_GetKerning;
+            jmp j_ret;
+
+        no_kerning:
+            xorps xmm0, xmm0;
+
+        j_ret:
+            jmp ret_addr;
         }
     }
-};
 
-struct CBitmapFont_RenderToScreen_0x85B_9
-{
-    void operator()(injector::reg_pack &regs) const
+    __declspec(naked) void CBitmapFont_RenderToScreen_0x8FA_11()
     {
-        CBitmapFont *_this = *(CBitmapFont **)(regs.ebp - 0x10);
+        __asm
+        {
+            pop ret_addr;
+            cmp code_point, 0xFF;
+            ja j_break;
+            cmp[ecx]EU4CharacterValues.h, 0;
+            jmp ret_addr;
 
-        regs.ecx = (uint32)_this->GetValueByCodePoint(code_point);
+        j_break:
+            add ret_addr, 6;
+            jmp ret_addr;
+        }
     }
-};
 
-__declspec(naked) void CBitmapFont_RenderToScreen_0x8CE_20()
-{
-    __asm
+
+
+    __declspec(naked) void CBitmapFont_RenderToScreen_OFF_SIZE()
     {
-        pop ret_addr;
-        cmp next_code_point, 0xFF;
-        ja no_kerning;
-        push next_code_point;
-        push code_point;
-        mov ecx, [ebp - 0x34];
-        call game_meta.pfCBitmapFontCharacterSet_GetKerning;
-        jmp j_ret;
+        __asm
+        {
+            pop ret_addr;
 
-    no_kerning:
-        xorps xmm0, xmm0;
-
-    j_ret:
-        jmp ret_addr;
+        }
     }
-}
 
-__declspec(naked) void CBitmapFont_RenderToScreen_0x8FA_11()
-{
-    __asm
+    struct CBitmapFont_RenderToScreen_OFF_SIZE
     {
-        pop ret_addr;
-        cmp code_point, 0xFF;
-        ja j_break;
-        cmp[ecx]EU4CharacterValues.h, 0;
-        jmp ret_addr;
+        void operator()(injector::reg_pack &regs) const
+        {
 
-    j_break:
-        add ret_addr, 6;
-        jmp ret_addr;
-    }
-}
+        }
+    };
 
-
-
-__declspec(naked) void CBitmapFont_RenderToScreen_OFF_SIZE()
-{
-    __asm
+    void Patch()
     {
-        pop ret_addr;
-
+        normalFont.InitWithFile("134.fnt");
+        std::cout << normalFont.GetValue(5)->kerning;
     }
-}
-
-struct CBitmapFont_RenderToScreen_OFF_SIZE
-{
-    void operator()(injector::reg_pack &regs) const
-    {
-
-    }
-};
-
-void BitmapFont::Patch()
-{
-
 }

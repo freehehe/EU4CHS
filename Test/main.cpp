@@ -1,14 +1,13 @@
-﻿#include "NonLatinFont.h"
-#include <iostream>
+﻿#include <iostream>
+#include "NonLatinFont.h"
 
 int main()
 {
     NonLatinFont font;
+    font.InitWithFile("normal.bin");
 
-    font.InitWithFile("C:/font/normal.bin");
+    std::cout << font.GetKerning(L'哈', L'蛤') << std::endl;
+    std::cout << font.GetValue(NonLatinFont::invalid_replacement)->xadvance << std::endl;
 
-    std::cout << font.GetKerning(L'a', L'a') << '\n';
-    std::cout << font.GetValue(L'c')->_xadvance << std::endl;
-    font.LoadTexturesDX9();
     return 0;
 }

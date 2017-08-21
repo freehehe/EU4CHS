@@ -2,7 +2,6 @@
 #include "plugin.h"
 #include "bitmapfont.h"
 #include "functions.h"
-#include "chsfont.h"
 #include "vfs.h"
 #include "byte_pattern.h"
 
@@ -24,7 +23,6 @@ void CPlugin::Init(HMODULE hself)
     _game_dir = std::experimental::filesystem::path(module_path).root_directory();
 
     CSingleton<CVFSManager>::Instance().EnumerateOurFiles();
-    CSingleton<CChsFont>::Instance().ReadTable(_table_path);
     Patch();
 }
 
@@ -53,12 +51,11 @@ const std::experimental::filesystem::path & CPlugin::GetGameDirectory() const
     return _game_dir;
 }
 
-
 void CPlugin::Patch()
 {
-    //CBitmapFont::Patch();
-    //Functions::Patch();
+    BitmapFont::Patch();
+    Functions::Patch();
 
     //贴图大小检测
-    //injector::WriteMemory<uint32_t>(g_pattern.set_module(pattern_default_module).set_pattern("81 FE 00 00 00 01").force_search().get(0).pointer(2), 0x7FFFFFFFu, true);
+    injector::WriteMemory<uint32_t>(g_pattern.set_module(pattern_default_module).set_pattern("81 FE 00 00 00 01").force_search().get(0).pointer(2), 0x7FFFFFFFu, true);
 }

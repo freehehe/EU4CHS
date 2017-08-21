@@ -1,10 +1,13 @@
 #include "NonLatinFont.h"
-#include <cstring>
-#include <algorithm>
-#include <iterator>
 
 using namespace std;
 using namespace std::experimental;
+
+NonLatinFont::NonLatinFont()
+{
+    _values.reserve(30000);
+    _kernings.reserve(300);
+}
 
 void NonLatinFont::ReadInfoBlock(FILE * file)
 {
@@ -93,22 +96,22 @@ void NonLatinFont::ReadCharsBlock(FILE * file)
 
     for (auto &binary : chars_block)
     {
-        CharValues values;
+        CharacterValues values;
 
         values._page = binary.page;
-        values._value._x = binary.x;
-        values._value._y = binary.y;
-        values._value._w = binary.width;
-        values._value._h = binary.height;
-        values._value._xoff = binary.xoff;
-        values._value._yoff = binary.yoff;
-        values._value._xadvance = binary.xadvance;
+        values._value.x = binary.x;
+        values._value.y = binary.y;
+        values._value.w = binary.width;
+        values._value.h = binary.height;
+        values._value.xoff = binary.xoff;
+        values._value.yoff = binary.yoff;
+        values._value.xadvance = binary.xadvance;
 
-        values._value._kerning = false;
+        values._value.kerning = false;
 
         uint32_t unicode = binary.code;
 
-        _values.emplace(unicode, values);
+        _values.emplace_back(unicode, values);
     }
 }
 
@@ -137,7 +140,7 @@ void NonLatinFont::ReadKerningsBlock(FILE * file)
         cp._first = binary.first;
         cp._second = binary.second;
 
-        _kernings.emplace(cp._packed, binary.value);
+        _kernings.emplace_back(cp._packed, binary.value);
     }
 }
 
@@ -149,8 +152,23 @@ void NonLatinFont::SetKernings()
 
         cp._packed = kp.first;
 
-        _values.find(cp._first)->second._value._kerning = true;
+        find_if(_values.begin(),_values.end(),
+            [cp](const pair<uint32, CharacterValues> &entry)
+        {
+            return entry.first == cp._first;
+        })->second._value.kerning = true;
     }
+}
+
+void NonLatinFont::SortData()
+{
+    sort(_values.begin(), _values.end(), 
+        [](pair<uint32_t, CharacterValues> &left, pair<uint32_t, CharacterValues> &right)
+    {
+        return left.first < right.first;
+    });
+
+    sort(_kernings.begin(), _kernings.end());
 }
 
 void NonLatinFont::InitWithFile(const std::experimental::filesystem::path &fntname)
@@ -195,6 +213,7 @@ void NonLatinFont::InitWithFile(const std::experimental::filesystem::path &fntna
     fclose(iFile);
 
     SetKernings();
+    SortData();
 }
 
 void NonLatinFont::LoadTexturesDX9()
@@ -205,8 +224,7 @@ void NonLatinFont::LoadTexturesDX9()
     {
         TextureGFX gfx;
 
-        D3DXCreateTextureFromFileA(NULL, (_workingdir / name).string().c_str(), &gfx.field_0);
-
+        //D3DXCreateTextureFromFileA(*(*game_meta.ppMasterContext)->GetDXDevice(), (_workingdir / name).string().c_str(), &gfx.field_0);
         _textures.emplace_back(gfx);
     }
 }
@@ -219,35 +237,69 @@ void NonLatinFont::UnloadTexturesDX9()
     }
 }
 
-std::int16_t NonLatinFont::GetKerning(uint32_t first, uint32_t second) const
+std::int16_t NonLatinFont::GetKerning(uint32_t first, uint32_t second)
 {
     UnicodeCharPair duochar;
 
     duochar._first = first;
     duochar._second = second;
 
-    auto it = _kernings.find(duochar._packed);
-
-    if (it == _kernings.end())
+    auto it = lower_bound(_kernings.begin(), _kernings.end(), duochar._packed,
+        [duochar](const pair<uint64_t, int16_t> &entry, uint64_t pack)
     {
-        return 0;
-    }
-    else
+        return entry.first == pack;
+    });
+
+    if (it != _kernings.end() && it->first == duochar._packed)
     {
         return it->second;
     }
+    else
+    {
+        return 0;
+    }
 }
 
-const EU4CharValues * NonLatinFont::GetValue(uint32_t unicode) const
+EU4CharacterValues * NonLatinFont::GetValue(uint32_t unicode)
 {
-    auto it = _values.find(unicode);
+    auto it = lower_bound(_values.begin(), _values.end(), unicode,
+        [](const pair<uint32, CharacterValues> &entry, uint32_t code)
+    {
+        return entry.first == code;
+    });
 
-    if (it != _values.end())
+    if (it != _values.end() && it->first == unicode)
     {
         return &it->second._value;
     }
     else
     {
-        return &_values.find(invalid_replacement)->second._value;
+        return &lower_bound(_values.begin(), _values.end(), invalid_replacement,
+            [](const pair<uint32, CharacterValues> &entry, uint32_t code)
+        {
+            return entry.first == code;
+        })->second._value;
+    }
+}
+
+TextureGFX * NonLatinFont::GetTexture(std::uint32_t unicode)
+{
+    auto it = lower_bound(_values.begin(), _values.end(), unicode,
+        [](const pair<uint32, CharacterValues> &entry, uint32_t code)
+    {
+        return entry.first == code;
+    });
+
+    if (it != _values.end() && it->first == unicode)
+    {
+        return &_textures[it->second._page];
+    }
+    else
+    {
+        return &_textures[lower_bound(_values.begin(), _values.end(), invalid_replacement,
+            [](const pair<uint32, CharacterValues> &entry, uint32_t code)
+        {
+            return entry.first == code;
+        })->second._page];
     }
 }
