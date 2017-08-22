@@ -243,7 +243,6 @@ void byte_pattern::bm_preprocess()
 {
 	std::ptrdiff_t index;
 
-	//Bad characters
 	for (std::uint32_t bc = 0; bc < 256; ++bc)
 	{
 		for (index = this->_pattern.size() - 1; index >= 0; --index)
@@ -257,9 +256,7 @@ void byte_pattern::bm_preprocess()
 		this->_bmbc[bc] = index;
 	}
 
-	//Good suffix
 	this->_bmgs.resize(this->_pattern.size(), 1);
-
 }
 
 void byte_pattern::bm_search()

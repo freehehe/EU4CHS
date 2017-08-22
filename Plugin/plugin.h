@@ -8,10 +8,8 @@ class CPlugin
     std::experimental::filesystem::path _vfs_dir;
     std::experimental::filesystem::path _game_dir;
 
-    void Patch();
-
 public:
-    void Init(HMODULE hself);
+    void InitAndPatch(HMODULE hself);
 
     const std::experimental::filesystem::path &GetFontPath() const;
     const std::experimental::filesystem::path &GetMapFontPath() const;

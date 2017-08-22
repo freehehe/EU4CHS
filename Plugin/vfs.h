@@ -3,9 +3,9 @@
 
 class VFSManager
 {
-    std::unordered_map<std::size_t, std::string> files;
+    std::unordered_map<std::string, std::string> files;
 
 public:
-	void EnumerateOurFiles();
-	void Patch();
+    void EnumerateOurFiles();
+    void InitAndPatch();
 };

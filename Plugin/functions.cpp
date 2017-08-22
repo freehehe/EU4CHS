@@ -89,7 +89,7 @@ namespace Functions
 
         const unsigned char *it = reinterpret_cast<const unsigned char *>(source);
 
-        while (it != 0)
+        while (*it != 0)
         {
             u32sequence.push_back(*it);
             ++it;
@@ -110,7 +110,7 @@ namespace Functions
         return isalpha(cp) || isdigit(cp) || cp == '_' || cp == '|';
     }
 
-    void Patch()
+    void InitAndPatch()
     {
         injector::MakeJMP(game_meta.pfConvertUTF8ToLatin1, ConvertUTF8ToLatin1);
     }

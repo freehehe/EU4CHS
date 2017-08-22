@@ -9,5 +9,5 @@ namespace Functions
 	bool IsNativeCharacter(uint32 cp);
 	bool IsTextIconChar(uint32 cp);
 
-	void Patch();
+	void InitAndPatch();
 };

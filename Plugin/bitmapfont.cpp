@@ -11,8 +11,6 @@ namespace BitmapFont
 
     static NonLatinFont normalFont, mapFont;
 
-    std::optional<int> hNormalFont, hMapFont;
-
     int __fastcall GetWidthOfString(CBitmapFont *pFont, int edx, const char *text, const int length, bool bUseSpecialChars)
     {
         static std::vector<uint32> wtext;
@@ -158,9 +156,7 @@ namespace BitmapFont
     {
         void operator()(injector::reg_pack &regs) const
         {
-            CBitmapFont *_this = *(CBitmapFont **)(regs.ebp - 0x10);
-
-            regs.ecx = (uint32)_this->GetValueByCodePoint(code_point);
+            regs.ecx = (uint32)(*(CBitmapFont **)(regs.ebp - 0x10))->GetValueByCodePoint(code_point);
         }
     };
 
@@ -220,19 +216,19 @@ namespace BitmapFont
         }
     };
 
-    static void AfterDeviceCreate()
+    static void AfterDX9DeviceCreate()
     {
         normalFont.LoadTexturesDX9();
         mapFont.LoadTexturesDX9();
     }
 
-    static void BeforeDeviceRelease()
+    static void BeforeDX9DeviceRelease()
     {
         normalFont.UnloadTexturesDX9();
-        normalFont.UnloadTexturesDX9();
+        mapFont.UnloadTexturesDX9();
     }
 
-    void Patch()
+    void InitAndPatch()
     {
         normalFont.InitWithFile(CSingleton<CPlugin>::Instance().GetFontPath());
         mapFont.InitWithFile(CSingleton<CPlugin>::Instance().GetMapFontPath());
