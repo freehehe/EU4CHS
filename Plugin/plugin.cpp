@@ -16,7 +16,7 @@ void CPlugin::InitAndPatch(HMODULE hself)
 
     _font_path = plugin_dir / "eu4chs/normal.fnt";
     _mapfont_path = plugin_dir / "eu4chs/map.fnt";
-    _vfs_dir = plugin_dir / "eu4chs/vfsroot/";
+    _plugin_vfs_dir = plugin_dir / "eu4chs/vfsroot/";
 
     GetModuleFileNameA(GetModuleHandle(NULL), module_path, 512);
     _game_dir = std::experimental::filesystem::path(module_path).parent_path();
@@ -44,7 +44,7 @@ const std::experimental::filesystem::path &CPlugin::GetMapFontPath() const
 
 const std::experimental::filesystem::path &CPlugin::GetVFSDirectory() const
 {
-    return _vfs_dir;
+    return _plugin_vfs_dir;
 }
 
 const std::experimental::filesystem::path & CPlugin::GetGameDirectory() const

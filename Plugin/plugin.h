@@ -5,8 +5,9 @@ class CPlugin
 {
     std::experimental::filesystem::path _font_path;
     std::experimental::filesystem::path _mapfont_path;
-    std::experimental::filesystem::path _vfs_dir;
+    std::experimental::filesystem::path _plugin_vfs_dir;
     std::experimental::filesystem::path _game_dir;
+    std::experimental::filesystem::path _plugin_dir;
 
 public:
     void InitAndPatch(HMODULE hself);

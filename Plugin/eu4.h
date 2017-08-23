@@ -175,12 +175,21 @@ struct CGraphics :public IncompleteClass
     }
 };
 
+struct EU4Vertex
+{
+    float x, y, z, rhw;
+    std::uint32_t color;
+    float u, v;
+};
+
 struct EU4Meta
 {
     std::uintptr_t pfConvertUTF8ToLatin1;
 
     std::uintptr_t pfCBitmapFont_GetWidthOfString;
     std::uintptr_t pfCBitmapFont_RenderToScreen;
+
+    std::uintptr_t *ppfGFXDrawDX9;
 
     SMasterContextDX9 **ppMasterContext;
 

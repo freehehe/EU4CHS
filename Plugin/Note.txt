@@ -7,4 +7,9 @@
 0x1098F0A : CBitmapFont::RenderToScreen + 0x8FA + 11
 
 SMasterContextDX9 *0xB226D48
-TextureGFX * 0x9E19230
+TextureGFX * 0x
+
+//让字体支持MipMap采样？
+IDirect3DDevice9 SetSamplerState
+http://www.cnblogs.com/9chu/archive/2012/12/01/2797027.html
+http://blog.csdn.net/xiangzhang321/article/details/8316812
