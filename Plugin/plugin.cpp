@@ -26,7 +26,10 @@ void CPlugin::InitAndPatch(HMODULE hself)
     CSingleton<VFSManager>::Instance().InitAndPatch();
 
     //贴图大小检测
-    //injector::WriteMemory<uint32_t>(g_pattern.set_module(pattern_default_module).set_pattern("81 FE 00 00 00 01").force_search().get(0).pointer(2), 0x7FFFFFFFu, true);
+    injector::WriteMemory<uint32_t>(g_pattern.set_module(pattern_default_module).set_pattern("81 FE 00 00 00 01").force_search().get(0).address(2), 0x7FFFFFFFu, true);
+
+    //跳过校验
+    injector::MakeNOP(g_pattern.set_pattern("0F 94 45 F3 56").force_search().get(0).address(), 4, true);
 }
 
 const std::experimental::filesystem::path &CPlugin::GetFontPath() const

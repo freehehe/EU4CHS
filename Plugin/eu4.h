@@ -175,8 +175,6 @@ struct CGraphics :public IncompleteClass
     }
 };
 
-//CCreateChecksumTask
-
 struct EU4Meta
 {
     std::uintptr_t pfConvertUTF8ToLatin1;
@@ -187,6 +185,7 @@ struct EU4Meta
     SMasterContextDX9 **ppMasterContext;
 
     void *pfPHYSFS_openRead;
+    std::uintptr_t pfVFSOpenFile;
 
     char *pOriginalText;
     char *pWord;
