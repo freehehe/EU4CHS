@@ -27,6 +27,14 @@ bool ConvertFile(const filesystem::path &path)
     cbuffer.clear();
     wbuffer.clear();
 
+    istreambuf_iterator<char> bufit{ iofs };
+    istreambuf_iterator<char> butend{};
+
+    if (utf8::starts_with_bom(bufit, butend) || utf8::is_valid(bufit, butend))
+    {
+        return;
+    }
+
     copy(istreambuf_iterator<char>{iofs}, istreambuf_iterator<char>(), back_inserter(cbuffer));
     transform(cbuffer.begin(), cbuffer.end(), back_inserter(wbuffer), 
         [](char character)

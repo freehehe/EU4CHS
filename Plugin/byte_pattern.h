@@ -70,15 +70,10 @@ public:
 		return this->compare(rhs);
 	}
 
-	bool operator==(std::uint8_t value) const
-	{
-		return this->match(value);
-	}
-
-	bool operator!=(std::uint8_t value) const
-	{
-		return !this->match(value);
-	}
+    bool operator!=(const pattern_byte &rhs) const
+    {
+        return !this->compare(rhs);
+    }
 
 private:
 	std::uint8_t _value;

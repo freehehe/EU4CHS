@@ -175,7 +175,12 @@ struct CGraphics :public IncompleteClass
     }
 };
 
-//CCreateChecksumTask
+struct EU4Vertex
+{
+    float x, y, z, rhw;
+    std::uint32_t color;
+    float u, v;
+};
 
 struct EU4Meta
 {
@@ -183,6 +188,8 @@ struct EU4Meta
 
     std::uintptr_t pfCBitmapFont_GetWidthOfString;
     std::uintptr_t pfCBitmapFont_RenderToScreen;
+
+    std::uintptr_t *ppfGFXDrawDX9;
 
     SMasterContextDX9 **ppMasterContext;
 

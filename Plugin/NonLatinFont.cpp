@@ -1,8 +1,19 @@
-#include "stdinc.h"
+﻿#include "stdinc.h"
 #include "NonLatinFont.h"
 
 using namespace std;
 using namespace std::experimental;
+
+union UnicodeCharPair
+{
+    struct
+    {
+        std::uint32_t _first;
+        std::uint32_t _second;
+    };
+
+    std::uint64_t _packed;
+};
 
 NonLatinFont::NonLatinFont()
 {
@@ -211,6 +222,8 @@ void NonLatinFont::LoadTexturesDX9()
 
         _textures.emplace_back(gfx);
     }
+
+    _vertices.resize(_textures.size());
 }
 
 void NonLatinFont::UnloadTexturesDX9()
@@ -219,6 +232,8 @@ void NonLatinFont::UnloadTexturesDX9()
     {
         texture.field_0->Release();
     }
+
+    _textures.clear();
 }
 
 std::int16_t NonLatinFont::GetKerning(uint32_t first, uint32_t second)
@@ -240,17 +255,17 @@ std::int16_t NonLatinFont::GetKerning(uint32_t first, uint32_t second)
     }
 }
 
-EU4CharacterValues * NonLatinFont::GetValue(uint32_t unicode)
+NonLatinFont::CharacterValues *NonLatinFont::GetValue(uint32_t unicode)
 {
     auto it = _values.find(unicode);
 
     if (it != _values.end() && it->first == unicode)
     {
-        return &it->second._value;
+        return &it->second;
     }
     else
     {
-        return &_values.find(invalid_replacement)->second._value;
+        return &_values.find(invalid_replacement)->second;
     }
 }
 
@@ -270,4 +285,32 @@ TextureGFX * NonLatinFont::GetTexture(std::uint32_t unicode)
     }
 
     return &_textures[page];
+}
+
+void NonLatinFont::GeneratePrimitivesDX9(std::uint32_t unicode, const CRect<uint16_t> *dstRect, std::uint32_t color)
+{
+    EU4Vertex vertices[6];
+
+    auto texture_index = GetValue(unicode)->_page;
+
+    //一波教科书式的计算
+
+
+    copy(begin(vertices), end(vertices), back_inserter(_vertices[texture_index]));
+}
+
+void NonLatinFont::DrawAllDX9()
+{
+    LPDIRECT3DDEVICE9 pDevice = *(*game_meta.ppMasterContext)->GetDXDevice();
+
+    pDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
+    pDevice->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEXTUREFORMAT2);
+    pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, 1);
+
+    for (size_t texture_index = 0; texture_index < _vertices.size(); ++texture_index)
+    {
+        pDevice->SetTexture(0, _textures[texture_index].field_0);
+        pDevice->DrawPrimitiveUP(D3DPT_TRIANGLELIST, _vertices[texture_index].size() / 3, _vertices[texture_index].data(), sizeof(EU4Vertex));
+        _vertices[texture_index].clear();
+    }
 }

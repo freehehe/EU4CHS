@@ -106,6 +106,7 @@
     <ClCompile Include="eu4.cpp" />
     <ClCompile Include="functions.cpp" />
     <ClCompile Include="NonLatinFont.cpp" />
+    <ClCompile Include="NonLatinFontManager.cpp" />
     <ClCompile Include="plugin.cpp" />
     <ClCompile Include="stdinc.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -119,6 +120,7 @@
     <ClInclude Include="eu4.h" />
     <ClInclude Include="functions.h" />
     <ClInclude Include="NonLatinFont.h" />
+    <ClInclude Include="NonLatinFontManager.h" />
     <ClInclude Include="stdinc.h" />
     <ClInclude Include="plugin.h" />
     <ClInclude Include="vfs.h" />

@@ -241,22 +241,67 @@ bool byte_pattern::check_address(std::uintptr_t address) const
 
 void byte_pattern::bm_preprocess()
 {
-	std::ptrdiff_t index;
+    std::ptrdiff_t i, j, c;
 
 	for (std::uint32_t bc = 0; bc < 256; ++bc)
 	{
-		for (index = this->_pattern.size() - 1; index >= 0; --index)
+		for (i = this->_pattern.size() - 1; i >= 0; --i)
 		{
-			if (this->_pattern[index].match(bc))
+			if (this->_pattern[i].match(bc))
 			{
 				break;
 			}
 		}
 
-		this->_bmbc[bc] = index;
+		this->_bmbc[bc] = i;
 	}
 
-	this->_bmgs.resize(this->_pattern.size(), 1);
+    this->_bmgs.resize(this->_pattern.size());    
+
+    for (i = 0; i < this->_pattern.size() - 1; ++i)
+    {
+        this->_bmgs[i] = this->_pattern.size();
+    }
+
+    this->_bmgs[this->_pattern.size() - 1] = 1;
+
+    for (i = this->_pattern.size() - 1, c = 0; i != 0; --i)
+    {
+        for (j = 0; j < i; ++j)
+        {
+            if (std::equal(this->_pattern.begin() + i, this->_pattern.end(), this->_pattern.begin() + j))
+            {
+                if (j == 0)
+                {
+                    c = this->_pattern.size() - i;
+                }
+                else
+                {
+                    if (this->_pattern[i - 1] != this->_pattern[j - 1])
+                    {
+                        this->_bmgs[i - 1] = j - 1;
+                    }
+                }
+            }
+        }
+    }
+
+    for (i = 0; i < this->_pattern.size() - 1; ++i)
+    {
+        if (this->_bmgs[i] != this->_pattern.size())
+        {
+            this->_bmgs[i] = this->_pattern.size() - 1 - this->_bmgs[i];
+        }
+        else
+        {
+            this->_bmgs[i] = this->_pattern.size() - 1 - i + this->_bmgs[i];
+
+            if (c != 0 && this->_pattern.size() - 1 - i >= c)
+            {
+                this->_bmgs[i] -= c;
+            }
+        }
+    }
 }
 
 void byte_pattern::bm_search()
