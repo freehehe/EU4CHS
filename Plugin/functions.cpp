@@ -1,6 +1,7 @@
 #include "stdinc.h"
 #include "functions.h"
 #include "eu4.h"
+#include "byte_pattern.h"
 
 namespace Functions
 {
@@ -110,9 +111,21 @@ namespace Functions
         return isalpha(cp) || isdigit(cp) || cp == '_' || cp == '|';
     }
 
+    __declspec(naked) void WriteVariableTrailHook()
+    {
+        __asm
+        {
+            mov dword ptr[eax], 0x0021A7C2;
+            add eax, 3;
+            ret;
+        }
+    }
+
     void InitAndPatch()
     {
         injector::MakeJMP(game_meta.pfConvertUTF8ToLatin1, ConvertUTF8ToLatin1);
+
+        injector::MakeCALL(g_pattern.set_pattern("66 C7 00 A7 21").get(0).address(), WriteVariableTrailHook);
     }
 }
 

@@ -4,257 +4,221 @@
 extern const HMODULE pattern_default_module = GetModuleHandleA(NULL);
 byte_pattern g_pattern;
 
-byte_pattern::byte_pattern(const char *pattern_literal)
-{
-	this->initialize(pattern_literal);
-}
-
-byte_pattern::byte_pattern(memory_pointer module, const char *pattern_literal)
-{
-	this->initialize(module, pattern_literal);
-}
-
-byte_pattern::byte_pattern(memory_pointer range_begin, memory_pointer range_end, const char *pattern_literal)
-{
-	this->initialize(range_begin, range_end, pattern_literal);
-}
-
-void byte_pattern::initialize(const char *pattern_literal)
-{
-	this->get_module_range(pattern_default_module);
-	this->transform_pattern(pattern_literal);
-	this->do_search();
-}
-
-void byte_pattern::initialize(memory_pointer module, const char *pattern_literal)
-{
-	this->get_module_range(module);
-	this->transform_pattern(pattern_literal);
-	this->do_search();
-}
-
-void byte_pattern::initialize(memory_pointer range_begin, memory_pointer range_end, const char *pattern_literal)
-{
-	this->set_range(range_begin, range_end);
-	this->transform_pattern(pattern_literal);
-	this->do_search();
-}
-
 const memory_pointer &byte_pattern::get(std::size_t index) const
 {
-	if (index >= this->_result.size())
-	{
-		std::stringstream sstr;
+    if (index >= this->_result.size())
+    {
+        std::stringstream sstr;
 
-		sstr << "Processing pattern: " << this->_literal << "\nTrying to access index " << index << " but got " << this->_result.size() << " results.\nGame will crash.";
+        sstr << "Processing pattern: " << this->_literal << "\nTrying to access index " << index << " but got " << this->_result.size() << " results.\nGame will crash.";
 
-		MessageBoxA(NULL, sstr.str().c_str(), "byte_pattern: too few results.", MB_OK);
-	}
+        MessageBoxA(NULL, sstr.str().c_str(), "byte_pattern: too few results.", MB_OK);
+    }
 
-	return this->_result[index];
+    return this->_result[index];
 }
 
 byte_pattern &byte_pattern::set_pattern(const char *pattern_literal)
 {
-	this->_result.clear();
-	this->_processed = false;
-	this->transform_pattern(pattern_literal);
+    this->_result.clear();
+    this->_processed = false;
+    this->transform_pattern(pattern_literal);
 
-	return *this;
+    return *this;
 }
 
 byte_pattern &byte_pattern::set_pattern(const void *data, std::size_t size)
 {
-	this->_pattern.assign(reinterpret_cast<const std::uint8_t *>(data), reinterpret_cast<const std::uint8_t *>(data) + size);
-	this->bm_preprocess();
+    this->_pattern.assign(reinterpret_cast<const std::uint8_t *>(data), reinterpret_cast<const std::uint8_t *>(data) + size);
+    this->bm_preprocess();
 
-	return *this;
+    return *this;
 }
 
 byte_pattern &byte_pattern::set_module(memory_pointer module)
 {
-	this->get_module_range(module);
+    this->get_module_range(module);
 
-	return *this;
+    return *this;
 }
 
 byte_pattern &byte_pattern::set_range(memory_pointer beg, memory_pointer end)
 {
-	this->_range = { beg.address(), end.address() };
+    this->_range = { beg.address(), end.address() };
 
-	return *this;
+    return *this;
 }
 
 void byte_pattern::do_search()
 {
-	if (!this->_processed)
-	{
-		this->force_search();
-	}
+    if (!this->_processed)
+    {
+        this->force_search();
+    }
 }
 
 byte_pattern &byte_pattern::force_search()
 {
-	this->_result.clear();
+    this->_result.clear();
 
-	this->_processed = true;
+    this->_processed = true;
 
-	if (!this->_pattern.empty())
-	{
-		this->bm_search();
-	}
+    if (!this->_pattern.empty())
+    {
+        this->bm_search();
+    }
 
-	return *this;
+    return *this;
 }
 
 void byte_pattern::transform_pattern(const char *pattern_literal)
 {
-	auto tol = [](char ch) -> uint8_t
-	{
-		if (ch >= 'A' && ch <= 'F') return uint8_t(ch - 'A' + 10);
-		if (ch >= 'a' && ch <= 'f') return uint8_t(ch - 'a' + 10);
-		return uint8_t(ch - '0');
-	};
+    auto tol = [](char ch) -> uint8_t
+    {
+        if (ch >= 'A' && ch <= 'F') return uint8_t(ch - 'A' + 10);
+        if (ch >= 'a' && ch <= 'f') return uint8_t(ch - 'a' + 10);
+        return uint8_t(ch - '0');
+    };
 
-	auto is_digit = [](char ch) -> bool
-	{
-		return (ch >= 'A' && ch <= 'F') || (ch >= 'a' && ch <= 'f') || (ch >= '0' && ch <= '9');
-	};
+    auto is_digit = [](char ch) -> bool
+    {
+        return (ch >= 'A' && ch <= 'F') || (ch >= 'a' && ch <= 'f') || (ch >= '0' && ch <= '9');
+    };
 
-	std::array<char, 2> temp_string{ 0, 0 };
+    std::array<char, 2> temp_string{ 0, 0 };
 
-	this->_literal = pattern_literal;
+    this->_literal = pattern_literal;
 
-	this->_pattern.clear();
+    this->_pattern.clear();
 
-	if (pattern_literal == nullptr)
-	{
-		return;
-	}
+    if (pattern_literal == nullptr)
+    {
+        return;
+    }
 
-	const char *patit = pattern_literal;
-	const char *patend = (pattern_literal + std::strlen(pattern_literal) + 1);
+    const char *patit = pattern_literal;
+    const char *patend = (pattern_literal + std::strlen(pattern_literal) + 1);
 
-	while (patit != patend)
-	{
-		char ch = *patit;
+    while (patit != patend)
+    {
+        char ch = *patit;
 
-		if (ch == ' ' || ch == 0)
-		{
-			if (!temp_string[0] && !temp_string[1])
-			{
-				continue;
-			}
-			else if (temp_string[0] == '?' && (temp_string[1] == '?' || temp_string[1] == 0))
-			{
-				this->_pattern.emplace_back();
-			}
-			else if (is_digit(temp_string[0]) && is_digit(temp_string[1]))
-			{
-				this->_pattern.emplace_back((tol(temp_string[0]) << 4) | tol(temp_string[1]));
-			}
-			else
-			{
-				this->_pattern.clear();
-				return;
-			}
+        if (ch == ' ' || ch == 0)
+        {
+            if (!temp_string[0] && !temp_string[1])
+            {
+                continue;
+            }
+            else if (temp_string[0] == '?' && (temp_string[1] == '?' || temp_string[1] == 0))
+            {
+                this->_pattern.emplace_back();
+            }
+            else if (is_digit(temp_string[0]) && is_digit(temp_string[1]))
+            {
+                this->_pattern.emplace_back((tol(temp_string[0]) << 4) | tol(temp_string[1]));
+            }
+            else
+            {
+                this->_pattern.clear();
+                return;
+            }
 
-			temp_string.fill(0);
-		}
-		else
-		{
-			if (temp_string[0] == 0)
-			{
-				temp_string[0] = ch;
-			}
-			else if (temp_string[1] == 0)
-			{
-				temp_string[1] = ch;
-			}
-			else
-			{
-				this->_pattern.clear();
-				return;
-			}
-		}
+            temp_string.fill(0);
+        }
+        else
+        {
+            if (temp_string[0] == 0)
+            {
+                temp_string[0] = ch;
+            }
+            else if (temp_string[1] == 0)
+            {
+                temp_string[1] = ch;
+            }
+            else
+            {
+                this->_pattern.clear();
+                return;
+            }
+        }
 
-		++patit;
-	}
+        ++patit;
+    }
 
-	this->bm_preprocess();
+    this->bm_preprocess();
 }
 
 void byte_pattern::get_module_range(memory_pointer module)
 {
-	static auto getSection = [](const PIMAGE_NT_HEADERS nt_headers, unsigned section) -> PIMAGE_SECTION_HEADER
-	{
-		return reinterpret_cast<PIMAGE_SECTION_HEADER>(
-			(UCHAR*)nt_headers->OptionalHeader.DataDirectory +
-			nt_headers->OptionalHeader.NumberOfRvaAndSizes * sizeof(IMAGE_DATA_DIRECTORY) +
-			section * sizeof(IMAGE_SECTION_HEADER));
-	};
+    static auto getSection = [](const PIMAGE_NT_HEADERS nt_headers, unsigned section) -> PIMAGE_SECTION_HEADER
+    {
+        return reinterpret_cast<PIMAGE_SECTION_HEADER>(
+            (UCHAR*)nt_headers->OptionalHeader.DataDirectory +
+            nt_headers->OptionalHeader.NumberOfRvaAndSizes * sizeof(IMAGE_DATA_DIRECTORY) +
+            section * sizeof(IMAGE_SECTION_HEADER));
+    };
 
-	this->_range.first = module.address();
+    this->_range.first = module.address();
 
-	PIMAGE_DOS_HEADER dosHeader = module.pointer<IMAGE_DOS_HEADER>();
-	PIMAGE_NT_HEADERS ntHeader = module.pointer<IMAGE_NT_HEADERS>(dosHeader->e_lfanew);
+    PIMAGE_DOS_HEADER dosHeader = module.pointer<IMAGE_DOS_HEADER>();
+    PIMAGE_NT_HEADERS ntHeader = module.pointer<IMAGE_NT_HEADERS>(dosHeader->e_lfanew);
 
-	for (int i = 0; i < ntHeader->FileHeader.NumberOfSections; i++)
-	{
-		auto sec = getSection(ntHeader, i);
-		auto secSize = sec->SizeOfRawData != 0 ? sec->SizeOfRawData : sec->Misc.VirtualSize;
-		if (sec->Characteristics & IMAGE_SCN_MEM_EXECUTE)
-			this->_range.second = this->_range.first + sec->VirtualAddress + secSize;
+    for (int i = 0; i < ntHeader->FileHeader.NumberOfSections; i++)
+    {
+        auto sec = getSection(ntHeader, i);
+        auto secSize = sec->SizeOfRawData != 0 ? sec->SizeOfRawData : sec->Misc.VirtualSize;
+        if (sec->Characteristics & IMAGE_SCN_MEM_EXECUTE)
+            this->_range.second = this->_range.first + sec->VirtualAddress + secSize;
 
-		if ((i == ntHeader->FileHeader.NumberOfSections - 1) && this->_range.second == 0)
-			this->_range.second = this->_range.first + sec->PointerToRawData + secSize;
-	}
+        if ((i == ntHeader->FileHeader.NumberOfSections - 1) && this->_range.second == 0)
+            this->_range.second = this->_range.first + sec->PointerToRawData + secSize;
+    }
 }
 
 void byte_pattern::clear()
 {
-	_range = { 0,0 };
-	this->_pattern.clear();
-	this->_result.clear();
-	this->_processed = false;
+    _range = { 0,0 };
+    this->_pattern.clear();
+    this->_result.clear();
+    this->_processed = false;
 }
 
 std::size_t byte_pattern::size() const
 {
-	return this->_result.size();
+    return this->_result.size();
 }
 
 bool byte_pattern::has_size(std::size_t expected) const
 {
-	return (this->_result.size() == expected);
+    return (this->_result.size() == expected);
 }
 
 bool byte_pattern::empty() const
 {
-	return this->_result.empty();
+    return this->_result.empty();
 }
 
 bool byte_pattern::check_address(std::uintptr_t address) const
 {
-	return std::equal(this->_pattern.begin(), this->_pattern.end(), reinterpret_cast<const uint8_t *>(address));
+    return std::equal(this->_pattern.begin(), this->_pattern.end(), reinterpret_cast<const uint8_t *>(address));
 }
 
 void byte_pattern::bm_preprocess()
 {
     std::ptrdiff_t i, j, c;
 
-	for (std::uint32_t bc = 0; bc < 256; ++bc)
-	{
-		for (i = this->_pattern.size() - 1; i >= 0; --i)
-		{
-			if (this->_pattern[i].match(bc))
-			{
-				break;
-			}
-		}
+    for (std::uint32_t bc = 0; bc < 256; ++bc)
+    {
+        for (i = this->_pattern.size() - 1; i >= 0; --i)
+        {
+            if (this->_pattern[i].match(bc))
+            {
+                break;
+            }
+        }
 
-		this->_bmbc[bc] = i;
-	}
+        this->_bmbc[bc] = i;
+    }
 
     this->_bmgs.resize(this->_pattern.size());    
 
@@ -306,36 +270,36 @@ void byte_pattern::bm_preprocess()
 
 void byte_pattern::bm_search()
 {
-	std::uint8_t *range_begin = reinterpret_cast<std::uint8_t *>(this->_range.first);
-	std::uint8_t *range_end = reinterpret_cast<std::uint8_t *>(this->_range.second - this->_pattern.size());
+    std::uint8_t *range_begin = reinterpret_cast<std::uint8_t *>(this->_range.first);
+    std::uint8_t *range_end = reinterpret_cast<std::uint8_t *>(this->_range.second - this->_pattern.size());
 
-	std::ptrdiff_t index;
+    std::ptrdiff_t index;
 
-	__try
-	{
-		while (range_begin <= range_end)
-		{
-			for (index = this->_pattern.size() - 1; index >= 0; --index)
-			{
-				if (!this->_pattern[index].match(range_begin[index]))
-				{
-					break;
-				}
-			}
+    __try
+    {
+        while (range_begin <= range_end)
+        {
+            for (index = this->_pattern.size() - 1; index >= 0; --index)
+            {
+                if (!this->_pattern[index].match(range_begin[index]))
+                {
+                    break;
+                }
+            }
 
-			if (index == -1)
-			{
-				this->_result.emplace_back(range_begin);
-				range_begin += this->_pattern.size();
-			}
-			else
-			{
-				range_begin += std::max(index - this->_bmbc[range_begin[index]], this->_bmgs[index]);
-			}
-		}
-	}
-	__except ((GetExceptionCode() == EXCEPTION_ACCESS_VIOLATION) ? EXCEPTION_EXECUTE_HANDLER : EXCEPTION_CONTINUE_SEARCH)
-	{
+            if (index == -1)
+            {
+                this->_result.emplace_back(range_begin);
+                range_begin += this->_pattern.size();
+            }
+            else
+            {
+                range_begin += std::max(index - this->_bmbc[range_begin[index]], this->_bmgs[index]);
+            }
+        }
+    }
+    __except ((GetExceptionCode() == EXCEPTION_ACCESS_VIOLATION) ? EXCEPTION_EXECUTE_HANDLER : EXCEPTION_CONTINUE_SEARCH)
+    {
 
-	}
+    }
 }

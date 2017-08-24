@@ -42,9 +42,6 @@
     <ClCompile Include="NonLatinFont.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="NonLatinFontManager.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="plugin.h">
@@ -69,9 +66,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="NonLatinFont.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="NonLatinFontManager.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

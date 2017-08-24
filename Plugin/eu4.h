@@ -182,6 +182,152 @@ struct EU4Vertex
     float u, v;
 };
 
+struct STextVertex
+{
+    CVector3<float> field_0;
+    CVector2<float> field_C;
+    uint32 FillColor;
+    uint32 BorderColor;
+};
+VALIDATE_SIZE(STextVertex, 0x1C)
+
+enum D3DVTABLE_INDEX {
+    iQueryInterface,
+    iAddRef,
+    iRelease,
+    iTestCooperativeLevel,
+    iGetAvailableTextureMem,
+    iEvictManagedResources,
+    iGetDirect3D,
+    iGetDeviceCaps,
+    iGetDisplayMode,
+    iGetCreationParameters,
+    iSetCursorProperties,
+    iSetCursorPosition,
+    iShowCursor,
+    iCreateAdditionalSwapChain,
+    iGetSwapChain,
+    iGetNumberOfSwapChains,
+    iReset,
+    iPresent,
+    iGetBackBuffer,
+    iGetRasterStatus,
+    iSetDialogBoxMode,
+    iSetGammaRamp,
+    iGetGammaRamp,
+    iCreateTexture,
+    iCreateVolumeTexture,
+    iCreateCubeTexture,
+    iCreateVertexBuffer,
+    iCreateIndexBuffer,
+    iCreateRenderTarget,
+    iCreateDepthStencilSurface,
+    iUpdateSurface,
+    iUpdateTexture,
+    iGetRenderTargetData,
+    iGetFrontBufferData,
+    iStretchRect,
+    iColorFill,
+    iCreateOffscreenPlainSurface,
+    iSetRenderTarget,
+    iGetRenderTarget,
+    iSetDepthStencilSurface,
+    iGetDepthStencilSurface,
+    iBeginScene,
+    iEndScene,
+    iClear,
+    iSetTransform,
+    iGetTransform,
+    iMultiplyTransform,
+    iSetViewport,
+    iGetViewport,
+    iSetMaterial,
+    iGetMaterial,
+    iSetLight,
+    iGetLight,
+    iLightEnable,
+    iGetLightEnable,
+    iSetClipPlane,
+    iGetClipPlane,
+    iSetRenderState,
+    iGetRenderState,
+    iCreateStateBlock,
+    iBeginStateBlock,
+    iEndStateBlock,
+    iSetClipStatus,
+    iGetClipStatus,
+    iGetTexture,
+    iSetTexture,
+    iGetTextureStageState,
+    iSetTextureStageState,
+    iGetSamplerState,
+    iSetSamplerState,
+    iValidateDevice,
+    iSetPaletteEntries,
+    iGetPaletteEntries,
+    iSetCurrentTexturePalette,
+    iGetCurrentTexturePalette,
+    iSetScissorRect,
+    iGetScissorRect,
+    iSetSoftwareVertexProcessing,
+    iGetSoftwareVertexProcessing,
+    iSetNPatchMode,
+    iGetNPatchMode,
+    iDrawPrimitive,
+    iDrawIndexedPrimitive,
+    iDrawPrimitiveUP,
+    iDrawIndexedPrimitiveUP,
+    iProcessVertices,
+    iCreateVertexDeclaration,
+    iSetVertexDeclaration,
+    iGetVertexDeclaration,
+    iSetFVF,
+    iGetFVF,
+    iCreateVertexShader,
+    iSetVertexShader,
+    iGetVertexShader,
+    iSetVertexShaderConstantF,
+    iGetVertexShaderConstantF,
+    iSetVertexShaderConstantI,
+    iGetVertexShaderConstantI,
+    iSetVertexShaderConstantB,
+    iGetVertexShaderConstantB,
+    iSetStreamSource,
+    iGetStreamSource,
+    iSetStreamSourceFreq,
+    iGetStreamSourceFreq,
+    iSetIndices,
+    iGetIndices,
+    iCreatePixelShader,
+    iSetPixelShader,
+    iGetPixelShader,
+    iSetPixelShaderConstantF,
+    iGetPixelShaderConstantF,
+    iSetPixelShaderConstantI,
+    iGetPixelShaderConstantI,
+    iSetPixelShaderConstantB,
+    iGetPixelShaderConstantB,
+    iDrawRectPatch,
+    iDrawTriPatch,
+    iDeletePatch,
+    iCreateQuery,
+    iSetConvolutionMonoKernel,
+    iComposeRects,
+    iPresentEx,
+    iGetGPUThreadPriority,
+    iSetGPUThreadPriority,
+    iWaitForVBlank,
+    iCheckResourceResidency,
+    iSetMaximumFrameLatency,
+    iGetMaximumFrameLatency,
+    iCheckDeviceState,
+    iCreateRenderTargetEx,
+    iCreateOffscreenPlainSurfaceEx,
+    iCreateDepthStencilSurfaceEx,
+    iResetEx,
+    iGetDisplayModeEx
+};
+
 struct EU4Meta
 {
     std::uintptr_t pfConvertUTF8ToLatin1;
@@ -189,12 +335,10 @@ struct EU4Meta
     std::uintptr_t pfCBitmapFont_GetWidthOfString;
     std::uintptr_t pfCBitmapFont_RenderToScreen;
 
-    std::uintptr_t *ppfGFXDrawDX9;
-
-    SMasterContextDX9 **ppMasterContext;
-
     void *pfPHYSFS_openRead;
     std::uintptr_t pfVFSOpenFile;
+
+    LPDIRECT3DDEVICE9 pDX9Device;
 
     char *pOriginalText;
     char *pWord;
