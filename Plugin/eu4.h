@@ -77,7 +77,7 @@ struct CString
     std::size_t length;
     std::size_t capacity;
 
-    const char *data() const
+    const char *c_str() const
     {
         return capacity > 15 ? heap : sso_head;
     }
@@ -165,31 +165,6 @@ struct CBitmapFont :IncompleteClass
         return field<int, 0x4E0>();
     }
 };
-
-class CTextureHandler;
-struct CGraphics :public IncompleteClass
-{
-    CTextureHandler *GetTextureHandler()
-    {
-        return field<CTextureHandler, 0x334>();
-    }
-};
-
-struct EU4Vertex
-{
-    float x, y, z, rhw;
-    std::uint32_t color;
-    float u, v;
-};
-
-struct STextVertex
-{
-    CVector3<float> field_0;
-    CVector2<float> field_C;
-    uint32 FillColor;
-    uint32 BorderColor;
-};
-VALIDATE_SIZE(STextVertex, 0x1C)
 
 enum D3DVTABLE_INDEX {
     iQueryInterface,
@@ -338,7 +313,10 @@ struct EU4Meta
     void *pfPHYSFS_openRead;
     std::uintptr_t pfVFSOpenFile;
 
+    SMasterContextDX9 **ppMasterContext;
     LPDIRECT3DDEVICE9 pDX9Device;
+
+    std::uintptr_t GFXSetPrimitive;
 
     char *pOriginalText;
     char *pWord;

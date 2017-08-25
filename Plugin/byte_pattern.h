@@ -17,27 +17,28 @@ public:
 
     pattern_byte()
     {
-        this->_method = match_method::WILDCARD;
-        this->_value = 0;
+        this->set_wild();
     }
 
-    pattern_byte(std::uint8_t value, match_method method = match_method::EXACT)
+    pattern_byte(std::uint8_t value)
     {
-        this->set(value, method);
+        this->set_value(value);
     }
 
-    pattern_byte &set(std::uint8_t value, match_method method = match_method::EXACT)
+    pattern_byte &set_value(std::uint8_t value)
     {
-        this->_method = method;
-        this->_value = (method == match_method::WILDCARD) ? 0 : value;
+        this->_method = match_method::EXACT;
+        this->_value = value;
 
         return *this;
     }
 
-    void be_wild()
+    pattern_byte &set_wild()
     {
         this->_method = match_method::WILDCARD;
         this->_value = 0;
+
+        return *this;
     }
 
     bool is_wild() const
@@ -108,17 +109,6 @@ public:
     T *pointer(std::ptrdiff_t offset = 0) const
     {
         return reinterpret_cast<T *>(this->address(offset));
-    }
-
-    operator std::uintptr_t() const
-    {
-        return _address;
-    }
-
-    template <typename T>
-    operator T *() const
-    {
-        return _pointer;
     }
 };
 

@@ -1,5 +1,6 @@
 ﻿#include "stdinc.h"
 #include "byte_pattern.h"
+#include <stdexcept>
 
 extern const HMODULE pattern_default_module = GetModuleHandleA(NULL);
 byte_pattern g_pattern;
@@ -10,9 +11,11 @@ const memory_pointer &byte_pattern::get(std::size_t index) const
     {
         std::stringstream sstr;
 
-        sstr << "Processing pattern: " << this->_literal << "\nTrying to access index " << index << " but got " << this->_result.size() << " results.\nGame will crash.";
+        sstr << "Processing pattern: " << this->_literal << "\nTrying to access index " << index << " but only " << this->_result.size() << " results.\nGame will crash.";
 
         MessageBoxA(NULL, sstr.str().c_str(), "byte_pattern: too few results.", MB_OK);
+
+        throw std::out_of_range{ "Pattern: results accessing out of range." };
     }
 
     return this->_result[index];

@@ -9,7 +9,7 @@ using namespace experimental;
 void VFSManager::EnumerateOurFiles()
 {
     string gameroot = CSingleton<CPlugin>::Instance().GetGameDirectory().string();
-    string ourroot = CSingleton<CPlugin>::Instance().GetVFSDirectory().string();
+    string ourroot = (CSingleton<CPlugin>::Instance().GetPluginDirectory() / "eu4chs/vfsroot").string();
 
     string vfspath;
     string ourvfspath;

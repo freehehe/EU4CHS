@@ -20,7 +20,16 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="3500chs.txt" />
-    <Text Include="52addchar.txt" />
+    <Text Include="52addchar.txt">
+      <Filter>资源文件</Filter>
+    </Text>
+    <Text Include="3500chs.txt">
+      <Filter>资源文件</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="52allin1.yml">
+      <Filter>资源文件</Filter>
+    </None>
   </ItemGroup>
 </Project>

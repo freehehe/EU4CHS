@@ -7,9 +7,18 @@ class NonLatinFont
 public:
     struct CharacterValues
     {
-        EU4CharacterValues _value;
-        std::uint16_t _page;
+        EU4CharacterValues EU4Values;
+        std::uint16_t PageIndex;
     };
+
+    struct OurVertex
+    {
+        CVector4<float> xyzrhw;
+        uint32 diffuse;
+        CVector2<float> uv;
+        char pad[4];
+    };
+    VALIDATE_SIZE(OurVertex,32)
 
     static const std::uint32_t invalid_replacement = L'？';
 
@@ -19,7 +28,6 @@ public:
     void LoadTexturesDX9();
     void UnloadTexturesDX9();
 
-    std::int16_t GetKerning(std::uint32_t first, std::uint32_t second);
     CharacterValues *GetValue(std::uint32_t unicode);
     TextureGFX *GetTexture(std::uint32_t unicode);
 
@@ -27,20 +35,20 @@ public:
     void DrawAllDX9();
 
 private:
+    bool _initialized;
+
+    std::experimental::filesystem::path _workingdir;
     std::uint16_t _scaleW;
     std::uint16_t _scaleH;
     std::uint16_t _pages;
     std::unordered_map<std::uint32_t, CharacterValues> _values;
-    std::unordered_map<std::uint64_t, std::int16_t> _kernings;
     std::vector<TextureGFX> _textures;
     std::vector<std::string> _texturenames;
-    std::experimental::filesystem::path _workingdir;
-    std::vector<std::vector<EU4Vertex>> _vertices;
+    std::vector<std::vector<OurVertex>> _vertices;
 
     void ReadInfoBlock(FILE *file);
     void ReadCommonBlock(FILE *file);
     void ReadPagesBlock(FILE *file);
     void ReadCharsBlock(FILE *file);
     void ReadKerningsBlock(FILE *file);
-    void SetKernings();
 };

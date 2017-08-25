@@ -105,6 +105,7 @@
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="eu4.cpp" />
     <ClCompile Include="functions.cpp" />
+    <ClCompile Include="FontManager.cpp" />
     <ClCompile Include="NonLatinFont.cpp" />
     <ClCompile Include="plugin.cpp" />
     <ClCompile Include="stdinc.cpp">
@@ -118,6 +119,7 @@
     <ClInclude Include="byte_pattern.h" />
     <ClInclude Include="eu4.h" />
     <ClInclude Include="functions.h" />
+    <ClInclude Include="FontManager.h" />
     <ClInclude Include="NonLatinFont.h" />
     <ClInclude Include="stdinc.h" />
     <ClInclude Include="plugin.h" />

@@ -9,8 +9,6 @@ namespace BitmapFont
 {
     static const float fIconWidth = 8.0f;
 
-    static NonLatinFont normalFont, mapFont;
-
     int __fastcall GetWidthOfString(CBitmapFont *pFont, int edx, const char *text, const int length, bool bUseSpecialChars)
     {
         static std::vector<uint32> wtext;
@@ -82,22 +80,13 @@ namespace BitmapFont
                 {
                     vTempWidth += pvalue->xadvance * *pFont->GetCharacterSet()->GetScaleX();
 
-                    if (pvalue->kerning && (it + 1) != wtext.end() && Functions::IsNativeCharacter(*(it + 1)))
+                    if (pvalue->kerning && (it + 1) != wtext.end())
                     {
                         uint32 nextcp = *(it + 1);
+
                         CBitmapFontCharacterSet *pset = pFont->GetCharacterSet();
-                        float fkerning;
 
-                        _asm
-                        {
-                            push nextcp;
-                            push cp;
-                            mov ecx, pset;
-                            call game_meta.pfCBitmapFontCharacterSet_GetKerning;
-                            movss fkerning, xmm0;
-                        }
-
-                        vTempWidth += fkerning;
+                        vTempWidth += GetKerning(pset, 0, cp, nextcp);
                     }
 
                     if (pvalue->h == 0 || !Functions::IsNativeCharacter(cp))
@@ -121,83 +110,31 @@ namespace BitmapFont
         return std::max(vTempWidth, (float)nWidth);
     }
 
+    float __fastcall GetKerning(CBitmapFontCharacterSet *pSet, int edx, uint32 first, uint32 second)
+    {
+        float result = 0.0f;
+
+        if (Functions::IsNativeCharacter(first) && Functions::IsNativeCharacter(second))
+        {
+            __asm
+            {
+                push second;
+                push first;
+                mov ecx, pSet;
+                call game_meta.pfCBitmapFontCharacterSet_GetKerning;
+                movss result, xmm0;
+            }
+        }
+
+        __asm movss xmm0, result;
+
+        return result;
+    }
+
     static uint32 code_point;
     static uint32 next_code_point;
     static std::ptrdiff_t cp_len;
     static void *ret_addr;
-
-    struct CBitmapFont_RenderToScreen_0x690_13
-    {
-        void operator()(injector::reg_pack &regs) const
-        {
-            char *source = game_meta.pOriginalText + regs.edi;
-            char *dest = game_meta.pWord + regs.esi;
-
-            cp_len = utf8::internal::sequence_length(source);
-
-            code_point = utf8::unchecked::next(source);
-            next_code_point = utf8::unchecked::next(source);
-
-            regs.eax = code_point;
-
-            utf8::unchecked::append(code_point, dest);
-
-            regs.edi += (cp_len - 1);
-            regs.esi += cp_len;
-
-            if (!Functions::IsNativeCharacter(code_point))
-            {
-                regs.ecx = 0;
-            }
-        }
-    };
-
-    struct CBitmapFont_RenderToScreen_0x85B_9
-    {
-        void operator()(injector::reg_pack &regs) const
-        {
-            regs.ecx = (uint32)(*(CBitmapFont **)(regs.ebp - 0x10))->GetValueByCodePoint(code_point);
-        }
-    };
-
-    __declspec(naked) void CBitmapFont_RenderToScreen_0x8CE_20()
-    {
-        __asm
-        {
-            pop ret_addr;
-            cmp next_code_point, 0xFF;
-            ja no_kerning;
-            push next_code_point;
-            push code_point;
-            mov ecx, [ebp - 0x34];
-            call game_meta.pfCBitmapFontCharacterSet_GetKerning;
-            jmp j_ret;
-
-        no_kerning:
-            xorps xmm0, xmm0;
-
-        j_ret:
-            jmp ret_addr;
-        }
-    }
-
-    __declspec(naked) void CBitmapFont_RenderToScreen_0x8FA_11()
-    {
-        __asm
-        {
-            pop ret_addr;
-            cmp code_point, 0xFF;
-            ja j_break;
-            cmp[ecx]EU4CharacterValues.h, 0;
-            jmp ret_addr;
-
-        j_break:
-            add ret_addr, 6;
-            jmp ret_addr;
-        }
-    }
-
-
 
     __declspec(naked) void CBitmapFont_RenderToScreen_OFF_SIZE()
     {
@@ -216,21 +153,8 @@ namespace BitmapFont
         }
     };
 
-    static void AfterDX9DeviceCreate()
-    {
-        normalFont.LoadTexturesDX9();
-        mapFont.LoadTexturesDX9();
-    }
-
-    static void BeforeDX9DeviceRelease()
-    {
-        normalFont.UnloadTexturesDX9();
-        mapFont.UnloadTexturesDX9();
-    }
-
     void InitAndPatch()
     {
-        normalFont.InitWithFile(CSingleton<CPlugin>::Instance().GetFontPath());
-        mapFont.InitWithFile(CSingleton<CPlugin>::Instance().GetMapFontPath());
+
     }
 }
