@@ -9,8 +9,8 @@ class NonLatinFontManager
     void LoadFonts();
 
 public:
-    static void AfterDX9DeviceCreate();
-    static void BeforeDX9DeviceRelease();
+    static void *InitGfxAndLoadTextures(void *, void *);
+    static void UnloadTexturesAndShutdownGfx(void *);
     NonLatinFont *GetFont(const CString *fontname);
 
     void InitAndPatch();

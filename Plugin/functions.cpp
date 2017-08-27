@@ -111,13 +111,37 @@ namespace Functions
         return isalpha(cp) || isdigit(cp) || cp == '_' || cp == '|';
     }
 
-    __declspec(naked) void WriteVariableTrailHook()
+    namespace Functors
     {
-        __asm
+        static void *ret_address;
+
+        __declspec(naked) void WriteVariable_0x10A_9()
         {
-            mov dword ptr[eax], 0x0021A7C2;
-            add eax, 3;
-            ret;
+            __asm
+            {
+                mov word ptr[esi], 0xA7C2;
+                mov[esi + 2], al;
+                add esi, 3;
+                ret;
+            }
+        }
+
+        __declspec(naked) void WriteVariable_0x54F_8()
+        {
+            __asm
+            {
+                mov dword ptr[esi], 0x0021A7C2;
+                lea eax, [esi + 3];
+                ret;
+            }
+        }
+    }
+
+    __declspec(naked) void CSdlEvents_HandlePdxEvents()
+    {
+        _asm
+        {
+
         }
     }
 
@@ -125,7 +149,11 @@ namespace Functions
     {
         injector::MakeJMP(game_meta.pfConvertUTF8ToLatin1, ConvertUTF8ToLatin1);
 
-        injector::MakeCALL(g_pattern.set_pattern("66 C7 00 A7 21").get(0).address(), WriteVariableTrailHook);
+        injector::MakeNOP(game_meta.pfWriteVariable + 0x10A, 9);
+        injector::MakeJMP(game_meta.pfWriteVariable + 0x10A, Functors::WriteVariable_0x10A_9);
+
+        injector::MakeNOP(game_meta.pfWriteVariable + 0x54F, 8);
+        injector::MakeJMP(game_meta.pfWriteVariable + 0x54F, Functors::WriteVariable_0x54F_8);
     }
 }
 

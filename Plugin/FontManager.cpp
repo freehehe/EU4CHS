@@ -2,13 +2,14 @@
 #include "FontManager.h"
 #include "plugin.h"
 #include "byte_pattern.h"
+#include <any>
 
 using namespace std;
 using namespace std::experimental;
 
 void NonLatinFontManager::LoadFonts()
 {
-    filesystem::directory_iterator dirit{ CSingleton<CPlugin>::Instance().GetPluginDirectory() / "fonts" };
+    filesystem::directory_iterator dirit{ CSingleton<CPlugin>::Instance().GetPluginDirectory() / "eu4chs/fonts" };
 
     while (dirit != filesystem::directory_iterator{})
     {
@@ -16,7 +17,7 @@ void NonLatinFontManager::LoadFonts()
 
         if (filesystem::is_regular_file(_path) && _path.extension() == ".fnt")
         {
-            auto result = _fonts.emplace(hash<string_view>()(_path.filename().string().c_str()), NonLatinFont{});
+            auto result = _fonts.emplace(hash<string_view>()(_path.stem().string().c_str()), NonLatinFont{});
 
             result.first->second.InitWithFile(_path);
         }
@@ -25,27 +26,40 @@ void NonLatinFontManager::LoadFonts()
     }
 }
 
-void NonLatinFontManager::AfterDX9DeviceCreate()
+void *NonLatinFontManager::InitGfxAndLoadTextures(void *pInfo, void *pBool)
 {
+    void *pMasterContext = injector::cstd<void *(void *, void *)>::call(game_meta.pfGfxInitDX9, pInfo, pBool);
+
+    __asm
+    {
+        mov eax, pMasterContext;
+        mov eax, [eax + 4];
+        mov game_meta.pDX9Device, eax;
+    }
+
     for (auto &font : CSingleton<NonLatinFontManager>::Instance()._fonts)
     {
         font.second.LoadTexturesDX9();
     }
+
+    return pMasterContext;
 }
 
-void NonLatinFontManager::BeforeDX9DeviceRelease()
+void NonLatinFontManager::UnloadTexturesAndShutdownGfx(void *pMasterContext)
 {
     for (auto &font : CSingleton<NonLatinFontManager>::Instance()._fonts)
     {
         font.second.UnloadTexturesDX9();
     }
+
+    injector::cstd<void(void *)>::call(game_meta.pfGfxShutdownDX9, pMasterContext);
 }
 
 NonLatinFont * NonLatinFontManager::GetFont(const CString * fontname)
 {
     const char *cname = fontname->c_str();
 
-    auto it = _fonts.find(hash<string_view>()(cname));
+    auto it = _fonts.find(hash<string_view>()(strrchr(cname, '/') + 1));
 
     if (it == _fonts.end())
     {
@@ -53,11 +67,16 @@ NonLatinFont * NonLatinFontManager::GetFont(const CString * fontname)
     }
     else
     {
-        return &_fonts.find(hash<string_view>()("default"))->second;
+        return &_fonts.find(hash<string_view>()("Default"))->second;
     }
 }
 
 void NonLatinFontManager::InitAndPatch()
 {
+    LoadFonts();
 
+    injector::WriteMemory(g_pattern.set_pattern("83 F9 02 0F 85 35 03 00 00").force_search().get(0).address(0x344), InitGfxAndLoadTextures, true);
+    injector::WriteMemory(g_pattern.get(0).address(0x34E), UnloadTexturesAndShutdownGfx, true);
+    injector::WriteMemory(*g_pattern.get(0).pointer<std::uintptr_t>(0x340), InitGfxAndLoadTextures, true);
+    injector::WriteMemory(*g_pattern.get(0).pointer<std::uintptr_t>(0x34A), UnloadTexturesAndShutdownGfx, true);
 }

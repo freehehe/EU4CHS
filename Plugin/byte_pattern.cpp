@@ -223,8 +223,9 @@ void byte_pattern::bm_preprocess()
         this->_bmbc[bc] = i;
     }
 
-    this->_bmgs.resize(this->_pattern.size());    
+    this->_bmgs.resize(this->_pattern.size(), 1);
 
+/*
     for (i = 0; i < this->_pattern.size() - 1; ++i)
     {
         this->_bmgs[i] = this->_pattern.size();
@@ -268,7 +269,7 @@ void byte_pattern::bm_preprocess()
                 this->_bmgs[i] -= c;
             }
         }
-    }
+    }*/
 }
 
 void byte_pattern::bm_search()

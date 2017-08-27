@@ -65,7 +65,7 @@ struct CCursorPosition
     uint16 column;
 };
 
-struct CString
+class CString
 {
     union
     {
@@ -76,6 +76,9 @@ struct CString
     char sso_rest[12];
     std::size_t length;
     std::size_t capacity;
+
+public:
+    CString() = delete;
 
     const char *c_str() const
     {
@@ -149,7 +152,7 @@ struct CBitmapFont :IncompleteClass
         return field<CBitmapFontCharacterSet, 0xB4>();
     }
 
-    const CString *GetFontName()
+    const CString *GetFontPath()
     {
         //e.g.  gfx/fonts/vic18
         return field<const CString, 0x9C>();
@@ -310,17 +313,19 @@ struct EU4Meta
     std::uintptr_t pfCBitmapFont_GetWidthOfString;
     std::uintptr_t pfCBitmapFont_RenderToScreen;
 
-    void *pfPHYSFS_openRead;
+    FARPROC pfPHYSFS_openRead;
     std::uintptr_t pfVFSOpenFile;
 
-    SMasterContextDX9 **ppMasterContext;
+    std::uintptr_t pfGfxInitDX9;
+    std::uintptr_t pfGfxShutdownDX9;
+
     LPDIRECT3DDEVICE9 pDX9Device;
 
-    std::uintptr_t GFXSetPrimitive;
+    std::uintptr_t pfWriteVariable;
 
     char *pOriginalText;
     char *pWord;
-    char *pProcessedText;
+    char *pText;
 
     EU4Meta();
 };

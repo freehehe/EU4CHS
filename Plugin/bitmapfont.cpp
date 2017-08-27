@@ -121,7 +121,7 @@ namespace BitmapFont
                 push second;
                 push first;
                 mov ecx, pSet;
-                call game_meta.pfCBitmapFontCharacterSet_GetKerning;
+                //call game_meta.pfCBitmapFontCharacterSet_GetKerning;
                 movss result, xmm0;
             }
         }
@@ -131,10 +131,13 @@ namespace BitmapFont
         return result;
     }
 
+    static NonLatinFont *coop_font;
     static uint32 code_point;
     static uint32 next_code_point;
     static std::ptrdiff_t cp_len;
     static void *ret_addr;
+
+    //1099880
 
     __declspec(naked) void CBitmapFont_RenderToScreen_OFF_SIZE()
     {

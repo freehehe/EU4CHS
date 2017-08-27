@@ -9,7 +9,10 @@
 SMasterContextDX9 *0xB226D48
 TextureGFX * 0x
 
-//让字体支持MipMap采样？
-IDirect3DDevice9 SetSamplerState
+CTextBuffer::Write时去除的特殊字符 "§¤£@{}" NOP RemoveIf?
+
+SDL_TEXTINPUT 771
+108450E case SDL_TEXTINPUT 只会读取一个字节
+
 http://www.cnblogs.com/9chu/archive/2012/12/01/2797027.html
 http://blog.csdn.net/xiangzhang321/article/details/8316812

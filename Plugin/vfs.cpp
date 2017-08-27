@@ -26,6 +26,9 @@ void VFSManager::EnumerateOurFiles()
             vfspath = full_path.data() + ourroot.length() + 1;
             ourvfspath = full_path.data() + gameroot.length() + 1;
 
+            replace(vfspath.begin(), vfspath.end(), '\\', '/');
+            replace(ourvfspath.begin(), ourvfspath.end(), '\\', '/');
+
             files.emplace(hash<string_view>()(vfspath), ourvfspath);
         }
 
