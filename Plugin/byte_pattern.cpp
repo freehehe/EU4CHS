@@ -7,18 +7,18 @@ byte_pattern g_pattern;
 
 const memory_pointer &byte_pattern::get(std::size_t index) const
 {
-    if (index >= this->_result.size())
+    if (index >= this->_results.size())
     {
         std::stringstream sstr;
 
-        sstr << "Processing pattern: " << this->_literal << "\nTrying to access index " << index << " but only " << this->_result.size() << " results.\nGame will crash.";
+        sstr << "Processing pattern: " << this->_literal << "\nTrying to access index " << index << " but only " << this->_results.size() << " results.\nGame will crash.";
 
         MessageBoxA(NULL, sstr.str().c_str(), "byte_pattern: too few results.", MB_OK);
 
         throw std::out_of_range{ "Pattern: results accessing out of range." };
     }
 
-    return this->_result[index];
+    return this->_results[index];
 }
 
 byte_pattern::byte_pattern()
@@ -28,7 +28,7 @@ byte_pattern::byte_pattern()
 
 byte_pattern &byte_pattern::set_pattern(const char *pattern_literal)
 {
-    this->_result.clear();
+    this->_results.clear();
     this->_processed = false;
     this->transform_pattern(pattern_literal);
 
@@ -67,7 +67,7 @@ void byte_pattern::do_search()
 
 byte_pattern &byte_pattern::force_search()
 {
-    this->_result.clear();
+    this->_results.clear();
 
     this->_processed = true;
 
@@ -105,6 +105,7 @@ void byte_pattern::transform_pattern(const char *pattern_literal)
     this->_literal = pattern_literal;
 
     this->_pattern.clear();
+    this->_mask.clear();
 
     if (pattern_literal == nullptr)
     {
@@ -126,23 +127,28 @@ void byte_pattern::transform_pattern(const char *pattern_literal)
             }
             else if (temp_string[0] == '?' && (temp_string[1] == '?' || temp_string[1] == 0))
             {
-                this->_pattern.emplace_back();
+                this->_pattern.emplace_back(0);
+                this->_mask.emplace_back(byte_mask::WILDCARD);
             }
             else if (temp_string[0] == '?' && is_digit(temp_string[1]))
             {
-                this->_pattern.emplace_back(tol(temp_string[1]), pattern_byte::match_method::LOW_ONLY);
+                this->_pattern.emplace_back(tol(temp_string[1]));
+                this->_mask.emplace_back(byte_mask::LOW_ONLY);
             }
             else if (temp_string[1] == '?' && is_digit(temp_string[0]))
             {
-                this->_pattern.emplace_back(tol(temp_string[0]), pattern_byte::match_method::HIGH_ONLY);
+                this->_pattern.emplace_back(tol(temp_string[0]));
+                this->_mask.emplace_back(byte_mask::HIGH_ONLY);
             }
             else if (is_digit(temp_string[0]) && is_digit(temp_string[1]))
             {
                 this->_pattern.emplace_back((tol(temp_string[0]) << 4) | tol(temp_string[1]));
+                this->_mask.emplace_back(byte_mask::EXACT);
             }
             else
             {
                 this->_pattern.clear();
+                this->_mask.clear();
                 return;
             }
 
@@ -202,48 +208,42 @@ void byte_pattern::clear()
 {
     _range = { 0,0 };
     this->_pattern.clear();
-    this->_result.clear();
+    this->_mask.clear();
+    this->_results.clear();
     this->_processed = false;
 }
 
 std::size_t byte_pattern::size() const
 {
-    return this->_result.size();
+    return this->_results.size();
 }
 
 bool byte_pattern::has_size(std::size_t expected) const
 {
-    return (this->_result.size() == expected);
+    return (this->_results.size() == expected);
 }
 
 bool byte_pattern::empty() const
 {
-    return this->_result.empty();
-}
-
-bool byte_pattern::check_address(std::uintptr_t address) const
-{
-    return std::equal(this->_pattern.begin(), this->_pattern.end(), reinterpret_cast<const uint8_t *>(address));
+    return this->_results.empty();
 }
 
 void byte_pattern::bm_preprocess()
 {
-    std::ptrdiff_t i, j, c;
+    std::ptrdiff_t index;
 
     for (std::uint32_t bc = 0; bc < 256; ++bc)
     {
-        for (i = this->_pattern.size() - 1; i >= 0; --i)
+        for (index = this->_pattern.size() - 1; index >= 0; --index)
         {
-            if (this->_pattern[i].match(bc))
+            if (this->_pattern[index].match(bc))
             {
                 break;
             }
         }
 
-        this->_bmbc[bc] = i;
+        this->_bmbc[bc] = index;
     }
-
-    this->_bmgs.resize(this->_pattern.size(), 1);
 }
 
 void byte_pattern::bm_search()
@@ -253,13 +253,17 @@ void byte_pattern::bm_search()
 
     std::ptrdiff_t index;
 
+    std::uint8_t *pbytes = this->_pattern.data();
+    byte_mask *pmask = this->_mask.data();
+    std::size_t pattern_len = this->_pattern.size();
+
     __try
     {
         while (range_begin <= range_end)
         {
-            for (index = this->_pattern.size() - 1; index >= 0; --index)
+            for (index = pattern_len - 1; index >= 0; --index)
             {
-                if (!this->_pattern[index].match(range_begin[index]))
+                if (!pbytes[index].match(range_begin[index]))
                 {
                     break;
                 }
@@ -267,12 +271,12 @@ void byte_pattern::bm_search()
 
             if (index == -1)
             {
-                this->_result.emplace_back(range_begin);
-                range_begin += this->_pattern.size();
+                this->_results.emplace_back(range_begin);
+                range_begin += pattern_len;
             }
             else
             {
-                range_begin += std::max(index - this->_bmbc[range_begin[index]], this->_bmgs[index]);
+                range_begin += std::max(index - this->_bmbc[range_begin[index]], 1);
             }
         }
     }

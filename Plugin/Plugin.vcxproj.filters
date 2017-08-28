@@ -45,12 +45,6 @@
     <ClCompile Include="cjk_font.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="a3a4a7.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Hooking.Patterns.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="plugin.h">
@@ -78,9 +72,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="cjk_font.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Hooking.Patterns.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

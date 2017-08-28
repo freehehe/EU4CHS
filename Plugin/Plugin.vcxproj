@@ -100,7 +100,6 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="a3a4a7.cpp" />
     <ClCompile Include="bitmapfont.cpp" />
     <ClCompile Include="byte_pattern.cpp" />
     <ClCompile Include="dllmain.cpp" />
@@ -108,7 +107,6 @@
     <ClCompile Include="functions.cpp" />
     <ClCompile Include="cjk_fonts.cpp" />
     <ClCompile Include="cjk_font.cpp" />
-    <ClCompile Include="Hooking.Patterns.cpp" />
     <ClCompile Include="plugin.cpp" />
     <ClCompile Include="stdinc.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -123,7 +121,6 @@
     <ClInclude Include="functions.h" />
     <ClInclude Include="cjk_fonts.h" />
     <ClInclude Include="cjk_font.h" />
-    <ClInclude Include="Hooking.Patterns.h" />
     <ClInclude Include="stdinc.h" />
     <ClInclude Include="plugin.h" />
     <ClInclude Include="vfs.h" />

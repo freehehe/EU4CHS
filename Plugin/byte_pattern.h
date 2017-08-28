@@ -6,87 +6,12 @@
 
 extern const HMODULE pattern_default_module;
 
-class pattern_byte
+enum class byte_mask :std::uint8_t
 {
-public:
-    enum class match_method :std::uint8_t
-    {
-        WILDCARD,
-        HIGH_ONLY,
-        LOW_ONLY,
-        EXACT
-    };
-
-    pattern_byte()
-    {
-        this->set_wild();
-    }
-
-    pattern_byte(std::uint8_t value, match_method method)
-    {
-        this->set_value(value, method);
-    }
-
-    pattern_byte &set_value(std::uint8_t value, match_method method)
-    {
-        this->_method = match_method::EXACT;
-        this->_value = (method == match_method::WILDCARD ? 0 : value);
-
-        return *this;
-    }
-
-    pattern_byte &set_wild()
-    {
-        this->_method = match_method::WILDCARD;
-        this->_value = 0;
-
-        return *this;
-    }
-
-    bool is_wild() const
-    {
-        return this->_method == match_method::WILDCARD;
-    }
-
-    bool match(std::uint8_t byte) const
-    {
-        switch (this->_method)
-        {
-        case match_method::EXACT:
-            return this->_value == byte;
-
-        case match_method::HIGH_ONLY:
-            return this->_value == (byte >> 4u);
-
-        case match_method::LOW_ONLY:
-            return this->_value == (byte & 0x0Fu);
-
-        case match_method::WILDCARD:
-            return true;
-
-        default:
-            return false;
-        }
-    }
-
-    bool compare(const pattern_byte &rhs) const
-    {
-        return (this->_method == rhs._method) && (this->_value == rhs._value);
-    }
-
-    bool operator==(const pattern_byte &rhs) const
-    {
-        return this->compare(rhs);
-    }
-
-    bool operator!=(const pattern_byte &rhs) const
-    {
-        return !this->compare(rhs);
-    }
-
-private:
-    std::uint8_t _value;
-    match_method _method;
+    WILDCARD,
+    HIGH_ONLY,
+    LOW_ONLY,
+    EXACT
 };
 
 class memory_pointer
@@ -123,14 +48,14 @@ public:
 class byte_pattern
 {
     std::pair<std::uintptr_t, std::uintptr_t> _range;
-    std::vector<pattern_byte> _pattern;
-    std::vector<memory_pointer> _result;
+    std::vector<std::uint8_t> _pattern;
+    std::vector<byte_mask> _mask;
+    std::vector<memory_pointer> _results;
     std::string _literal;
 
     bool _processed = false;
 
-    std::array<std::ptrdiff_t, 256> _bmbc;
-    std::vector<std::ptrdiff_t> _bmgs;
+    std::ptrdiff_t _bmbc[256];
 
     void transform_pattern(const char *pattern_literal);
     void get_module_range(memory_pointer module);
@@ -161,13 +86,11 @@ public:
     template <typename Fn>
     void for_each_result(Fn Pr) const
     {
-        for (auto &result : this->_result)
+        for (auto &result : this->_results)
         {
             Pr(result);
         }
     }
-
-    bool check_address(std::uintptr_t address) const;
 };
 
 extern byte_pattern g_pattern;
