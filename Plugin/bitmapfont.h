@@ -4,9 +4,9 @@
 
 namespace BitmapFont
 {
+    //获取字符串的宽度，用于计算背景宽度
     int __fastcall GetWidthOfString(CBitmapFont *pFont, int edx, const char *text, const int length, bool bUseSpecialChars);
-
-    float __fastcall GetKerning(CBitmapFontCharacterSet *pSet, int edx, uint32 first, uint32 second);
 
     void InitAndPatch();
 }
+#pragma message("Fuck you")

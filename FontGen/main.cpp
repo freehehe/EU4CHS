@@ -60,7 +60,7 @@ void enumerate_chars(const char *folder)
 
 		wbuffer.clear();
 
-		utf8::unchecked::utf8to32(istreambuf_iterator<char>(ifs), istreambuf_iterator<char>(), back_inserter(wbuffer));
+		utf8::utf8to32(istreambuf_iterator<char>(ifs), istreambuf_iterator<char>(), back_inserter(wbuffer));
 		
 		for (auto chr : wbuffer)
 		{
@@ -135,7 +135,7 @@ void generate_table()
 		return;
 	}
 
-	utf8::unchecked::utf32to8(wbuffer.begin(), wbuffer.end(), ostreambuf_iterator<char>(ofs));
+	utf8::utf32to8(wbuffer.begin(), wbuffer.end(), ostreambuf_iterator<char>(ofs));
 
 	ofs.close();
 }

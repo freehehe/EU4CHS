@@ -1,13 +1,12 @@
 #include "stdinc.h"
-#include "FontManager.h"
+#include "cjk_fonts.h"
 #include "plugin.h"
 #include "byte_pattern.h"
-#include <any>
 
 using namespace std;
 using namespace std::experimental;
 
-void NonLatinFontManager::LoadFonts()
+void CJKFontManager::LoadFonts()
 {
     filesystem::directory_iterator dirit{ CSingleton<CPlugin>::Instance().GetPluginDirectory() / "eu4chs/fonts" };
 
@@ -17,27 +16,26 @@ void NonLatinFontManager::LoadFonts()
 
         if (filesystem::is_regular_file(_path) && _path.extension() == ".fnt")
         {
-            auto result = _fonts.emplace(hash<string_view>()(_path.stem().string().c_str()), NonLatinFont{});
-
-            result.first->second.InitWithFile(_path);
+            _fonts.emplace(hash<string_view>()(_path.stem().string().c_str()), _path);
         }
 
         ++dirit;
     }
 }
 
-void *NonLatinFontManager::InitGfxAndLoadTextures(void *pInfo, void *pBool)
+void *CJKFontManager::InitGfxAndLoadTextures(void *pInfo, void *pBool)
 {
     void *pMasterContext = injector::cstd<void *(void *, void *)>::call(game_meta.pfGfxInitDX9, pInfo, pBool);
 
     __asm
     {
         mov eax, pMasterContext;
+        mov game_meta.pMasterContext, eax;
         mov eax, [eax + 4];
         mov game_meta.pDX9Device, eax;
     }
 
-    for (auto &font : CSingleton<NonLatinFontManager>::Instance()._fonts)
+    for (auto &font : CSingleton<CJKFontManager>::Instance()._fonts)
     {
         font.second.LoadTexturesDX9();
     }
@@ -45,9 +43,9 @@ void *NonLatinFontManager::InitGfxAndLoadTextures(void *pInfo, void *pBool)
     return pMasterContext;
 }
 
-void NonLatinFontManager::UnloadTexturesAndShutdownGfx(void *pMasterContext)
+void CJKFontManager::UnloadTexturesAndShutdownGfx(void *pMasterContext)
 {
-    for (auto &font : CSingleton<NonLatinFontManager>::Instance()._fonts)
+    for (auto &font : CSingleton<CJKFontManager>::Instance()._fonts)
     {
         font.second.UnloadTexturesDX9();
     }
@@ -55,7 +53,7 @@ void NonLatinFontManager::UnloadTexturesAndShutdownGfx(void *pMasterContext)
     injector::cstd<void(void *)>::call(game_meta.pfGfxShutdownDX9, pMasterContext);
 }
 
-NonLatinFont * NonLatinFontManager::GetFont(const CString * fontname)
+CJKFont * CJKFontManager::GetFont(const CString * fontname)
 {
     const char *cname = fontname->c_str();
 
@@ -71,7 +69,7 @@ NonLatinFont * NonLatinFontManager::GetFont(const CString * fontname)
     }
 }
 
-void NonLatinFontManager::InitAndPatch()
+void CJKFontManager::InitAndPatch()
 {
     LoadFonts();
 

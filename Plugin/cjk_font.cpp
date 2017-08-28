@@ -1,9 +1,10 @@
 ﻿#include "stdinc.h"
-#include "NonLatinFont.h"
+#include "cjk_font.h"
 
 using namespace std;
 using namespace std::experimental;
 
+//打包2个32位unicode,方便搜索
 union UnicodeCharPair
 {
     struct
@@ -15,20 +16,27 @@ union UnicodeCharPair
     std::uint64_t _packed;
 };
 
-NonLatinFont::NonLatinFont()
+//29000-30000个字
+CJKFont::CJKFont()
 {
     _initialized = false;
     _values.reserve(30000);
 }
 
-void NonLatinFont::ReadInfoBlock(FILE * file)
+CJKFont::CJKFont(const std::experimental::filesystem::path & fntname)
+    :CJKFont()
+{
+    InitWithFile(fntname);
+}
+
+void CJKFont::ReadInfoBlock(FILE * file)
 {
     uint32_t block_size;
     fread(&block_size, 4, 1, file);
     fseek(file, block_size, SEEK_CUR);
 }
 
-void NonLatinFont::ReadCommonBlock(FILE * file)
+void CJKFont::ReadCommonBlock(FILE * file)
 {
 #pragma pack(push,1)
     struct CommonBlock
@@ -63,7 +71,7 @@ void NonLatinFont::ReadCommonBlock(FILE * file)
     _pages = common_block.pages;
 }
 
-void NonLatinFont::ReadPagesBlock(FILE *file)
+void CJKFont::ReadPagesBlock(FILE *file)
 {
     uint32_t block_size;
     fread(&block_size, 4, 1, file);
@@ -83,7 +91,7 @@ void NonLatinFont::ReadPagesBlock(FILE *file)
     delete[]buffer;
 }
 
-void NonLatinFont::ReadCharsBlock(FILE * file)
+void CJKFont::ReadCharsBlock(FILE * file)
 {
     struct BinaryCharValues
     {
@@ -126,14 +134,67 @@ void NonLatinFont::ReadCharsBlock(FILE * file)
     }
 }
 
-void NonLatinFont::ReadKerningsBlock(FILE * file)
+void CJKFont::ReadKerningsBlock(FILE * file)
 {
+#pragma pack(push,1)
+    struct BinaryKerningValue
+    {
+        uint32_t first;
+        uint32_t second;
+        int16_t value;
+    };
+#pragma pack(pop)
+
+    std::vector<BinaryKerningValue> kernings_block;
+
     uint32_t block_size;
     fread(&block_size, 4, 1, file);
-    fseek(file, block_size, SEEK_CUR);
+    kernings_block.resize(block_size / sizeof(BinaryKerningValue));
+    fread(kernings_block.data(), block_size, 1, file);
+
+    for (auto &binary : kernings_block)
+    {
+        UnicodeCharPair cp;
+
+        cp._first = binary.first;
+        cp._second = binary.second;
+
+        _kernings.emplace(cp._packed, binary.value);
+    }
 }
 
-void NonLatinFont::InitWithFile(const std::experimental::filesystem::path &fntname)
+void CJKFont::SetKernings()
+{
+    for (auto &kp : _kernings)
+    {
+        UnicodeCharPair cp;
+
+        cp._packed = kp.first;
+
+        _values.find(cp._first)->second.EU4Values.kerning = true;
+    }
+}
+
+std::int16_t CJKFont::GetKerning(uint32_t first, uint32_t second) const
+{
+    UnicodeCharPair duochar;
+
+    duochar._first = first;
+    duochar._second = second;
+
+    auto it = _kernings.find(duochar._packed);
+
+    if (it == _kernings.end())
+    {
+        return 0;
+    }
+    else
+    {
+        return it->second;
+    }
+}
+
+void CJKFont::InitWithFile(const std::experimental::filesystem::path &fntname)
 {
     unsigned char block_type;
 
@@ -179,10 +240,12 @@ void NonLatinFont::InitWithFile(const std::experimental::filesystem::path &fntna
 
     fclose(iFile);
 
+    SetKernings();
+
     _initialized = true;
 }
 
-void NonLatinFont::LoadTexturesDX9()
+void CJKFont::LoadTexturesDX9()
 {
     for (auto &name : _texturenames)
     {
@@ -197,7 +260,7 @@ void NonLatinFont::LoadTexturesDX9()
     _vertices.resize(_textures.size());
 }
 
-void NonLatinFont::UnloadTexturesDX9()
+void CJKFont::UnloadTexturesDX9()
 {
     for (auto &texture : _textures)
     {
@@ -207,11 +270,11 @@ void NonLatinFont::UnloadTexturesDX9()
     _textures.clear();
 }
 
-NonLatinFont::CharacterValues *NonLatinFont::GetValue(uint32_t unicode)
+CJKFont::CharacterValues *CJKFont::GetValue(uint32_t unicode)
 {
     auto it = _values.find(unicode);
 
-    if (it != _values.end() && it->first == unicode)
+    if (it != _values.end())
     {
         return &it->second;
     }
@@ -221,7 +284,7 @@ NonLatinFont::CharacterValues *NonLatinFont::GetValue(uint32_t unicode)
     }
 }
 
-TextureGFX * NonLatinFont::GetTexture(std::uint32_t unicode)
+TextureGFX * CJKFont::GetTexture(std::uint32_t unicode)
 {
     uint16_t page;
 
@@ -239,41 +302,28 @@ TextureGFX * NonLatinFont::GetTexture(std::uint32_t unicode)
     return &_textures[page];
 }
 
-void NonLatinFont::GeneratePrimitivesDX9(std::uint32_t unicode, const CRect<uint16_t> *dstRect, std::uint32_t color)
+void CJKFont::SetPrimitivesDX9(std::uint32_t unicode, const CRect<int> *dstRect, std::uint32_t color)
 {
     OurVertex vertices[6];
 
     CharacterValues *pValues = GetValue(unicode);
 
-    //一波教科书式的计算
-    CRect<float> screenRect;
+    CRect<int> screenRect;
     CRect <float> textureRect;
-
-    float texture_width = _scaleW;
-    float texture_height = _scaleH;
-    float character_x = pValues->EU4Values.x;
-    float character_y = pValues->EU4Values.y;
-    float character_width = pValues->EU4Values.w;
-    float character_height = pValues->EU4Values.h;
-
-    textureRect._Origin.x = character_x / texture_width;
-    textureRect._Origin.y = character_y / texture_height;
-    textureRect._Extension.x= character_width / texture_width;
-    textureRect._Extension.y = character_height / texture_width;
 
     copy(begin(vertices), end(vertices), back_inserter(_vertices[pValues->PageIndex]));
 }
 
-void NonLatinFont::DrawAllDX9()
+void CJKFont::DrawAllDX9()
 {
     LPDIRECT3DDEVICE9 pDevice = game_meta.pDX9Device;
 
-    pDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
-    pDevice->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEXCOORDSIZE2(0));
+    pDevice->SetFVF(D3DFVF_XYZRHW | D3DFVF_TEX1 | D3DFVF_TEXCOORDSIZE2(0));
 
     for (size_t texture_index = 0; texture_index < _vertices.size(); ++texture_index)
     {
         pDevice->SetTexture(0, _textures[texture_index].field_0);
+        pDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
         pDevice->DrawPrimitiveUP(D3DPT_TRIANGLELIST, _vertices[texture_index].size() / 3, _vertices[texture_index].data(), sizeof(OurVertex));
         _vertices[texture_index].clear();
     }

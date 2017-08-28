@@ -1,4 +1,4 @@
-//Core code from Hooking.Patterns
+﻿//Core code from Hooking.Patterns
 //https://github.com/ThirteenAG/Hooking.Patterns
 
 #pragma once
@@ -12,6 +12,8 @@ public:
     enum class match_method :std::uint8_t
     {
         WILDCARD,
+        HIGH_ONLY,
+        LOW_ONLY,
         EXACT
     };
 
@@ -20,15 +22,15 @@ public:
         this->set_wild();
     }
 
-    pattern_byte(std::uint8_t value)
+    pattern_byte(std::uint8_t value, match_method method)
     {
-        this->set_value(value);
+        this->set_value(value, method);
     }
 
-    pattern_byte &set_value(std::uint8_t value)
+    pattern_byte &set_value(std::uint8_t value, match_method method)
     {
         this->_method = match_method::EXACT;
-        this->_value = value;
+        this->_value = (method == match_method::WILDCARD ? 0 : value);
 
         return *this;
     }
@@ -52,6 +54,12 @@ public:
         {
         case match_method::EXACT:
             return this->_value == byte;
+
+        case match_method::HIGH_ONLY:
+            return this->_value == (byte >> 4u);
+
+        case match_method::LOW_ONLY:
+            return this->_value == (byte & 0x0Fu);
 
         case match_method::WILDCARD:
             return true;
@@ -133,11 +141,15 @@ class byte_pattern
     void bm_search();
 
 public:
+    byte_pattern();
+
     byte_pattern &set_pattern(const char *pattern_literal);
     byte_pattern &set_pattern(const void *data, std::size_t size);
     byte_pattern &set_module(memory_pointer module = pattern_default_module);
     byte_pattern &set_range(memory_pointer beg, memory_pointer end);
     byte_pattern &force_search();
+
+    byte_pattern &find_pattern(const char *pattern_literal);
 
     const memory_pointer &get(std::size_t index) const;
 

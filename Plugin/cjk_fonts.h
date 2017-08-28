@@ -1,17 +1,18 @@
 #pragma once
 #include "stdinc.h"
-#include "NonLatinFont.h"
+#include "cjk_font.h"
 
-class NonLatinFontManager
+class CJKFontManager
 {
-    std::unordered_map<std::size_t, NonLatinFont> _fonts;
+    std::unordered_map<std::size_t, CJKFont> _fonts;
 
     void LoadFonts();
 
 public:
     static void *InitGfxAndLoadTextures(void *, void *);
     static void UnloadTexturesAndShutdownGfx(void *);
-    NonLatinFont *GetFont(const CString *fontname);
+
+    CJKFont *GetFont(const CString *fontname);
 
     void InitAndPatch();
 };

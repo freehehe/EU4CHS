@@ -11,7 +11,7 @@ namespace Functions
     {
         std::string_view source_view(source);
         u32sequence.clear();
-        utf8::unchecked::utf8to32(source_view.begin(), source_view.end(), std::back_inserter(u32sequence));
+        utf8::utf8to32(source_view.begin(), source_view.end(), std::back_inserter(u32sequence));
 
         for (uint32 &cp : u32sequence)
         {
@@ -98,10 +98,10 @@ namespace Functions
 
         u32sequence.push_back(0);
 
-        utf8::unchecked::utf32to8(u32sequence.begin(), u32sequence.end(), dest);
+        utf8::utf32to8(u32sequence.begin(), u32sequence.end(), dest);
     }
 
-    bool IsNativeCharacter(uint32 cp)
+    bool IsNativeChar(uint32 cp)
     {
         return cp <= 0xFF;
     }
@@ -111,37 +111,26 @@ namespace Functions
         return isalpha(cp) || isdigit(cp) || cp == '_' || cp == '|';
     }
 
-    namespace Functors
+    static void *ret_address;
+
+    __declspec(naked) void WriteVariable_0x10A_9()
     {
-        static void *ret_address;
-
-        __declspec(naked) void WriteVariable_0x10A_9()
+        __asm
         {
-            __asm
-            {
-                mov word ptr[esi], 0xA7C2;
-                mov[esi + 2], al;
-                add esi, 3;
-                ret;
-            }
-        }
-
-        __declspec(naked) void WriteVariable_0x54F_8()
-        {
-            __asm
-            {
-                mov dword ptr[esi], 0x0021A7C2;
-                lea eax, [esi + 3];
-                ret;
-            }
+            mov word ptr[esi], 0xA7C2;
+            mov[esi + 2], al;
+            add esi, 3;
+            ret;
         }
     }
 
-    __declspec(naked) void CSdlEvents_HandlePdxEvents()
+    __declspec(naked) void WriteVariable_0x54F_8()
     {
-        _asm
+        __asm
         {
-
+            mov dword ptr[esi], 0x0021A7C2;
+            lea eax, [esi + 3];
+            ret;
         }
     }
 
@@ -150,10 +139,9 @@ namespace Functions
         injector::MakeJMP(game_meta.pfConvertUTF8ToLatin1, ConvertUTF8ToLatin1);
 
         injector::MakeNOP(game_meta.pfWriteVariable + 0x10A, 9);
-        injector::MakeJMP(game_meta.pfWriteVariable + 0x10A, Functors::WriteVariable_0x10A_9);
+        injector::MakeJMP(game_meta.pfWriteVariable + 0x10A, WriteVariable_0x10A_9);
 
         injector::MakeNOP(game_meta.pfWriteVariable + 0x54F, 8);
-        injector::MakeJMP(game_meta.pfWriteVariable + 0x54F, Functors::WriteVariable_0x54F_8);
+        injector::MakeJMP(game_meta.pfWriteVariable + 0x54F, WriteVariable_0x54F_8);
     }
 }
-

@@ -134,7 +134,7 @@ VALIDATE_SIZE(EU4CharacterValues, 0x10)
 
 struct CBitmapFontCharacterSet :IncompleteClass
 {
-    EU4CharacterValues **GetValues()
+    EU4CharacterValues **GetLatin1Values()
     {
         return field<EU4CharacterValues *, 0>();
     }
@@ -147,7 +147,7 @@ struct CBitmapFontCharacterSet :IncompleteClass
 
 struct CBitmapFont :IncompleteClass
 {
-    CBitmapFontCharacterSet *GetCharacterSet()
+    CBitmapFontCharacterSet *GetLatin1CharacterSet()
     {
         return field<CBitmapFontCharacterSet, 0xB4>();
     }
@@ -158,152 +158,10 @@ struct CBitmapFont :IncompleteClass
         return field<const CString, 0x9C>();
     }
 
-    EU4CharacterValues *GetValueByCodePoint(uint32 cp)
+    EU4CharacterValues *GetLatin1Value(uint32 cp)
     {
-        return GetCharacterSet()->GetValues()[cp];
+        return GetLatin1CharacterSet()->GetLatin1Values()[cp];
     }
-
-    int *GetTextureID()
-    {
-        return field<int, 0x4E0>();
-    }
-};
-
-enum D3DVTABLE_INDEX {
-    iQueryInterface,
-    iAddRef,
-    iRelease,
-    iTestCooperativeLevel,
-    iGetAvailableTextureMem,
-    iEvictManagedResources,
-    iGetDirect3D,
-    iGetDeviceCaps,
-    iGetDisplayMode,
-    iGetCreationParameters,
-    iSetCursorProperties,
-    iSetCursorPosition,
-    iShowCursor,
-    iCreateAdditionalSwapChain,
-    iGetSwapChain,
-    iGetNumberOfSwapChains,
-    iReset,
-    iPresent,
-    iGetBackBuffer,
-    iGetRasterStatus,
-    iSetDialogBoxMode,
-    iSetGammaRamp,
-    iGetGammaRamp,
-    iCreateTexture,
-    iCreateVolumeTexture,
-    iCreateCubeTexture,
-    iCreateVertexBuffer,
-    iCreateIndexBuffer,
-    iCreateRenderTarget,
-    iCreateDepthStencilSurface,
-    iUpdateSurface,
-    iUpdateTexture,
-    iGetRenderTargetData,
-    iGetFrontBufferData,
-    iStretchRect,
-    iColorFill,
-    iCreateOffscreenPlainSurface,
-    iSetRenderTarget,
-    iGetRenderTarget,
-    iSetDepthStencilSurface,
-    iGetDepthStencilSurface,
-    iBeginScene,
-    iEndScene,
-    iClear,
-    iSetTransform,
-    iGetTransform,
-    iMultiplyTransform,
-    iSetViewport,
-    iGetViewport,
-    iSetMaterial,
-    iGetMaterial,
-    iSetLight,
-    iGetLight,
-    iLightEnable,
-    iGetLightEnable,
-    iSetClipPlane,
-    iGetClipPlane,
-    iSetRenderState,
-    iGetRenderState,
-    iCreateStateBlock,
-    iBeginStateBlock,
-    iEndStateBlock,
-    iSetClipStatus,
-    iGetClipStatus,
-    iGetTexture,
-    iSetTexture,
-    iGetTextureStageState,
-    iSetTextureStageState,
-    iGetSamplerState,
-    iSetSamplerState,
-    iValidateDevice,
-    iSetPaletteEntries,
-    iGetPaletteEntries,
-    iSetCurrentTexturePalette,
-    iGetCurrentTexturePalette,
-    iSetScissorRect,
-    iGetScissorRect,
-    iSetSoftwareVertexProcessing,
-    iGetSoftwareVertexProcessing,
-    iSetNPatchMode,
-    iGetNPatchMode,
-    iDrawPrimitive,
-    iDrawIndexedPrimitive,
-    iDrawPrimitiveUP,
-    iDrawIndexedPrimitiveUP,
-    iProcessVertices,
-    iCreateVertexDeclaration,
-    iSetVertexDeclaration,
-    iGetVertexDeclaration,
-    iSetFVF,
-    iGetFVF,
-    iCreateVertexShader,
-    iSetVertexShader,
-    iGetVertexShader,
-    iSetVertexShaderConstantF,
-    iGetVertexShaderConstantF,
-    iSetVertexShaderConstantI,
-    iGetVertexShaderConstantI,
-    iSetVertexShaderConstantB,
-    iGetVertexShaderConstantB,
-    iSetStreamSource,
-    iGetStreamSource,
-    iSetStreamSourceFreq,
-    iGetStreamSourceFreq,
-    iSetIndices,
-    iGetIndices,
-    iCreatePixelShader,
-    iSetPixelShader,
-    iGetPixelShader,
-    iSetPixelShaderConstantF,
-    iGetPixelShaderConstantF,
-    iSetPixelShaderConstantI,
-    iGetPixelShaderConstantI,
-    iSetPixelShaderConstantB,
-    iGetPixelShaderConstantB,
-    iDrawRectPatch,
-    iDrawTriPatch,
-    iDeletePatch,
-    iCreateQuery,
-    iSetConvolutionMonoKernel,
-    iComposeRects,
-    iPresentEx,
-    iGetGPUThreadPriority,
-    iSetGPUThreadPriority,
-    iWaitForVBlank,
-    iCheckResourceResidency,
-    iSetMaximumFrameLatency,
-    iGetMaximumFrameLatency,
-    iCheckDeviceState,
-    iCreateRenderTargetEx,
-    iCreateOffscreenPlainSurfaceEx,
-    iCreateDepthStencilSurfaceEx,
-    iResetEx,
-    iGetDisplayModeEx
 };
 
 struct EU4Meta
@@ -319,6 +177,7 @@ struct EU4Meta
     std::uintptr_t pfGfxInitDX9;
     std::uintptr_t pfGfxShutdownDX9;
 
+    SMasterContextDX9 *pMasterContext;
     LPDIRECT3DDEVICE9 pDX9Device;
 
     std::uintptr_t pfWriteVariable;

@@ -21,6 +21,11 @@ const memory_pointer &byte_pattern::get(std::size_t index) const
     return this->_result[index];
 }
 
+byte_pattern::byte_pattern()
+{
+    set_module();
+}
+
 byte_pattern &byte_pattern::set_pattern(const char *pattern_literal)
 {
     this->_result.clear();
@@ -74,6 +79,13 @@ byte_pattern &byte_pattern::force_search()
     return *this;
 }
 
+byte_pattern & byte_pattern::find_pattern(const char * pattern_literal)
+{
+    this->set_pattern(pattern_literal).force_search();
+
+    return *this;
+}
+
 void byte_pattern::transform_pattern(const char *pattern_literal)
 {
     auto tol = [](char ch) -> uint8_t
@@ -115,6 +127,14 @@ void byte_pattern::transform_pattern(const char *pattern_literal)
             else if (temp_string[0] == '?' && (temp_string[1] == '?' || temp_string[1] == 0))
             {
                 this->_pattern.emplace_back();
+            }
+            else if (temp_string[0] == '?' && is_digit(temp_string[1]))
+            {
+                this->_pattern.emplace_back(tol(temp_string[1]), pattern_byte::match_method::LOW_ONLY);
+            }
+            else if (temp_string[1] == '?' && is_digit(temp_string[0]))
+            {
+                this->_pattern.emplace_back(tol(temp_string[0]), pattern_byte::match_method::HIGH_ONLY);
             }
             else if (is_digit(temp_string[0]) && is_digit(temp_string[1]))
             {
@@ -224,52 +244,6 @@ void byte_pattern::bm_preprocess()
     }
 
     this->_bmgs.resize(this->_pattern.size(), 1);
-
-/*
-    for (i = 0; i < this->_pattern.size() - 1; ++i)
-    {
-        this->_bmgs[i] = this->_pattern.size();
-    }
-
-    this->_bmgs[this->_pattern.size() - 1] = 1;
-
-    for (i = this->_pattern.size() - 1, c = 0; i != 0; --i)
-    {
-        for (j = 0; j < i; ++j)
-        {
-            if (std::equal(this->_pattern.begin() + i, this->_pattern.end(), this->_pattern.begin() + j))
-            {
-                if (j == 0)
-                {
-                    c = this->_pattern.size() - i;
-                }
-                else
-                {
-                    if (this->_pattern[i - 1] != this->_pattern[j - 1])
-                    {
-                        this->_bmgs[i - 1] = j - 1;
-                    }
-                }
-            }
-        }
-    }
-
-    for (i = 0; i < this->_pattern.size() - 1; ++i)
-    {
-        if (this->_bmgs[i] != this->_pattern.size())
-        {
-            this->_bmgs[i] = this->_pattern.size() - 1 - this->_bmgs[i];
-        }
-        else
-        {
-            this->_bmgs[i] = this->_pattern.size() - 1 - i + this->_bmgs[i];
-
-            if (c != 0 && this->_pattern.size() - 1 - i >= c)
-            {
-                this->_bmgs[i] -= c;
-            }
-        }
-    }*/
 }
 
 void byte_pattern::bm_search()

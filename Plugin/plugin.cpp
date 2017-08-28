@@ -4,7 +4,7 @@
 #include "functions.h"
 #include "vfs.h"
 #include "byte_pattern.h"
-#include "FontManager.h"
+#include "cjk_fonts.h"
 
 void CPlugin::InitAndPatch(HMODULE hself)
 {
@@ -16,7 +16,7 @@ void CPlugin::InitAndPatch(HMODULE hself)
     GetModuleFileNameA(GetModuleHandle(NULL), module_path, 512);
     _game_dir = std::experimental::filesystem::path(module_path).parent_path();
 
-    CSingleton<NonLatinFontManager>::Instance().InitAndPatch();
+    CSingleton<CJKFontManager>::Instance().InitAndPatch();
     CSingleton<VFSManager>::Instance().InitAndPatch();
 
     //纹理大小检测

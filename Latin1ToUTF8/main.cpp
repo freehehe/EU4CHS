@@ -52,7 +52,7 @@ bool ConvertFile(const filesystem::path &path)
         return false;
     }
 
-    utf8::unchecked::utf32to8(wbuffer.begin(), wbuffer.end(), ostreambuf_iterator<char>{iofs});
+    utf8::utf32to8(wbuffer.begin(), wbuffer.end(), ostreambuf_iterator<char>{iofs});
     iofs.close();
 
     return true;

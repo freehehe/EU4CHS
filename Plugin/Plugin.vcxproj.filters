@@ -39,10 +39,16 @@
     <ClCompile Include="vfs.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="NonLatinFont.cpp">
+    <ClCompile Include="cjk_fonts.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="FontManager.cpp">
+    <ClCompile Include="cjk_font.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="a3a4a7.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Hooking.Patterns.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -68,10 +74,13 @@
     <ClInclude Include="vfs.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="NonLatinFont.h">
+    <ClInclude Include="cjk_fonts.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="FontManager.h">
+    <ClInclude Include="cjk_font.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Hooking.Patterns.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

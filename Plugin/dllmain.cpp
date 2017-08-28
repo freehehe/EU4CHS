@@ -3,7 +3,7 @@
 #include "eu4.h"
 #include "byte_pattern.h"
 
-//开发用 - 把ucs2字符集跑一遍生成转换表
+//调试用 - 把ucs2字符集跑一遍生成转换表
 void UTF8ToLatin1View()
 {
     std::vector<char> u8sequence; 
@@ -16,7 +16,7 @@ void UTF8ToLatin1View()
         u32sequence.push_back(cp);
     }
 
-    utf8::unchecked::utf32to8(u32sequence.begin(), u32sequence.end(), std::back_inserter(u8sequence));
+    utf8::utf32to8(u32sequence.begin(), u32sequence.end(), std::back_inserter(u8sequence));
 
     u8sequence.push_back(0);
 
