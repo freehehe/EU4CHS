@@ -1,10 +1,10 @@
 ﻿#include "stdinc.h"
 #include "cjk_font.h"
+#include "functions.h"
 
 using namespace std;
 using namespace std::experimental;
 
-//打包2个32位unicode,方便搜索
 union UnicodeCharPair
 {
     struct
@@ -16,16 +16,11 @@ union UnicodeCharPair
     std::uint64_t _packed;
 };
 
-//29000-30000个字
-CJKFont::CJKFont()
+CJKFont::CJKFont(const std::experimental::filesystem::path & fntname)
 {
     _initialized = false;
     _values.reserve(30000);
-}
 
-CJKFont::CJKFont(const std::experimental::filesystem::path & fntname)
-    :CJKFont()
-{
     InitWithFile(fntname);
 }
 
@@ -251,7 +246,7 @@ void CJKFont::LoadTexturesDX9()
     {
         TextureGFX gfx;
 
-        D3DXCreateTextureFromFileA(game_meta.pDX9Device, (_workingdir / name).string().c_str(), &gfx.field_0);
+        D3DXCreateTextureFromFileW(game_meta.pDX9Device, (_workingdir / name).c_str(), &gfx.field_0);
 
         _textures.emplace_back(gfx);
     }
@@ -304,24 +299,36 @@ TextureGFX * CJKFont::GetTexture(std::uint32_t unicode)
 
 void CJKFont::SetPrimitivesDX9(std::uint32_t unicode, const CRect<int> *dstRect, std::uint32_t color)
 {
-    OurVertex vertices[6];
+    if (Functions::IsNativeChar(unicode))
+    {
 
-    CharacterValues *pValues = GetValue(unicode);
+    }
+    else
+    {
+        OurVertex vertices[6];
 
-    CRect<int> screenRect;
-    CRect <float> textureRect;
+        CharacterValues *pValues = GetValue(unicode);
 
-    copy(begin(vertices), end(vertices), back_inserter(_vertices[pValues->PageIndex]));
+        CRect<int> screenRect;
+        CRect <float> textureRect;
+
+        copy(begin(vertices), end(vertices), back_inserter(_vertices[pValues->PageIndex]));
+    }
 }
 
 void CJKFont::DrawAllDX9()
 {
     LPDIRECT3DDEVICE9 pDevice = game_meta.pDX9Device;
 
-    pDevice->SetFVF(D3DFVF_XYZRHW | D3DFVF_TEX1 | D3DFVF_TEXCOORDSIZE2(0));
+    pDevice->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1);
 
     for (size_t texture_index = 0; texture_index < _vertices.size(); ++texture_index)
     {
+        if (_vertices[texture_index].empty())
+        {
+            return;
+        }
+
         pDevice->SetTexture(0, _textures[texture_index].field_0);
         pDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
         pDevice->DrawPrimitiveUP(D3DPT_TRIANGLELIST, _vertices[texture_index].size() / 3, _vertices[texture_index].data(), sizeof(OurVertex));

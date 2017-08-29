@@ -19,10 +19,8 @@ void CPlugin::InitAndPatch(HMODULE hself)
     CSingleton<CJKFontManager>::Instance().InitAndPatch();
     CSingleton<VFSManager>::Instance().InitAndPatch();
 
-    //纹理大小检测
     injector::WriteMemory<uint32_t>(g_pattern.set_pattern("81 FE 00 00 00 01").force_search().get(0).address(2), INT32_MAX, true);
 
-    //跳过校验
     injector::MakeNOP(g_pattern.set_pattern("0F 94 45 F3 56").force_search().get(0).address(), 4, true);
 }
 

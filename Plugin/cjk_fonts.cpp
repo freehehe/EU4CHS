@@ -53,6 +53,16 @@ void CJKFontManager::UnloadTexturesAndShutdownGfx(void *pMasterContext)
     injector::cstd<void(void *)>::call(game_meta.pfGfxShutdownDX9, pMasterContext);
 }
 
+void CJKFontManager::DrawAll(void *pMasterContext)
+{
+    injector::cstd<void(void*)>::call(game_meta.pfGfxDrawDX9, pMasterContext);
+
+    for (auto &font : CSingleton<CJKFontManager>::Instance()._fonts)
+    {
+        font.second.DrawAllDX9();
+    }
+}
+
 CJKFont * CJKFontManager::GetFont(const CString * fontname)
 {
     const char *cname = fontname->c_str();

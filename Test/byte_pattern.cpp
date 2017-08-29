@@ -1,5 +1,4 @@
-﻿#include "stdinc.h"
-#include "byte_pattern.h"
+﻿#include "byte_pattern.h"
 #include <stdexcept>
 
 extern const HMODULE pattern_default_module = GetModuleHandleA(NULL);

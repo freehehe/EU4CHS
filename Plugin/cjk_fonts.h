@@ -11,6 +11,7 @@ class CJKFontManager
 public:
     static void *InitGfxAndLoadTextures(void *, void *);
     static void UnloadTexturesAndShutdownGfx(void *);
+    static void DrawAll(void *);
 
     CJKFont *GetFont(const CString *fontname);
 
