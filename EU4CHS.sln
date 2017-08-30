@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.8
+VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Plugin", "Plugin\Plugin.vcxproj", "{34652C2B-D575-4CE9-8039-FE4BFBDD0284}"
 EndProject
@@ -12,6 +12,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PO2YML", "PO2YML\PO2YML.vcxproj", "{38F451AB-2D22-4067-B483-260B2757C4E4}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Latin1ToUTF8", "Latin1ToUTF8\Latin1ToUTF8.vcxproj", "{9A1E183E-EEA6-4E0C-9388-00E744EFF7DB}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "d3d9", "d3d9\d3d9.vcxproj", "{F94DACB0-1C6A-4571-9D4E-94B886AD6569}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +53,14 @@ Global
 		{9A1E183E-EEA6-4E0C-9388-00E744EFF7DB}.Release|x64.ActiveCfg = Release|Win32
 		{9A1E183E-EEA6-4E0C-9388-00E744EFF7DB}.Release|x86.ActiveCfg = Release|Win32
 		{9A1E183E-EEA6-4E0C-9388-00E744EFF7DB}.Release|x86.Build.0 = Release|Win32
+		{F94DACB0-1C6A-4571-9D4E-94B886AD6569}.Debug|x64.ActiveCfg = Debug|x64
+		{F94DACB0-1C6A-4571-9D4E-94B886AD6569}.Debug|x64.Build.0 = Debug|x64
+		{F94DACB0-1C6A-4571-9D4E-94B886AD6569}.Debug|x86.ActiveCfg = Debug|Win32
+		{F94DACB0-1C6A-4571-9D4E-94B886AD6569}.Debug|x86.Build.0 = Debug|Win32
+		{F94DACB0-1C6A-4571-9D4E-94B886AD6569}.Release|x64.ActiveCfg = Release|x64
+		{F94DACB0-1C6A-4571-9D4E-94B886AD6569}.Release|x64.Build.0 = Release|x64
+		{F94DACB0-1C6A-4571-9D4E-94B886AD6569}.Release|x86.ActiveCfg = Release|Win32
+		{F94DACB0-1C6A-4571-9D4E-94B886AD6569}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
