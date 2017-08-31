@@ -9,17 +9,17 @@ union UnicodeCharPair
 {
     struct
     {
-        std::uint32_t _first;
-        std::uint32_t _second;
+        uint32_t _first;
+        uint32_t _second;
     };
 
-    std::uint64_t _packed;
+    uint64_t _packed;
 };
 
-CJKFont::CJKFont(const std::experimental::filesystem::path & fntname)
+CJKFont::CJKFont(const filesystem::path & fntname)
 {
     _initialized = false;
-    _values.reserve(30000);
+    _values.reserve(45000);
 
     InitWithFile(fntname);
 }
@@ -189,7 +189,7 @@ std::int16_t CJKFont::GetKerning(CBitmapFont *pFont, uint32_t first, uint32_t se
     }
 }
 
-void CJKFont::InitWithFile(const std::experimental::filesystem::path &fntname)
+void CJKFont::InitWithFile(const filesystem::path &fntname)
 {
     unsigned char block_type;
 

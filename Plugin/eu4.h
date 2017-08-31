@@ -3,15 +3,6 @@
 
 #define VALIDATE_SIZE(type,size) static_assert(sizeof(type)==size);
 
-typedef std::uint8_t uint8;
-typedef std::uint16_t uint16;
-typedef std::uint32_t uint32;
-typedef std::uint64_t uint64;
-typedef std::int8_t int8;
-typedef std::int16_t int16;
-typedef std::int32_t int32;
-typedef std::int64_t int64;
-
 struct IncompleteClass
 {
     template <typename T, std::uintptr_t offset>
@@ -61,8 +52,8 @@ struct CVector4
 
 struct CCursorPosition
 {
-    uint16 row;
-    uint16 column;
+    uint16_t row;
+    uint16_t column;
 };
 
 class CString
@@ -99,8 +90,8 @@ struct STextVertex
 {
     CVector3<float> Position;
     CVector2<float> UV;
-    uint32 FillColor;
-    uint32 BorderColor;
+    uint32_t FillColor;
+    uint32_t BorderColor;
 };
 VALIDATE_SIZE(STextVertex,28)
 
@@ -131,13 +122,13 @@ struct SMasterContextDX9 : public IncompleteClass
 
 struct EU4CharacterValues
 {
-    int16 x;
-    int16 y;
-    int16 w;
-    int16 h;
-    int16 xoff;
-    int16 yoff;
-    int16 xadvance;
+    int16_t x;
+    int16_t y;
+    int16_t w;
+    int16_t h;
+    int16_t xoff;
+    int16_t yoff;
+    int16_t xadvance;
     bool kerning;
 };
 VALIDATE_SIZE(EU4CharacterValues, 0x10)
@@ -168,7 +159,7 @@ struct CBitmapFont :IncompleteClass
         return field<const CString, 0x9C>();
     }
 
-    EU4CharacterValues *GetLatin1Value(uint32 cp)
+    EU4CharacterValues *GetLatin1Value(uint32_t cp)
     {
         return GetLatin1CharacterSet()->GetLatin1Values()[cp];
     }

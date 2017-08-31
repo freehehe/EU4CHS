@@ -30,5 +30,6 @@ Outline:
 Black text with alpha
 PS加描边
 
-"default"
-"tahoma_60
+"Default"
+"Mapfont"
+贴图文件名！

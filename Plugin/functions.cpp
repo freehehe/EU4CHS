@@ -5,7 +5,7 @@
 
 namespace Functions
 {
-    static std::vector<uint32> u32sequence;
+    static std::vector<uint32_t> u32sequence;
 
     void __fastcall ConvertUTF8ToLatin1(const char *source, char *dest)
     {
@@ -13,7 +13,7 @@ namespace Functions
         u32sequence.clear();
         utf8::utf8to32(source_view.begin(), source_view.end(), std::back_inserter(u32sequence));
 
-        for (uint32 &cp : u32sequence)
+        for (uint32_t &cp : u32sequence)
         {
             switch (cp)
             {
@@ -101,17 +101,17 @@ namespace Functions
         utf8::utf32to8(u32sequence.begin(), u32sequence.end(), dest);
     }
 
-    bool IsNativeChar(uint32 cp)
+    bool IsNativeChar(uint32_t cp)
     {
         return cp <= 0xFF;
     }
 
-    bool IsTextIconChar(uint32 cp)
+    bool IsTextIconChar(uint32_t cp)
     {
         return isalpha(cp) || isdigit(cp) || cp == '_' || cp == '|';
     }
 
-    bool IsSpecialChar(uint32 cp)
+    bool IsSpecialChar(uint32_t cp)
     {
         return (cp == 0x40 || cp == 0x7B || cp == 0x7D || cp == 0xA3 || cp == 0xA4 || cp == 0xA7);
     }
