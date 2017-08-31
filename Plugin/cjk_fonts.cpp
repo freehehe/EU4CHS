@@ -75,7 +75,7 @@ CJKFont * CJKFontManager::GetFont(const CString * fontname)
     }
     else
     {
-        return &_fonts.find(hash<string_view>()("Default"))->second;
+        return &_fonts.find(hash<string_view>()("default"))->second;
     }
 }
 

@@ -95,6 +95,15 @@ struct CArray
     T *_Myend;
 };
 
+struct STextVertex
+{
+    CVector3<float> Position;
+    CVector2<float> UV;
+    uint32 FillColor;
+    uint32 BorderColor;
+};
+VALIDATE_SIZE(STextVertex,28)
+
 struct TextureGFX
 {
     LPDIRECT3DTEXTURE9 field_0 = nullptr;
@@ -118,10 +127,6 @@ struct SMasterContextDX9 : public IncompleteClass
         return field<LPDIRECT3DDEVICE9, 4>();
     }
 
-    LPDIRECT3DVERTEXBUFFER9 GetVertexBuffer()
-    {
-#error Impl or delete
-    }
 };
 
 struct EU4CharacterValues

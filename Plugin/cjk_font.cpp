@@ -170,7 +170,7 @@ void CJKFont::SetKernings()
     }
 }
 
-std::int16_t CJKFont::GetKerning(uint32_t first, uint32_t second) const
+std::int16_t CJKFont::GetKerning(CBitmapFont *pFont, uint32_t first, uint32_t second) const
 {
     UnicodeCharPair duochar;
 
@@ -265,7 +265,7 @@ void CJKFont::UnloadTexturesDX9()
     _textures.clear();
 }
 
-CJKFont::CharacterValues *CJKFont::GetValue(uint32_t unicode)
+CJKFont::CharacterValues *CJKFont::GetValue(CBitmapFont *pFont, uint32_t unicode)
 {
     auto it = _values.find(unicode);
 
@@ -279,7 +279,7 @@ CJKFont::CharacterValues *CJKFont::GetValue(uint32_t unicode)
     }
 }
 
-TextureGFX * CJKFont::GetTexture(std::uint32_t unicode)
+TextureGFX * CJKFont::GetTexture(CBitmapFont *pFont, std::uint32_t unicode)
 {
     uint16_t page;
 
@@ -305,22 +305,36 @@ void CJKFont::SetPrimitivesDX9(std::uint32_t unicode, const CRect<int> *dstRect,
     }
     else
     {
-        OurVertex vertices[6];
+        STextVertex vertices[6];
 
         CharacterValues *pValues = GetValue(unicode);
 
-        CRect<int> screenRect;
-        CRect <float> textureRect;
+        float fTexWidth, fTexHeight;
+        float fSrcX, fSrcY, fSrcWidth, fSrcHeight, fDstX, fDstY, fDstWidth, fDstHeight;
+
+        fTexWidth = _scaleW;
+        fTexHeight = _scaleH;
+
+        fSrcX = pValues->EU4Values.x;
+        fSrcY = pValues->EU4Values.y;
+        fSrcWidth = pValues->EU4Values.w;
+        fSrcHeight = pValues->EU4Values.h;
+        fDstX = dstRect->_Origin.x;
+        fDstY = dstRect->_Origin.y;
+        fDstWidth = dstRect->_Extension.x;
+        fDstHeight = dstRect->_Extension.y;
+
+        //左下-左上-右上-左下-右上-右下
 
         copy(begin(vertices), end(vertices), back_inserter(_vertices[pValues->PageIndex]));
+
+        //减掉nVertexCount
     }
 }
 
 void CJKFont::DrawAllDX9()
 {
     LPDIRECT3DDEVICE9 pDevice = game_meta.pDX9Device;
-
-    pDevice->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1);
 
     for (size_t texture_index = 0; texture_index < _vertices.size(); ++texture_index)
     {
@@ -330,8 +344,15 @@ void CJKFont::DrawAllDX9()
         }
 
         pDevice->SetTexture(0, _textures[texture_index].field_0);
+
+/*      先尝试游戏设置
+        pDevice->SetFVF(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1);
         pDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
-        pDevice->DrawPrimitiveUP(D3DPT_TRIANGLELIST, _vertices[texture_index].size() / 3, _vertices[texture_index].data(), sizeof(OurVertex));
+        pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+        pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+        pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);*/
+
+        pDevice->DrawPrimitiveUP(D3DPT_TRIANGLELIST, _vertices[texture_index].size() / 3, _vertices[texture_index].data(), sizeof(STextVertex));
         _vertices[texture_index].clear();
     }
 }

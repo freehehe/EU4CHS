@@ -11,15 +11,6 @@ public:
         std::uint16_t PageIndex;
     };
 
-    struct OurVertex
-    {
-        CVector4<float> xyzrhw;
-        uint32 color;
-        CVector2<float> uv;
-        char pad[4];
-    };
-    VALIDATE_SIZE(OurVertex,32)
-
     static const std::uint32_t invalid_replacement = L'？';
 
     CJKFont(const std::experimental::filesystem::path &fntname);
@@ -29,9 +20,9 @@ public:
     void LoadTexturesDX9();
     void UnloadTexturesDX9();
 
-    CharacterValues *GetValue(std::uint32_t unicode);
-    std::int16_t GetKerning(uint32_t first, uint32_t second) const;
-    TextureGFX *GetTexture(std::uint32_t unicode);
+    CharacterValues *GetValue(CBitmapFont *pFont, std::uint32_t unicode);
+    std::int16_t GetKerning(CBitmapFont *pFont, uint32_t first, uint32_t second) const;
+    TextureGFX *GetTexture(CBitmapFont *pFont, std::uint32_t unicode);
 
     void SetPrimitivesDX9(std::uint32_t unicode, const CRect<int> *dstRect, std::uint32_t color);
     void DrawAllDX9();
@@ -46,7 +37,7 @@ private:
     std::unordered_map<std::uint64_t, std::int16_t> _kernings;
     std::vector<TextureGFX> _textures;
     std::vector<std::string> _texturenames;
-    std::vector<std::vector<OurVertex>> _vertices;
+    std::vector<std::vector<STextVertex>> _vertices;
 
     void ReadInfoBlock(FILE *file);
     void ReadCommonBlock(FILE *file);
