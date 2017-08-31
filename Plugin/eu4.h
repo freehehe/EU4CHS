@@ -120,7 +120,7 @@ struct SMasterContextDX9 : public IncompleteClass
 
     LPDIRECT3DVERTEXBUFFER9 GetVertexBuffer()
     {
-#error Impl or delete
+
     }
 };
 

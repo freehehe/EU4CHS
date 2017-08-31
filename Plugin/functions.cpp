@@ -111,6 +111,11 @@ namespace Functions
         return isalpha(cp) || isdigit(cp) || cp == '_' || cp == '|';
     }
 
+    bool IsSpecialChar(uint32 cp)
+    {
+        return (cp == 0x40 || cp == 0x7B || cp == 0x7D || cp == 0xA3 || cp == 0xA4 || cp == 0xA7);
+    }
+
     static void *ret_address;
 
     __declspec(naked) void WriteVariable_0x10A_9()
