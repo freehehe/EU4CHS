@@ -6,37 +6,6 @@
 
 extern const HMODULE pattern_default_module;
 
-class memory_pointer
-{
-    union
-    {
-        void *_pointer;
-        std::uintptr_t _address;
-    };
-
-public:
-    memory_pointer(void *pointer)
-        : _pointer(pointer)
-    {
-    }
-
-    memory_pointer(std::uintptr_t address)
-        : _address(address)
-    {
-    }
-
-    std::uintptr_t address(std::ptrdiff_t offset = 0) const
-    {
-        return (this->_address + offset);
-    }
-
-    template<typename T = void>
-    T *pointer(std::ptrdiff_t offset = 0) const
-    {
-        return reinterpret_cast<T *>(this->address(offset));
-    }
-};
-
 class byte_pattern
 {
     std::pair<std::uintptr_t, std::uintptr_t> _range;

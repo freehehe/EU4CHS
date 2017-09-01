@@ -140,7 +140,7 @@ void CJKFont::ReadKerningsBlock(FILE * file)
     };
 #pragma pack(pop)
 
-    std::vector<BinaryKerningValue> kernings_block;
+    vector<BinaryKerningValue> kernings_block;
 
     uint32_t block_size;
     fread(&block_size, 4, 1, file);
@@ -170,7 +170,7 @@ void CJKFont::SetKernings()
     }
 }
 
-std::int16_t CJKFont::GetKerning(CBitmapFont *pFont, uint32_t first, uint32_t second) const
+int16_t CJKFont::GetKerning(uint32_t first, uint32_t second) const
 {
     UnicodeCharPair duochar;
 
@@ -265,7 +265,7 @@ void CJKFont::UnloadTexturesDX9()
     _textures.clear();
 }
 
-CJKFont::CharacterValues *CJKFont::GetValue(CBitmapFont *pFont, uint32_t unicode)
+const CJKFont::CharacterValues *CJKFont::GetValue(uint32_t unicode)
 {
     auto it = _values.find(unicode);
 
@@ -279,7 +279,7 @@ CJKFont::CharacterValues *CJKFont::GetValue(CBitmapFont *pFont, uint32_t unicode
     }
 }
 
-TextureGFX * CJKFont::GetTexture(CBitmapFont *pFont, std::uint32_t unicode)
+TextureGFX * CJKFont::GetTexture(uint32_t unicode)
 {
     uint16_t page;
 
@@ -299,37 +299,30 @@ TextureGFX * CJKFont::GetTexture(CBitmapFont *pFont, std::uint32_t unicode)
 
 void CJKFont::SetPrimitivesDX9(std::uint32_t unicode, const CRect<int> *dstRect, std::uint32_t color)
 {
-    if (Functions::IsNativeChar(unicode))
-    {
+    STextVertex vertices[6];
 
-    }
-    else
-    {
-        STextVertex vertices[6];
+    const CharacterValues *pValues = GetValue(unicode);
 
-        CharacterValues *pValues = GetValue(unicode);
+    float fTexWidth, fTexHeight;
+    float fSrcX, fSrcY, fSrcWidth, fSrcHeight, fDstX, fDstY, fDstWidth, fDstHeight;
 
-        float fTexWidth, fTexHeight;
-        float fSrcX, fSrcY, fSrcWidth, fSrcHeight, fDstX, fDstY, fDstWidth, fDstHeight;
+    fTexWidth = _scaleW;
+    fTexHeight = _scaleH;
 
-        fTexWidth = _scaleW;
-        fTexHeight = _scaleH;
+    fSrcX = pValues->EU4Values.x;
+    fSrcY = pValues->EU4Values.y;
+    fSrcWidth = pValues->EU4Values.w;
+    fSrcHeight = pValues->EU4Values.h;
+    fDstX = dstRect->_Origin.x;
+    fDstY = dstRect->_Origin.y;
+    fDstWidth = dstRect->_Extension.x;
+    fDstHeight = dstRect->_Extension.y;
 
-        fSrcX = pValues->EU4Values.x;
-        fSrcY = pValues->EU4Values.y;
-        fSrcWidth = pValues->EU4Values.w;
-        fSrcHeight = pValues->EU4Values.h;
-        fDstX = dstRect->_Origin.x;
-        fDstY = dstRect->_Origin.y;
-        fDstWidth = dstRect->_Extension.x;
-        fDstHeight = dstRect->_Extension.y;
+    //左下-左上-右上-左下-右上-右下
 
-        //左下-左上-右上-左下-右上-右下
+    copy(begin(vertices), end(vertices), back_inserter(_vertices[pValues->PageIndex]));
 
-        copy(begin(vertices), end(vertices), back_inserter(_vertices[pValues->PageIndex]));
-
-        //减掉nVertexCount
-    }
+    //减掉nVertexCount
 }
 
 void CJKFont::DrawAllDX9()

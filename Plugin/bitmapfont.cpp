@@ -7,14 +7,11 @@
 
 namespace BitmapFont
 {
-    
-
-    static std::vector<uint32_t> wbuffer;
-
-    static CJKFont *coop_font;
+    static CJKFont *cjk_font;
     static uint32_t code_point;
     static uint32_t next_code_point;
     static std::ptrdiff_t cp_len;
+    static std::ptrdiff_t str_index;
     static void *ret_addr;
     
     //1099880
@@ -44,7 +41,7 @@ namespace BitmapFont
         float vTempWidth = 0.0f;
         int nWidth = 0;
 
-        CJKFont *cjk = CSingleton<CJKFontManager>::Instance().GetFont(pFont->GetFontPath());
+        cjk_font = CSingleton<CJKFontManager>::Instance().GetFont(pFont->GetFontPath());
 
         int real_length = length;
 
@@ -54,9 +51,8 @@ namespace BitmapFont
         }
 
         utf8::unchecked::iterator<const char *> u8it{ text };
-        utf8::unchecked::iterator<const char *> u8end{ text + real_length };
 
-        while (u8it.base() < u8end.base())
+        while (u8it.base() < (text + real_length))
         {
             uint32_t unicode = *u8it;
 
@@ -76,19 +72,20 @@ namespace BitmapFont
 
                 case 0xA3:
                     ++u8it;
-                    memset(tag, 0, 128);
 
                     {
                         size_t tag_len = 0;
                         uint32_t tag_char = *u8it;
 
-                        while (Functions::IsTextIconChar(tag_char))
+                        while (Functions::IsTextIconChar(tag_char) && (tag_len < 127))
                         {
                             tag[tag_len] = tag_char;
                             ++tag_len;
                             ++u8it;
                             tag_char = *u8it;
                         }
+
+                        tag[tag_len] = 0;
                     }
 
                     vTempWidth += injector::thiscall<int(CBitmapFont *, const char *)>::vtbl<28>(pFont, tag);
@@ -108,13 +105,37 @@ namespace BitmapFont
             }
             else
             {
+                const EU4CharacterValues *pValues;
+
+                if (Functions::IsNativeChar(unicode))
+                {
+                    pValues = pFont->GetLatin1Value(unicode);
+                }
+                else
+                {
+                    pValues = &cjk_font->GetValue(unicode)->EU4Values;
+                }
+
+                if (pValues == nullptr && unicode == 0xA) //换行符
+                {
+                    nWidth = vTempWidth;
+                    vTempWidth = 0.0f;
+                }
+                else
+                {
+                    vTempWidth += pValues->w * *pFont->field<float, 0x428>();
+                }
+
+                /////////////////////////////////////////////
+
+                //空格和中文间断
 
             }
 
             ++u8it;
         }
 
-        return nWidth;
+        return max(nWidth, vTempWidth);
     }
 
     void InitAndPatch()

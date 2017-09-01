@@ -20,9 +20,9 @@ public:
     void LoadTexturesDX9();
     void UnloadTexturesDX9();
 
-    CharacterValues *GetValue(CBitmapFont *pFont, std::uint32_t unicode);
-    std::int16_t GetKerning(CBitmapFont *pFont, uint32_t first, uint32_t second) const;
-    TextureGFX *GetTexture(CBitmapFont *pFont, std::uint32_t unicode);
+    const CharacterValues *GetValue(std::uint32_t unicode);
+    std::int16_t GetKerning(uint32_t first, uint32_t second) const;
+    TextureGFX *GetTexture(std::uint32_t unicode);
 
     void SetPrimitivesDX9(std::uint32_t unicode, const CRect<int> *dstRect, std::uint32_t color);
     void DrawAllDX9();
