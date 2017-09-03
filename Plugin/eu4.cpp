@@ -4,10 +4,10 @@
 
 EU4Meta::EU4Meta()
 {
-    this->pfCBitmapFont_RenderToScreen = g_pattern.set_pattern("81 EC 1C 06 00 00 56").force_search().get(0).address(-0x18);
-    this->pOriginalText = *g_pattern.get(0).pointer<char *>(0xD1);
-    this->pText = *g_pattern.get(0).pointer<char *>(0xFB);
-    this->pWord = *g_pattern.get(0).pointer<char *>(0x10C);
+    g_pattern.find_pattern("81 EC 1C 06 00 00 56");
+    this->pOriginalText = *g_pattern.get(0).pointer<char *>(0xD1 - 0x18);
+    this->pText = *g_pattern.get(0).pointer<char *>(0xFB - 0x18);
+    this->pWord = *g_pattern.get(0).pointer<char *>(0x10C - 0x18);
 
     this->pfCbitmapFontCharacterSet_GetKerning = g_pattern.find_pattern("56 8B F1 0F B6 4D 08").get(0).address(-3);
 

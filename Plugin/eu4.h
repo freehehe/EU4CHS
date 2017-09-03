@@ -140,6 +140,11 @@ struct CBitmapFontCharacterSet :IncompleteClass
         return field<EU4CharacterValues *, 0>();
     }
 
+    EU4CharacterValues *GetLatin1Value(uint32_t cp)
+    {
+        return GetLatin1Values()[cp];
+    }
+
     float *GetScaleX()
     {
         return field<float, 0x428>();
@@ -167,7 +172,6 @@ struct CBitmapFont :IncompleteClass
 
 struct EU4Meta
 {
-    std::uintptr_t pfCBitmapFont_RenderToScreen;
     std::uintptr_t pfCbitmapFontCharacterSet_GetKerning;
 
     FARPROC pfPHYSFS_openRead;

@@ -11,6 +11,43 @@ namespace BitmapFont
 {
     //1099880
 
+    struct CBitmapFont_RenderToScreen_0x690_13 //1098CA0
+    {
+        void operator()(injector::reg_pack *regs) const
+        {
+            hook_context.cjk_font = CSingleton<CJKFontManager>::Instance().GetFont(((CBitmapFont *)(regs->ebp - 0x10))->GetFontPath());
+            char *pStr = game_meta.pOriginalText + regs->edi;
+            hook_context.cp_len = utf8::internal::sequence_length(pStr);
+            hook_context.code_point = utf8::unchecked::next(pStr);
+            regs->eax = hook_context.code_point;
+
+            regs->edi += (hook_context.cp_len - 1);
+            regs->esi += hook_context.cp_len;
+
+            if (!Functions::IsNativeChar(hook_context.code_point))
+            {
+                regs->ecx = 0;
+            }
+        }
+    };
+
+    struct CBitmapFont_RenderToScreen_0x85B_9
+    {
+        void operator()(injector::reg_pack *regs) const
+        {
+            if (Functions::IsNativeChar(hook_context.code_point))
+            {
+                regs->ecx = (uint32_t)(((CBitmapFontCharacterSet *)(regs->ebp - 0x34))->GetLatin1Value(hook_context.code_point));
+            }
+            else
+            {
+                regs->ecx = (uint32_t)(&hook_context.cjk_font->GetValue(hook_context.code_point)->EU4Values);
+            }
+        }
+    };
+
+
+
     __declspec(naked) void CBitmapFont_RenderToScreen_OFF_SIZE()
     {
         __asm
@@ -169,5 +206,10 @@ namespace BitmapFont
     void InitAndPatch()
     {
         injector::MakeJMP(g_pattern.find_pattern("81 EC 8C 00 00 00 53 8B 5D 0C").get(0).address(-6), GetWidthOfString);
+
+        g_pattern.find_pattern("8A 87 ? ? ? ? 88 86 ? ? ? ? 46");
+        injector::MakeInline<CBitmapFont_RenderToScreen_0x690_13>(g_pattern.get(0).address(), g_pattern.get(0).address(13));
+
+
     }
 }
