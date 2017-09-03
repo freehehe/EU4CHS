@@ -18,6 +18,8 @@ void CPlugin::InitAndPatch(HMODULE hself)
 
     CSingleton<CJKFontManager>::Instance().InitAndPatch();
     CSingleton<VFSManager>::Instance().InitAndPatch();
+    Functions::InitAndPatch();
+    BitmapFont::InitAndPatch();
 
     injector::WriteMemory<uint32_t>(g_pattern.set_pattern("81 FE 00 00 00 01").force_search().get(0).address(2), INT32_MAX, true);
 

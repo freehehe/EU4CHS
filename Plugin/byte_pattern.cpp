@@ -2,7 +2,7 @@
 #include "byte_pattern.h"
 #include <stdexcept>
 
-extern const HMODULE pattern_default_module = GetModuleHandleA(NULL);
+extern HMODULE pattern_default_module = GetModuleHandleA(NULL);
 byte_pattern g_pattern;
 
 const memory_pointer &byte_pattern::get(std::size_t index) const

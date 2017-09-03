@@ -4,7 +4,7 @@
 #pragma once
 #include "stdinc.h"
 
-extern const HMODULE pattern_default_module;
+extern HMODULE pattern_default_module;
 
 class byte_pattern
 {

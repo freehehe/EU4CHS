@@ -50,12 +50,12 @@ class memory_pointer
     };
 
 public:
-    explicit memory_pointer(void *pointer)
+    memory_pointer(void *pointer)
         : _pointer(pointer)
     {
     }
 
-    explicit memory_pointer(std::uintptr_t address)
+    memory_pointer(std::uintptr_t address)
         : _address(address)
     {
     }

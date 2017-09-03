@@ -141,12 +141,12 @@ namespace Functions
 
     void InitAndPatch()
     {
-        injector::MakeJMP(game_meta.pfConvertUTF8ToLatin1, ConvertUTF8ToLatin1);
+        injector::MakeJMP(g_pattern.find_pattern("81 EC B0 00 00 00 53 56 8B F1 8B DA").get(0).address(-0x18), ConvertUTF8ToLatin1);
 
-        injector::MakeNOP(game_meta.pfWriteVariable + 0x10A, 9);
-        injector::MakeJMP(game_meta.pfWriteVariable + 0x10A, WriteVariable_0x10A_9);
-
-        injector::MakeNOP(game_meta.pfWriteVariable + 0x54F, 8);
-        injector::MakeJMP(game_meta.pfWriteVariable + 0x54F, WriteVariable_0x54F_8);
+        g_pattern.find_pattern("8B 45 0C 83 EC 74");
+        injector::MakeNOP(g_pattern.get(0).address(-0x6) + 0x10A, 9);
+        injector::MakeCALL(g_pattern.get(0).address(-0x6) + 0x10A, WriteVariable_0x10A_9);
+        injector::MakeNOP(g_pattern.get(0).address(-0x6) + 0x54F, 8);
+        injector::MakeCALL(g_pattern.get(0).address(-0x6) + 0x54F, WriteVariable_0x54F_8);
     }
 }

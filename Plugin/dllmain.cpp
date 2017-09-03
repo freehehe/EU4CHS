@@ -4,6 +4,7 @@
 #include "byte_pattern.h"
 
 //调试用 - 把ucs2字符集跑一遍生成转换表
+/*
 void UTF8ToLatin1View()
 {
     std::vector<char> u8sequence; 
@@ -36,7 +37,7 @@ void UTF8ToLatin1View()
     }
 
     std::cout << result.size();
-}
+}*/
 
 BOOL WINAPI DllMain(HMODULE module, DWORD reason, void *reserved)
 {

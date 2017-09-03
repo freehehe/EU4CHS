@@ -33,3 +33,14 @@ PS加描边
 "Default"
 "Mapfont"
 贴图文件名！
+
+启动器
+gfx/fonts/vic_18.fnt.tga
+gfx/fonts/vic_18_grey.fnt.tga
+gfx/fonts/vic_22.fnt.tga
+gfx/fonts/vic_36s.fnt.dds
+pdx_launcher/common/gfx/fonts/flaunch_16b.fnt.dds
+pdx_launcher/common/gfx/fonts/flaunch_18b.fnt.dds
+pdx_launcher/common/gfx/fonts/newsfeed_body.fnt.dds
+
+游戏

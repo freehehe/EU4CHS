@@ -167,21 +167,16 @@ struct CBitmapFont :IncompleteClass
 
 struct EU4Meta
 {
-    std::uintptr_t pfConvertUTF8ToLatin1;
-
-    std::uintptr_t pfCBitmapFont_GetWidthOfString;
     std::uintptr_t pfCBitmapFont_RenderToScreen;
+    std::uintptr_t pfCbitmapFontCharacterSet_GetKerning;
 
     FARPROC pfPHYSFS_openRead;
-    std::uintptr_t pfVFSOpenFile;
 
     std::uintptr_t pfGfxInitDX9;
     std::uintptr_t pfGfxShutdownDX9;
 
     SMasterContextDX9 *pMasterContext;
     LPDIRECT3DDEVICE9 pDX9Device;
-
-    std::uintptr_t pfWriteVariable;
 
     char *pOriginalText;
     char *pWord;

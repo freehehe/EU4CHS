@@ -2,6 +2,7 @@
 #include "plugin.h"
 #include "vfs.h"
 #include "eu4.h"
+#include "byte_pattern.h"
 
 using namespace std;
 using namespace experimental;
@@ -51,5 +52,5 @@ void *VFSManager::VFSOpenFile_0x8D(const char *virtualpath)
 void VFSManager::InitAndPatch()
 {
     EnumerateOurFiles();
-    injector::MakeCALL(game_meta.pfVFSOpenFile + 0x8D, VFSOpenFile_0x8D);
+    injector::MakeCALL(g_pattern.find_pattern("81 EC AC 01 00 00 53 56 8B F1").get(0).address(-0x18) + 0x8D, VFSOpenFile_0x8D);
 }

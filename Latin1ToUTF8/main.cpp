@@ -11,12 +11,12 @@
 using namespace std;
 using namespace std::experimental;
 
-bool ConvertFile(const filesystem::path &path)
+bool ConvertFile(const filesystem::path &in_file, const filesystem::path &out_file)
 {
     static std::vector<char> cbuffer;
     static std::vector<uint32_t> wbuffer;
 
-    fstream iofs{ path, ios::in };
+    fstream iofs{ in_file, ios::in };
 
     if (!iofs)
     {
@@ -27,15 +27,13 @@ bool ConvertFile(const filesystem::path &path)
     cbuffer.clear();
     wbuffer.clear();
 
-    istreambuf_iterator<char> bufit{ iofs };
-    istreambuf_iterator<char> butend{};
+    cbuffer.assign(istreambuf_iterator<char>{ iofs }, istreambuf_iterator<char>{});
 
-    if (utf8::starts_with_bom(bufit, butend) || utf8::is_valid(bufit, butend))
+    if (utf8::is_valid(cbuffer.begin(), cbuffer.end()))
     {
-        return;
+        return true;
     }
 
-    copy(istreambuf_iterator<char>{iofs}, istreambuf_iterator<char>(), back_inserter(cbuffer));
     transform(cbuffer.begin(), cbuffer.end(), back_inserter(wbuffer), 
         [](char character)
     {
@@ -44,7 +42,9 @@ bool ConvertFile(const filesystem::path &path)
 
     iofs.close();
 
-    iofs.open(path, ios::out | ios::trunc);
+    filesystem::create_directories(out_file.parent_path());
+
+    iofs.open(out_file, ios::out | ios::trunc);
 
     if (!iofs)
     {
@@ -58,9 +58,9 @@ bool ConvertFile(const filesystem::path &path)
     return true;
 }
 
-void ConvertDirectory(const filesystem::path &path)
+void ConvertDirectory(const filesystem::path &in_folder, const filesystem::path &out_folder)
 {
-    filesystem::recursive_directory_iterator dirit{ path };
+    filesystem::recursive_directory_iterator dirit{ in_folder };
 
     while (dirit != filesystem::recursive_directory_iterator{})
     {
@@ -68,7 +68,10 @@ void ConvertDirectory(const filesystem::path &path)
 
         if (filesystem::is_regular_file(_path) && _path.extension() == ".txt")
         {
-            if (!ConvertFile(_path))
+            wstring pathstr = _path.wstring();
+            pathstr.erase(0, in_folder.wstring().length());
+
+            if (!ConvertFile(_path, out_folder / pathstr))
             {
                 return;
             }
@@ -80,13 +83,14 @@ void ConvertDirectory(const filesystem::path &path)
 
 int main(int argc, char *argv[])
 {
-    if (argc == 2)
+    if (argc == 3)
     {
-        ConvertDirectory(argv[1]);
+        ConvertDirectory(argv[1], argv[2]);
     }
     else
     {
-        ConvertDirectory("C:/province_names/");
+        ConvertDirectory("D:/Steam/steamapps/common/Europa Universalis IV", "C:/u8text");
     }
+
     return 0;
 }

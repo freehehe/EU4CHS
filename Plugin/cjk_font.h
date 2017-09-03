@@ -24,9 +24,6 @@ public:
     std::int16_t GetKerning(uint32_t first, uint32_t second) const;
     TextureGFX *GetTexture(std::uint32_t unicode);
 
-    void SetPrimitivesDX9(std::uint32_t unicode, const CRect<int> *dstRect, std::uint32_t color);
-    void DrawAllDX9();
-
 private:
     bool _initialized;
     std::experimental::filesystem::path _workingdir;

@@ -4,16 +4,11 @@
 #include "functions.h"
 #include "eu4.h"
 #include "cjk_fonts.h"
+#include "byte_pattern.h"
+#include "hook_variables.h"
 
 namespace BitmapFont
 {
-    static CJKFont *cjk_font;
-    static uint32_t code_point;
-    static uint32_t next_code_point;
-    static std::ptrdiff_t cp_len;
-    static std::ptrdiff_t str_index;
-    static void *ret_addr;
-    
     //1099880
 
     __declspec(naked) void CBitmapFont_RenderToScreen_OFF_SIZE()
@@ -27,13 +22,13 @@ namespace BitmapFont
 
     struct CBitmapFont_RenderToScreen_OFF_SIZE
     {
-        void operator()(injector::reg_pack &regs) const
+        void operator()(injector::reg_pack *regs) const
         {
 
         }
     };
 
-    int GetWidthOfString(CBitmapFont * pFont, int edx, const char * text, const int length, bool bUseSpecialChars)
+    int __fastcall GetWidthOfString(CBitmapFont * pFont, int edx, const char * text, const int length, bool bUseSpecialChars)
     {
         static const float fIconWidth = 8.0f;
 
@@ -41,7 +36,7 @@ namespace BitmapFont
         float vTempWidth = 0.0f;
         int nWidth = 0;
 
-        cjk_font = CSingleton<CJKFontManager>::Instance().GetFont(pFont->GetFontPath());
+        hook_context.cjk_font = CSingleton<CJKFontManager>::Instance().GetFont(pFont->GetFontPath());
 
         int real_length = length;
 
@@ -50,39 +45,41 @@ namespace BitmapFont
             real_length = strlen(text);
         }
 
-        utf8::unchecked::iterator<const char *> u8it{ text };
+        hook_context.wide_text.clear();
 
-        while (u8it.base() < (text + real_length))
+        utf8::unchecked::utf8to32(text, text + real_length, back_inserter(hook_context.wide_text));
+
+        for (auto strit = hook_context.wide_text.begin(); strit < hook_context.wide_text.end(); ++strit)
         {
-            uint32_t unicode = *u8it;
+            uint32_t unicode = *strit;
 
             if (bUseSpecialChars && (unicode == 0x40 || unicode == 0x7B || unicode == 0xA3 || unicode == 0xA4 || unicode == 0xA7))
             {
                 switch (unicode)
                 {
                 case 0x40:
-                    std::advance(u8it, 3);
+                    strit += 3;
                     vTempWidth += injector::thiscall<int(CBitmapFont *)>::vtbl<30>(pFont);
                     break;
 
                 case 0x7B:
-                    std::advance(u8it, 2);
+                    strit += 2;
                     vTempWidth += fIconWidth;
                     break;
 
                 case 0xA3:
-                    ++u8it;
+                    ++strit;
 
                     {
                         size_t tag_len = 0;
-                        uint32_t tag_char = *u8it;
+                        uint32_t tag_char = *strit;
 
                         while (Functions::IsTextIconChar(tag_char) && (tag_len < 127))
                         {
                             tag[tag_len] = tag_char;
                             ++tag_len;
-                            ++u8it;
-                            tag_char = *u8it;
+                            ++strit;
+                            tag_char = *strit;
                         }
 
                         tag[tag_len] = 0;
@@ -96,7 +93,7 @@ namespace BitmapFont
                     break;
 
                 case 0xA7:
-                    ++u8it;
+                    ++strit;
                     break;
 
                 default:
@@ -113,26 +110,57 @@ namespace BitmapFont
                 }
                 else
                 {
-                    pValues = &cjk_font->GetValue(unicode)->EU4Values;
+                    pValues = &hook_context.cjk_font->GetValue(unicode)->EU4Values;
                 }
 
-                if (pValues == nullptr && unicode == 0xA) //换行符
+                if (pValues == nullptr)
                 {
-                    nWidth = vTempWidth;
-                    vTempWidth = 0.0f;
+                    if (unicode == 0xA)
+                    {
+                        nWidth = max(nWidth, vTempWidth);
+                        vTempWidth = 0.0f;
+                    }
                 }
                 else
                 {
-                    vTempWidth += pValues->w * *pFont->field<float, 0x428>();
+                    vTempWidth += pValues->xadvance * *pFont->field<float, 0x428>();
+
+                    if (pValues->kerning)
+                    {
+                        if (strit < hook_context.wide_text.end() - 1)
+                        {
+                            uint32_t next = *(strit + 1);
+
+                            if (Functions::IsNativeChar(unicode) && Functions::IsNativeChar(next))
+                            {
+                                CBitmapFontCharacterSet *pSet = pFont->GetLatin1CharacterSet();
+                                float fKerning;
+
+                                __asm
+                                {
+                                    push next;
+                                    push unicode;
+                                    mov ecx, pSet;
+                                    call game_meta.pfCbitmapFontCharacterSet_GetKerning;
+                                    movss fKerning, xmm0;
+                                }
+
+                                vTempWidth += fKerning;
+                            }
+                            else
+                            {
+                                vTempWidth += hook_context.cjk_font->GetKerning(unicode, next);
+                            }
+                        }
+                    }
+
+                    //空格及中文间断
+                    if (pValues->h == 0 || !Functions::IsNativeChar(unicode))
+                    {
+                        nWidth = max(nWidth, vTempWidth);
+                    }
                 }
-
-                /////////////////////////////////////////////
-
-                //空格和中文间断
-
             }
-
-            ++u8it;
         }
 
         return max(nWidth, vTempWidth);
@@ -140,6 +168,6 @@ namespace BitmapFont
 
     void InitAndPatch()
     {
-
+        injector::MakeJMP(g_pattern.find_pattern("81 EC 8C 00 00 00 53 8B 5D 0C").get(0).address(-6), GetWidthOfString);
     }
 }
