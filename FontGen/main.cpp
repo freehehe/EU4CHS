@@ -21,13 +21,13 @@ void enumerate_chars(const filesystem::path &folder)
 {
     ifstream ifs;
 
-    filesystem::directory_iterator dirit{ folder };
+    filesystem::recursive_directory_iterator dirit{ folder };
 
-    while (dirit != filesystem::directory_iterator{})
+    while (dirit != filesystem::recursive_directory_iterator{})
     {
         auto _path = dirit->path();
 
-        if (filesystem::is_regular_file(_path) && (_path.extension() == ".yml" || _path.extension() == ".yml"))
+        if (filesystem::is_regular_file(_path) && (_path.extension() == ".yml" || _path.extension() == ".txt"))
         {
             ifs.open(_path);
 

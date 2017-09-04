@@ -73,8 +73,10 @@ void CJKFontManager::InitAndPatch()
 {
     LoadFonts();
 
-    injector::WriteMemory(g_pattern.set_pattern("83 F9 02 0F 85 35 03 00 00").force_search().get(0).address(0x344), InitGfxAndLoadTextures, true);
-    injector::WriteMemory(g_pattern.get(0).address(0x34E), UnloadTexturesAndShutdownGfx, true);
+    g_pattern.find_pattern("83 F9 02 0F 85 35 03 00 00");
+
+    //injector::WriteMemory(g_pattern.get(0).address(0x344), InitGfxAndLoadTextures, true);
+    //injector::WriteMemory(g_pattern.get(0).address(0x34E), UnloadTexturesAndShutdownGfx, true);
     injector::WriteMemory(*g_pattern.get(0).pointer<std::uintptr_t>(0x340), InitGfxAndLoadTextures, true);
     injector::WriteMemory(*g_pattern.get(0).pointer<std::uintptr_t>(0x34A), UnloadTexturesAndShutdownGfx, true);
 }

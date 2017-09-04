@@ -9,7 +9,7 @@ EU4Meta::EU4Meta()
     this->pText = *g_pattern.get(0).pointer<char *>(0xFB - 0x18);
     this->pWord = *g_pattern.get(0).pointer<char *>(0x10C - 0x18);
 
-    this->pfCbitmapFontCharacterSet_GetKerning = g_pattern.find_pattern("56 8B F1 0F B6 4D 08").get(0).address(-3);
+    this->pfCBitmapFontCharacterSet_GetKerning = g_pattern.find_pattern("56 8B F1 0F B6 4D 08").get(0).address(-3);
 
     this->pfPHYSFS_openRead = GetProcAddress(pattern_default_module, "PHYSFS_openRead");
 

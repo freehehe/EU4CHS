@@ -77,10 +77,6 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="3500chs.txt" />
-    <Text Include="52addchar.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="52allin1.yml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

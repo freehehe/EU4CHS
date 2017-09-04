@@ -34,7 +34,6 @@ private:
     std::unordered_map<std::uint64_t, std::int16_t> _kernings;
     std::vector<TextureGFX> _textures;
     std::vector<std::string> _texturenames;
-    std::vector<std::vector<STextVertex>> _vertices;
 
     void ReadInfoBlock(FILE *file);
     void ReadCommonBlock(FILE *file);

@@ -11,40 +11,60 @@ namespace BitmapFont
 {
     //1099880
 
+    //预处理字符串，插入换行符
     struct CBitmapFont_RenderToScreen_0x690_13 //1098CA0
     {
         void operator()(injector::reg_pack *regs) const
         {
-            hook_context.cjk_font = CSingleton<CJKFontManager>::Instance().GetFont(((CBitmapFont *)(regs->ebp - 0x10))->GetFontPath());
             char *pStr = game_meta.pOriginalText + regs->edi;
-            hook_context.cp_len = utf8::internal::sequence_length(pStr);
-            hook_context.code_point = utf8::unchecked::next(pStr);
-            regs->eax = hook_context.code_point;
 
-            regs->edi += (hook_context.cp_len - 1);
-            regs->esi += hook_context.cp_len;
+            hook_context.cjkFont = CSingleton<CJKFontManager>::Instance().GetFont((*(CBitmapFont **)(regs->ebp - 0x10))->GetFontPath());
+            hook_context.unicodeLength = utf8::internal::sequence_length(pStr);
+            hook_context.unicode = utf8::unchecked::next(pStr);
+            regs->eax = hook_context.unicode;
 
-            if (!Functions::IsNativeChar(hook_context.code_point))
+            regs->edi += (hook_context.unicodeLength - 1);
+            regs->esi += hook_context.unicodeLength;
+
+            if (!Functions::IsNativeChar(hook_context.unicode))
             {
                 regs->ecx = 0;
             }
         }
     };
 
-    struct CBitmapFont_RenderToScreen_0x85B_9
+    struct CBitmapFont_RenderToScreen_0x85B_9 //1098E6B
     {
         void operator()(injector::reg_pack *regs) const
         {
-            if (Functions::IsNativeChar(hook_context.code_point))
+            if (Functions::IsNativeChar(hook_context.unicode))
             {
-                regs->ecx = (uint32_t)(((CBitmapFontCharacterSet *)(regs->ebp - 0x34))->GetLatin1Value(hook_context.code_point));
+                regs->ecx = (uint32_t)((*(CBitmapFontCharacterSet **)(regs->ebp - 0x34))->GetLatin1Value(hook_context.unicode));
             }
             else
             {
-                regs->ecx = (uint32_t)(&hook_context.cjk_font->GetValue(hook_context.code_point)->EU4Values);
+                regs->ecx = (uint32_t)(&hook_context.cjkFont->GetValue(hook_context.unicode)->EU4Values);
             }
         }
     };
+
+    void SetTexturesHook(void *pContext, TextureGFX **ppTextures, unsigned int count)
+    {
+        //调用原函数
+        TextureGFX *pTexture;
+
+        if (Functions::IsNativeChar(hook_context.unicode))
+        {
+
+        }
+        else
+        {
+            pTexture = hook_context.cjkFont->GetTexture(hook_context.unicode);
+        }
+
+        //启用Mipmap
+        game_meta.pDX9Device->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_POINT);
+    }
 
 
 
@@ -73,7 +93,7 @@ namespace BitmapFont
         float vTempWidth = 0.0f;
         int nWidth = 0;
 
-        hook_context.cjk_font = CSingleton<CJKFontManager>::Instance().GetFont(pFont->GetFontPath());
+        hook_context.cjkFont = CSingleton<CJKFontManager>::Instance().GetFont(pFont->GetFontPath());
 
         int real_length = length;
 
@@ -82,11 +102,11 @@ namespace BitmapFont
             real_length = strlen(text);
         }
 
-        hook_context.wide_text.clear();
+        hook_context.wideText.clear();
 
-        utf8::unchecked::utf8to32(text, text + real_length, back_inserter(hook_context.wide_text));
+        utf8::unchecked::utf8to32(text, text + real_length, back_inserter(hook_context.wideText));
 
-        for (auto strit = hook_context.wide_text.begin(); strit < hook_context.wide_text.end(); ++strit)
+        for (auto strit = hook_context.wideText.begin(); strit < hook_context.wideText.end(); ++strit)
         {
             uint32_t unicode = *strit;
 
@@ -147,7 +167,7 @@ namespace BitmapFont
                 }
                 else
                 {
-                    pValues = &hook_context.cjk_font->GetValue(unicode)->EU4Values;
+                    pValues = &hook_context.cjkFont->GetValue(unicode)->EU4Values;
                 }
 
                 if (pValues == nullptr)
@@ -164,7 +184,7 @@ namespace BitmapFont
 
                     if (pValues->kerning)
                     {
-                        if (strit < hook_context.wide_text.end() - 1)
+                        if (strit < hook_context.wideText.end() - 1)
                         {
                             uint32_t next = *(strit + 1);
 
@@ -178,7 +198,7 @@ namespace BitmapFont
                                     push next;
                                     push unicode;
                                     mov ecx, pSet;
-                                    call game_meta.pfCbitmapFontCharacterSet_GetKerning;
+                                    call game_meta.pfCBitmapFontCharacterSet_GetKerning;
                                     movss fKerning, xmm0;
                                 }
 
@@ -186,7 +206,7 @@ namespace BitmapFont
                             }
                             else
                             {
-                                vTempWidth += hook_context.cjk_font->GetKerning(unicode, next);
+                                vTempWidth += hook_context.cjkFont->GetKerning(unicode, next);
                             }
                         }
                     }

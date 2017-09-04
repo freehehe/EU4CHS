@@ -250,9 +250,6 @@ void CJKFont::LoadTexturesDX9()
 
         _textures.emplace_back(gfx);
     }
-
-    _vertices.clear();
-    _vertices.resize(_textures.size());
 }
 
 void CJKFont::UnloadTexturesDX9()

@@ -3,8 +3,6 @@
 #include "eu4.h"
 #include "byte_pattern.h"
 
-//调试用 - 把ucs2字符集跑一遍生成转换表
-/*
 void UTF8ToLatin1View()
 {
     std::vector<char> u8sequence; 
@@ -21,7 +19,7 @@ void UTF8ToLatin1View()
 
     u8sequence.push_back(0);
 
-    injector::fastcall<void(const char *, unsigned char *)>::call(game_meta.pfConvertUTF8ToLatin1, u8sequence.data(), latin1s.data());
+    injector::fastcall<void(const char *, unsigned char *)>::call(g_pattern.find_pattern("81 EC B0 00 00 00 53 56 8B F1 8B DA").get(0).address(-0x18), u8sequence.data(), latin1s.data());
 
     latin1s.pop_back();
 
@@ -37,7 +35,7 @@ void UTF8ToLatin1View()
     }
 
     std::cout << result.size();
-}*/
+}
 
 BOOL WINAPI DllMain(HMODULE module, DWORD reason, void *reserved)
 {

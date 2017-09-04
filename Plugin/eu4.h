@@ -86,15 +86,6 @@ struct CArray
     T *_Myend;
 };
 
-struct STextVertex
-{
-    CVector3<float> Position;
-    CVector2<float> UV;
-    uint32_t FillColor;
-    uint32_t BorderColor;
-};
-VALIDATE_SIZE(STextVertex,28)
-
 struct TextureGFX
 {
     LPDIRECT3DTEXTURE9 field_0 = nullptr;
@@ -105,20 +96,6 @@ struct TextureGFX
     int field_14 = 0;
 };
 VALIDATE_SIZE(TextureGFX, 0x18)
-
-struct SMasterContextDX9 : public IncompleteClass
-{
-    LPDIRECT3D9 *GetDXObject()
-    {
-        return field<LPDIRECT3D9, 0>();
-    }
-
-    LPDIRECT3DDEVICE9 *GetDXDevice()
-    {
-        return field<LPDIRECT3DDEVICE9, 4>();
-    }
-
-};
 
 struct EU4CharacterValues
 {
@@ -135,14 +112,9 @@ VALIDATE_SIZE(EU4CharacterValues, 0x10)
 
 struct CBitmapFontCharacterSet :IncompleteClass
 {
-    EU4CharacterValues **GetLatin1Values()
-    {
-        return field<EU4CharacterValues *, 0>();
-    }
-
     EU4CharacterValues *GetLatin1Value(uint32_t cp)
     {
-        return GetLatin1Values()[cp];
+        return field<EU4CharacterValues *, 0>()[cp];
     }
 
     float *GetScaleX()
@@ -166,20 +138,20 @@ struct CBitmapFont :IncompleteClass
 
     EU4CharacterValues *GetLatin1Value(uint32_t cp)
     {
-        return GetLatin1CharacterSet()->GetLatin1Values()[cp];
+        return GetLatin1CharacterSet()->GetLatin1Value(cp);
     }
 };
 
 struct EU4Meta
 {
-    std::uintptr_t pfCbitmapFontCharacterSet_GetKerning;
+    std::uintptr_t pfCBitmapFontCharacterSet_GetKerning;
 
     FARPROC pfPHYSFS_openRead;
 
     std::uintptr_t pfGfxInitDX9;
     std::uintptr_t pfGfxShutdownDX9;
+    std::uintptr_t pfGfxSetTexturesDX9;
 
-    SMasterContextDX9 *pMasterContext;
     LPDIRECT3DDEVICE9 pDX9Device;
 
     char *pOriginalText;

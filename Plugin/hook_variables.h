@@ -4,13 +4,13 @@
 
 struct hook_variables
 {
-    std::vector<uint32_t> wide_text;
-    uint32_t *pwide_text;
-    CJKFont *cjk_font;
-    uint32_t code_point;
-    uint32_t next_code_point;
-    ptrdiff_t cp_len;
-    ptrdiff_t text_index;
+    std::vector<uint32_t> wideText;
+    uint32_t *pWideText;
+    CJKFont *cjkFont;
+    uint32_t unicode;
+    uint32_t nextUnicode;
+    ptrdiff_t unicodeLength;
+    ptrdiff_t stringIndex;
     void *ret_addr;
 };
 
