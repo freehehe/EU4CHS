@@ -16,12 +16,14 @@ namespace BitmapFont
     {
         void operator()(injector::reg_pack *regs) const
         {
-            char *pStr = game_meta.pOriginalText + regs->edi;
+            char *pSrc = game_meta.pOriginalText + regs->edi;
+            char *pDst = game_meta.pWord + regs->esi;
 
             hook_context.cjkFont = CSingleton<CJKFontManager>::Instance().GetFont((*(CBitmapFont **)(regs->ebp - 0x10))->GetFontPath());
-            hook_context.unicodeLength = utf8::internal::sequence_length(pStr);
-            hook_context.unicode = utf8::unchecked::next(pStr);
+            hook_context.unicodeLength = utf8::internal::sequence_length(pSrc);
+            hook_context.unicode = utf8::unchecked::next(pSrc);
             regs->eax = hook_context.unicode;
+            utf8::append(hook_context.unicode, pDst);
 
             regs->edi += (hook_context.unicodeLength - 1);
             regs->esi += hook_context.unicodeLength;
@@ -47,26 +49,6 @@ namespace BitmapFont
             }
         }
     };
-
-    void SetTexturesHook(void *pContext, TextureGFX **ppTextures, unsigned int count)
-    {
-        //调用原函数
-        TextureGFX *pTexture;
-
-        if (Functions::IsNativeChar(hook_context.unicode))
-        {
-
-        }
-        else
-        {
-            pTexture = hook_context.cjkFont->GetTexture(hook_context.unicode);
-        }
-
-        //启用Mipmap
-        game_meta.pDX9Device->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_POINT);
-    }
-
-
 
     __declspec(naked) void CBitmapFont_RenderToScreen_OFF_SIZE()
     {
@@ -231,5 +213,7 @@ namespace BitmapFont
         injector::MakeInline<CBitmapFont_RenderToScreen_0x690_13>(g_pattern.get(0).address(), g_pattern.get(0).address(13));
 
 
+
+        injector::WriteMemory<uint8_t>(g_pattern.find_pattern("3D C2 00 00 00 7C 5B").get(0).address(1), 1, true);
     }
 }
