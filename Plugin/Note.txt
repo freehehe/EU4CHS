@@ -1,12 +1,5 @@
-﻿CBitmapFont::RenderToScreen : 0x1098610
-
-0x1098CA0 : CBitmapFont::RenderToScreen + 0x690 + 13
-0x1098D1B : CBitmapFont::RenderToScreen + 0x7B + 7
-0x1098E6B : CBitmapFont::RenderToScreen + 0x85B + 9
-0x1098EDE : CBitmapFont::RenderToScreen + 0x8CE + 20
-0x1098F0A : CBitmapFont::RenderToScreen + 0x8FA + 11
-
-CTextBuffer::Write时去除的特殊字符 "§¤£@{}" NOP RemoveIf?
+﻿CTextBuffer::Write时去除的特殊字符 "§¤£@{}" NOP RemoveIf?
+"\3\4\7@{}"
 
 SDL_TEXTINPUT 771
 108450E case SDL_TEXTINPUT 只会读取一个字节
@@ -17,13 +10,10 @@ http://blog.csdn.net/xiangzhang321/article/details/8316812
 http://www.cnblogs.com/resound/archive/2010/08/09/1795640.html
 http://www.gad.qq.com/article/detail/15034
 
-启动器
-gfx/fonts/vic_18.fnt.tga
-gfx/fonts/vic_18_grey.fnt.tga
-gfx/fonts/vic_22.fnt.tga
-gfx/fonts/vic_36s.fnt.dds
-pdx_launcher/common/gfx/fonts/flaunch_16b.fnt.dds
-pdx_launcher/common/gfx/fonts/flaunch_18b.fnt.dds
-pdx_launcher/common/gfx/fonts/newsfeed_body.fnt.dds
+字号
+12 14 16 18 22 24 29 35 36 100
+35应该没用
+12无法阅读 用14
+小字号用细字体!!!
 
-游戏
+只有地图字体需要mipmap

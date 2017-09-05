@@ -28,10 +28,8 @@ namespace BitmapFont
             regs->edi += (hook_context.unicodeLength - 1);
             regs->esi += hook_context.unicodeLength;
 
-            if (!Functions::IsNativeChar(hook_context.unicode))
-            {
-                regs->ecx = 0;
-            }
+            //SpecialChars全部位于ASCII范围后，不用跳过SpecialChar判断
+            //TXT里的A3A4A7怎么办？？读的时候转换啊？？或者渲染时转换？？
         }
     };
 
@@ -54,8 +52,9 @@ namespace BitmapFont
     {
         __asm
         {
-            pop ret_addr;
+            pop hook_context.ret_addr;
 
+            jmp hook_context.ret_addr;
         }
     }
 
@@ -92,7 +91,7 @@ namespace BitmapFont
         {
             uint32_t unicode = *strit;
 
-            if (bUseSpecialChars && (unicode == 0x40 || unicode == 0x7B || unicode == 0xA3 || unicode == 0xA4 || unicode == 0xA7))
+            if (bUseSpecialChars && (unicode == 0x40 || unicode == 0x7B || unicode == 0x3 || unicode == 0x4 || unicode == 0x7))
             {
                 switch (unicode)
                 {
@@ -106,7 +105,7 @@ namespace BitmapFont
                     vTempWidth += fIconWidth;
                     break;
 
-                case 0xA3:
+                case 0x3:
                     ++strit;
 
                     {
@@ -127,11 +126,11 @@ namespace BitmapFont
                     vTempWidth += injector::thiscall<int(CBitmapFont *, const char *)>::vtbl<28>(pFont, tag);
                     break;
 
-                case 0xA4:
+                case 0x4:
                     vTempWidth += fIconWidth;
                     break;
 
-                case 0xA7:
+                case 0x7:
                     ++strit;
                     break;
 
@@ -186,7 +185,7 @@ namespace BitmapFont
 
                                 vTempWidth += fKerning;
                             }
-                            else
+                            else if (!Functions::IsNativeChar(unicode))
                             {
                                 vTempWidth += hook_context.cjkFont->GetKerning(unicode, next);
                             }
@@ -207,13 +206,57 @@ namespace BitmapFont
 
     void InitAndPatch()
     {
-        injector::MakeJMP(g_pattern.find_pattern("81 EC 8C 00 00 00 53 8B 5D 0C").get(0).address(-6), GetWidthOfString);
+        injector::MakeJMP(g_pattern.find_pattern("81 EC 8C 00 00 00 53 8B 5D 0C").get(0).integer(-6), GetWidthOfString);
 
+        //---------------------字符串解析部分--------------------------------
         g_pattern.find_pattern("8A 87 ? ? ? ? 88 86 ? ? ? ? 46");
-        injector::MakeInline<CBitmapFont_RenderToScreen_0x690_13>(g_pattern.get(0).address(), g_pattern.get(0).address(13));
+        injector::MakeInline<CBitmapFont_RenderToScreen_0x690_13>(g_pattern.get(0).integer(), g_pattern.get(0).integer(13));
 
+        //---------------------------0xA3 0xA4 0xA7-------------------------------
+        g_pattern.find_pattern("80 3C 38 A?"); //cmp byte ptr [eax + edi], 0xA?
+        g_pattern.for_each_result(
+            [](memory_pointer p)
+        {
+            uint8_t *pb = p.raw<uint8_t>(3);
+            uint8_t b = *pb;
 
+            if (b == 0xA3 || b == 0xA4 || b == 0xA7)
+            {
+                injector::WriteMemory<uint8_t>(pb, b - 0xA0, true);
+            }
+        });
 
-        injector::WriteMemory<uint8_t>(g_pattern.find_pattern("3D C2 00 00 00 7C 5B").get(0).address(1), 1, true);
+        g_pattern.find_pattern("3C A? 75"); //cmp al, 0xA?; jnz short
+        g_pattern.for_each_result(
+            [](memory_pointer p)
+        {
+            uint8_t *pb = p.raw<uint8_t>(1);
+            uint8_t b = *pb;
+
+            if (b == 0xA3 || b == 0xA4 || b == 0xA7)
+            {
+                injector::WriteMemory<uint8_t>(pb, b - 0xA0, true);
+            }
+
+        });
+
+        g_pattern.find_pattern("3C A? 0F 85"); //cmp al, 0xA?; jnz long
+        g_pattern.for_each_result(
+            [](memory_pointer p)
+        {
+            uint8_t *pb = p.raw<uint8_t>(1);
+            uint8_t b = *pb;
+
+            if (b == 0xA3 || b == 0xA4 || b == 0xA7)
+            {
+                injector::WriteMemory<uint8_t>(pb, b - 0xA0, true);
+            }
+        });
+
+        //漏网之鱼
+
+        //----------------------------WriteVariable 0xA7----------------------------------------
+        injector::WriteMemory<uint8_t>(g_pattern.find_pattern("C6 06 A7").get(0).integer(2), 7, true);
+        injector::WriteMemory<uint8_t>(g_pattern.find_pattern("66 C7 06 A7 21").get(0).integer(3), 7, true);
     }
 }

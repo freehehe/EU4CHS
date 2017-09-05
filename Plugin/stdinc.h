@@ -6,13 +6,14 @@
 #include <cstddef>
 #include <fstream>
 #include <iostream>
+#include <array>
+#include <type_traits>
 #include <vector>
 #include <tuple>
 #include <utility>
 #include <map>
 #include <unordered_map>
 #include <string>
-#include <array>
 #include <iterator>
 #include <algorithm>
 #include <string_view>
@@ -38,101 +39,5 @@ public:
         static T _instance;
 
         return _instance;
-    }
-};
-
-class memory_pointer
-{
-    union
-    {
-        void *_pointer;
-        std::uintptr_t _address;
-    };
-
-public:
-    memory_pointer(void *pointer)
-        : _pointer(pointer)
-    {
-    }
-
-    memory_pointer(std::uintptr_t address)
-        : _address(address)
-    {
-    }
-
-    memory_pointer(const memory_pointer &rhs) = default;
-
-    std::uintptr_t address(std::ptrdiff_t offset = 0) const
-    {
-        return (this->_address + offset);
-    }
-
-    template<typename T = void>
-    T *pointer(std::ptrdiff_t offset = 0) const
-    {
-        return reinterpret_cast<T *>(this->address(offset));
-    }
-
-    bool operator==(const memory_pointer &rhs) const
-    {
-        return this->address() == rhs.address();
-    }
-
-    bool operator!=(const memory_pointer &rhs) const
-    {
-        return this->address() != rhs.address();
-    }
-
-    bool operator>(const memory_pointer &rhs) const
-    {
-        return this->address() > rhs.address();
-    }
-
-    bool operator<(const memory_pointer &rhs) const
-    {
-        return this->address() < rhs.address();
-    }
-
-    bool operator>=(const memory_pointer &rhs) const
-    {
-        return this->address() >= rhs.address();
-    }
-
-    bool operator<=(const memory_pointer &rhs) const
-    {
-        return this->address() <= rhs.address();
-    }
-
-    memory_pointer operator+(std::ptrdiff_t offset) const
-    {
-        return memory_pointer{ this->address(offset) };
-    }
-
-    memory_pointer operator-(std::ptrdiff_t offset) const
-    {
-        return memory_pointer{ this->address(-offset) };
-    }
-
-    memory_pointer &operator+=(std::ptrdiff_t offset)
-    {
-        this->_address += offset;
-        return *this;
-    }
-
-    memory_pointer &operator-=(std::ptrdiff_t offset)
-    {
-        this->_address -= offset;
-        return *this;
-    }
-
-    operator std::uintptr_t() const
-    {
-        return this->address();
-    }
-
-    template <typename T>
-    operator T*() const
-    {
-        return this->pointer<T>();
     }
 };

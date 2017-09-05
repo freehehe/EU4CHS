@@ -19,7 +19,7 @@ void UTF8ToLatin1View()
 
     u8sequence.push_back(0);
 
-    injector::fastcall<void(const char *, unsigned char *)>::call(g_pattern.find_pattern("81 EC B0 00 00 00 53 56 8B F1 8B DA").get(0).address(-0x18), u8sequence.data(), latin1s.data());
+    injector::fastcall<void(const char *, unsigned char *)>::call(g_pattern.find_pattern("81 EC B0 00 00 00 53 56 8B F1 8B DA").get(0).integer(-0x18), u8sequence.data(), latin1s.data());
 
     latin1s.pop_back();
 

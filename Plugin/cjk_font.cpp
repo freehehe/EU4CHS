@@ -237,6 +237,9 @@ void CJKFont::InitWithFile(const filesystem::path &fntname)
 
     SetKernings();
 
+    _buffer.clear();
+    _buffer.resize(_pages);
+
     _initialized = true;
 }
 
@@ -278,18 +281,22 @@ const CJKFont::CharacterValues *CJKFont::GetValue(uint32_t unicode)
 
 TextureGFX * CJKFont::GetTexture(uint32_t unicode)
 {
-    uint16_t page;
+    return &_textures[GetValue(unicode)->PageIndex];
+}
 
-    auto it = _values.find(unicode);
+void CJKFont::AddVerticesDX9(std::uint32_t unicode, STextVertex * pVertices)
+{
+    copy_n(pVertices, 6, back_inserter(_buffer[GetValue(unicode)->PageIndex]));
+}
 
-    if (it != _values.end())
+void CJKFont::DrawAllDX9()
+{
+    for (size_t index = 0; index < _pages; ++index)
     {
-        page = it->second.PageIndex;
-    }
-    else
-    {
-        page = _values.find(invalid_replacement)->second.PageIndex;
-    }
+        game_meta.pDX9Device->SetTexture(0, _textures[index].field_0);
 
-    return &_textures[page];
+        game_meta.pDX9Device->DrawPrimitiveUP(D3DPT_TRIANGLELIST, 2, _buffer[index].data(), sizeof(STextVertex));
+
+        _buffer[index].clear();
+    }
 }

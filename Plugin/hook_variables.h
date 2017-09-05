@@ -4,6 +4,7 @@
 
 struct hook_variables
 {
+    std::string narrowText;
     std::vector<uint32_t> wideText;
     uint32_t *pWideText;
     CJKFont *cjkFont;

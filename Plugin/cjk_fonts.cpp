@@ -53,6 +53,16 @@ void CJKFontManager::UnloadTexturesAndShutdownGfx(void *pMasterContext)
     injector::cstd<void(void *)>::call(game_meta.pfGfxShutdownDX9, pMasterContext);
 }
 
+void CJKFontManager::DrawAllDX9()
+{
+    injector::cstd<void()>::call(game_meta.pfGfxDrawDX9);
+
+    for (auto &font: CSingleton<CJKFontManager>::Instance()._fonts)
+    {
+        font.second.DrawAllDX9();
+    }
+}
+
 CJKFont * CJKFontManager::GetFont(const CString * fontname)
 {
     const char *cname = fontname->c_str();
@@ -77,6 +87,6 @@ void CJKFontManager::InitAndPatch()
 
     //injector::WriteMemory(g_pattern.get(0).address(0x344), InitGfxAndLoadTextures, true);
     //injector::WriteMemory(g_pattern.get(0).address(0x34E), UnloadTexturesAndShutdownGfx, true);
-    injector::WriteMemory(*g_pattern.get(0).pointer<std::uintptr_t>(0x340), InitGfxAndLoadTextures, true);
-    injector::WriteMemory(*g_pattern.get(0).pointer<std::uintptr_t>(0x34A), UnloadTexturesAndShutdownGfx, true);
+    injector::WriteMemory(*g_pattern.get(0).raw<std::uintptr_t>(0x340), InitGfxAndLoadTextures, true);
+    injector::WriteMemory(*g_pattern.get(0).raw<std::uintptr_t>(0x34A), UnloadTexturesAndShutdownGfx, true);
 }

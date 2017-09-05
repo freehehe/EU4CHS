@@ -97,6 +97,15 @@ struct TextureGFX
 };
 VALIDATE_SIZE(TextureGFX, 0x18)
 
+struct STextVertex
+{
+    CVector3<float> Position;
+    CVector2<float> UV;
+    uint32_t FillColor;
+    uint32_t BorderColor;
+};
+VALIDATE_SIZE(STextVertex,0x1C)
+
 struct EU4CharacterValues
 {
     int16_t x;
@@ -150,7 +159,7 @@ struct EU4Meta
 
     std::uintptr_t pfGfxInitDX9;
     std::uintptr_t pfGfxShutdownDX9;
-    std::uintptr_t pfGfxSetTexturesDX9;
+    std::uintptr_t pfGfxDrawDX9;
 
     LPDIRECT3DDEVICE9 pDX9Device;
 

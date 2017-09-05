@@ -47,6 +47,12 @@ namespace Functions
                 cp = '?';
                 break;
 
+            case 0xA3:
+            case 0xA4:
+            case 0xA7:
+                cp -= 0xA0;
+                break;
+
             case 0x152: cp = 0x8c; break;
             case 0x153: cp = 0x9c; break;
             case 0x160: cp = 0x8a; break;
@@ -116,37 +122,8 @@ namespace Functions
         return (cp == 0x40 || cp == 0x7B || cp == 0x7D || cp == 0xA3 || cp == 0xA4 || cp == 0xA7);
     }
 
-    static void *ret_address;
-
-    __declspec(naked) void WriteVariable_0x10A_9()
-    {
-        __asm
-        {
-            mov word ptr[esi], 0xA7C2;
-            mov[esi + 2], al;
-            add esi, 3;
-            ret;
-        }
-    }
-
-    __declspec(naked) void WriteVariable_0x54F_8()
-    {
-        __asm
-        {
-            mov dword ptr[esi], 0x0021A7C2;
-            lea eax, [esi + 3];
-            ret;
-        }
-    }
-
     void InitAndPatch()
     {
-        injector::MakeJMP(g_pattern.find_pattern("81 EC B0 00 00 00 53 56 8B F1 8B DA").get(0).address(-0x18), ConvertUTF8ToLatin1);
-
-        g_pattern.find_pattern("8B 45 0C 83 EC 74");
-        injector::MakeNOP(g_pattern.get(0).address(-0x6) + 0x10A, 9);
-        injector::MakeCALL(g_pattern.get(0).address(-0x6) + 0x10A, WriteVariable_0x10A_9);
-        injector::MakeNOP(g_pattern.get(0).address(-0x6) + 0x54F, 8);
-        injector::MakeCALL(g_pattern.get(0).address(-0x6) + 0x54F, WriteVariable_0x54F_8);
+        injector::MakeJMP(g_pattern.find_pattern("81 EC B0 00 00 00 53 56 8B F1 8B DA").get(0).integer(-0x18), ConvertUTF8ToLatin1);
     }
 }
