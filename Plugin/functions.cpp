@@ -1,19 +1,20 @@
-#include "stdinc.h"
+﻿#include "stdinc.h"
 #include "functions.h"
 #include "eu4.h"
 #include "byte_pattern.h"
+#include "hook_variables.h"
+
+using namespace std;
 
 namespace Functions
 {
-    static std::vector<uint32_t> u32sequence;
-
     void __fastcall ConvertUTF8ToLatin1(const char *source, char *dest)
     {
-        std::string_view source_view(source);
-        u32sequence.clear();
-        utf8::utf8to32(source_view.begin(), source_view.end(), std::back_inserter(u32sequence));
+        string_view source_view(source);
+        hook_context.wideText.clear();
+        utf8::utf8to32(source_view.begin(), source_view.end(), back_inserter(hook_context.wideText));
 
-        for (uint32_t &cp : u32sequence)
+        for (uint32_t &cp : hook_context.wideText)
         {
             switch (cp)
             {
@@ -86,25 +87,42 @@ namespace Functions
             }
         }
 
-        u32sequence.push_back(0);
-        utf8::utf32to8(u32sequence.begin(), u32sequence.end(), dest);
+        hook_context.wideText.push_back(0);
+        utf8::utf32to8(hook_context.wideText.begin(), hook_context.wideText.end(), dest);
     }
 
-    void ConvertLatin1ToUTF8(const char *source, char *dest)
+    struct CReader_ReadSimpleStatement_0x161_7
     {
-        u32sequence.clear();
-
-        const unsigned char *it = reinterpret_cast<const unsigned char *>(source);
-
-        while (*it != 0)
+        void operator()(injector::reg_pack *regs) const
         {
-            u32sequence.push_back(*it);
-            ++it;
+            //esi+4 char *source
+            //copy 520 bytes from [esi] to [edi]
+        }
+    };
+
+    void ConvertSpecialChars(char *source)
+    {
+        string_view source_view(source);
+        hook_context.wideText.clear();
+        utf8::utf8to32(source_view.begin(), source_view.end(), back_inserter(hook_context.wideText));
+
+        for (uint32_t &cp : hook_context.wideText)
+        {
+            switch (cp)
+            {
+            case 0xA3:
+            case 0xA4:
+            case 0xA7:
+                cp -= 0xA0;
+                break;
+
+            default:
+                break;
+            }
         }
 
-        u32sequence.push_back(0);
-
-        utf8::utf32to8(u32sequence.begin(), u32sequence.end(), dest);
+        hook_context.wideText.push_back(0);
+        utf8::utf32to8(hook_context.wideText.begin(), hook_context.wideText.end(), source);
     }
 
     bool IsNativeChar(uint32_t cp)
@@ -125,5 +143,9 @@ namespace Functions
     void InitAndPatch()
     {
         injector::MakeJMP(g_pattern.find_pattern("81 EC B0 00 00 00 53 56 8B F1 8B DA").get(0).integer(-0x18), ConvertUTF8ToLatin1);
+
+        g_pattern.find_pattern("B9 82 00 00 00 F3 A5");
+        injector::MakeInline<CReader_ReadSimpleStatement_0x161_7>(g_pattern.get(0).integer(), g_pattern.get(0).integer(7));
+        
     }
 }

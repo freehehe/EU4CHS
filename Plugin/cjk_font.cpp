@@ -131,62 +131,9 @@ void CJKFont::ReadCharsBlock(FILE * file)
 
 void CJKFont::ReadKerningsBlock(FILE * file)
 {
-#pragma pack(push,1)
-    struct BinaryKerningValue
-    {
-        uint32_t first;
-        uint32_t second;
-        int16_t value;
-    };
-#pragma pack(pop)
-
-    vector<BinaryKerningValue> kernings_block;
-
     uint32_t block_size;
     fread(&block_size, 4, 1, file);
-    kernings_block.resize(block_size / sizeof(BinaryKerningValue));
-    fread(kernings_block.data(), block_size, 1, file);
-
-    for (auto &binary : kernings_block)
-    {
-        UnicodeCharPair cp;
-
-        cp._first = binary.first;
-        cp._second = binary.second;
-
-        _kernings.emplace(cp._packed, binary.value);
-    }
-}
-
-void CJKFont::SetKernings()
-{
-    for (auto &kp : _kernings)
-    {
-        UnicodeCharPair cp;
-
-        cp._packed = kp.first;
-
-        _values.find(cp._first)->second.EU4Values.kerning = true;
-    }
-}
-
-int16_t CJKFont::GetKerning(uint32_t first, uint32_t second) const
-{
-    UnicodeCharPair duochar;
-
-    duochar._first = first;
-    duochar._second = second;
-
-    auto it = _kernings.find(duochar._packed);
-
-    if (it == _kernings.end())
-    {
-        return 0;
-    }
-    else
-    {
-        return it->second;
-    }
+    fseek(file, block_size, SEEK_CUR);
 }
 
 void CJKFont::InitWithFile(const filesystem::path &fntname)
@@ -234,8 +181,6 @@ void CJKFont::InitWithFile(const filesystem::path &fntname)
     }
 
     fclose(iFile);
-
-    SetKernings();
 
     _buffer.clear();
     _buffer.resize(_pages);

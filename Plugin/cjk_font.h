@@ -21,7 +21,6 @@ public:
     void UnloadTexturesDX9();
 
     const CharacterValues *GetValue(std::uint32_t unicode);
-    std::int16_t GetKerning(uint32_t first, uint32_t second) const;
     TextureGFX *GetTexture(std::uint32_t unicode);
 
     void AddVerticesDX9(std::uint32_t unicode, STextVertex *pVertices);
@@ -34,7 +33,6 @@ private:
     std::uint16_t _scaleH;
     std::uint16_t _pages;
     std::unordered_map<std::uint32_t, CharacterValues> _values;
-    std::unordered_map<std::uint64_t, std::int16_t> _kernings;
     std::vector<TextureGFX> _textures;
     std::vector<std::string> _texturenames;
     std::vector<std::vector<STextVertex>> _buffer;
@@ -44,5 +42,4 @@ private:
     void ReadPagesBlock(FILE *file);
     void ReadCharsBlock(FILE *file);
     void ReadKerningsBlock(FILE *file);
-    void SetKernings();
 };

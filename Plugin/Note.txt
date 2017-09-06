@@ -10,10 +10,15 @@ http://blog.csdn.net/xiangzhang321/article/details/8316812
 http://www.cnblogs.com/resound/archive/2010/08/09/1795640.html
 http://www.gad.qq.com/article/detail/15034
 
+NoKerning
 字号
 12 14 16 18 22 24 29 35 36 100
 35应该没用
-12无法阅读 用14
-小字号用细字体!!!
+12 14 16 18 not smoothing
+
+地图字体 RGB都是64
+外发光200 200 200左右 不透明度100
 
 只有地图字体需要mipmap
+查找B4 00 00 00
+看看CLexer里面 100BD80
