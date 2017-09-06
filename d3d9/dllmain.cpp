@@ -69,5 +69,5 @@ BOOL WINAPI DllMain(HMODULE module, DWORD reason, LPVOID reserved)
     return TRUE;
 }
 
-__declspec(naked) void _Direct3DCreate9() { _asm { jmp[d3d9meta.Direct3DCreate9] } }
-__declspec(naked) void _Direct3DCreate9Ex() { _asm { jmp[d3d9meta.Direct3DCreate9Ex] } }
+__declspec(naked) void _Direct3DCreate9() { _asm { jmp d3d9meta.Direct3DCreate9 } }
+__declspec(naked) void _Direct3DCreate9Ex() { _asm { jmp d3d9meta.Direct3DCreate9Ex } }

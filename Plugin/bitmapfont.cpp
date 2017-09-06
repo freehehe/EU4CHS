@@ -11,7 +11,6 @@ namespace BitmapFont
 {
     //1099880
 
-    //预处理字符串，插入换行符
     struct CBitmapFont_RenderToScreen_0x690_13 //1098CA0
     {
         void operator()(injector::reg_pack *regs) const
@@ -66,7 +65,8 @@ namespace BitmapFont
         }
     };
 
-    int __fastcall GetWidthOfString(CBitmapFont * pFont, int edx, const char * text, const int length, bool bUseSpecialChars)
+    //获取字符串的宽度，用于计算背景宽度
+    static int __fastcall GetWidthOfString(CBitmapFont * pFont, int edx, const char * text, const int length, bool bUseSpecialChars)
     {
         static const float fIconWidth = 8.0f;
 
@@ -185,10 +185,6 @@ namespace BitmapFont
 
                                 vTempWidth += fKerning;
                             }
-                            else if (!Functions::IsNativeChar(unicode))
-                            {
-                                vTempWidth += hook_context.cjkFont->GetKerning(unicode, next);
-                            }
                         }
                     }
 
@@ -202,6 +198,13 @@ namespace BitmapFont
         }
 
         return max(nWidth, vTempWidth);
+    }
+
+    //获取字符串的高度，用于计算背景高度
+    static int GetHeightOfString(CBitmapFont *pFont, int edx, CString *str, int, int, const CVector2<int> *rect, bool bUseSpecialChar)
+    {
+
+        
     }
 
     void InitAndPatch()

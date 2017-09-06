@@ -21,6 +21,8 @@ void enumerate_chars(const filesystem::path &folder)
 {
     ifstream ifs;
 
+    filesystem::remove(folder / "charchart.txt");
+
     filesystem::recursive_directory_iterator dirit{ folder };
 
     while (dirit != filesystem::recursive_directory_iterator{})
@@ -87,7 +89,7 @@ void generate_table(const filesystem::path &folder)
 {
     for (auto chr : collection)
     {
-        if (char_matrix.back().size() == 64)
+        if (char_matrix.back().size() == 128)
         {
             char_matrix.emplace_back();
         }
