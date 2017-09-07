@@ -89,7 +89,7 @@ namespace injector
         {
             static void call(reg_pack* regs)
             {
-                T fun; fun(*regs);
+                T fun; fun(regs);
             }
         };
 

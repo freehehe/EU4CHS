@@ -1,5 +1,4 @@
 ﻿CTextBuffer::Write时去除的特殊字符 "§¤£@{}" NOP RemoveIf?
-"\3\4\7@{}"
 
 SDL_TEXTINPUT 771
 108450E case SDL_TEXTINPUT 只会读取一个字节
@@ -14,7 +13,7 @@ NoKerning
 字号
 12 14 16 18 22 24 29 35 36 100
 35应该没用
-12 14 16 18 not smoothing
+12 14 16 18 hinting
 
 地图字体 RGB都是64
 外发光200 200 200左右 不透明度100
@@ -22,3 +21,36 @@ NoKerning
 只有地图字体需要mipmap
 查找B4 00 00 00
 看看CLexer里面 100BD80
+
+不改A3A4A7的可能性？GetHeightString被换掉了所以不需要？
+Render3d没用
+
+3C A? 0F 85
+.text:01096E22 cmp al, 0A3h
+.text:01098D93 cmp al, 0A3h
+.text:01099A27 cmp al, 0A3h
+.text:0109BF14 cmp al, 0A3h
+.text:0109DCFB cmp al, 0A3h
+.text:0109E267 cmp al, 0A3h
+.text:01099B18 cmp al, 0A4h
+
+3C A? 75
+.text:0109ADB5 cmp al, 0A3h
+.text:0109AE0A cmp al, 0A4h
+.text:01098E39 cmp al, 0A4h
+.text:01096ED7 cmp al, 0A4h
+.text:012082E2 cmp al, 0A7h
+.text:0109E17B cmp al, 0A7h
+.text:0109DC3E cmp al, 0A7h
+.text:0109BEA7 cmp al, 0A7h
+.text:0109AD7F cmp al, 0A7h
+.text:010998B6 cmp al, 0A7h
+.text:01098E54 cmp al, 0A7h
+
+用mod取代vfshook?
+
+name = "52X牧有汉化补丁文本"
+path = "mod/eu4chs"
+supported_version = "1.22.2"
+
+SOE 984

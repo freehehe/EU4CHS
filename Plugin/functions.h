@@ -5,7 +5,6 @@
 namespace Functions
 {
     void __fastcall ConvertUTF8ToLatin1(const char *source, char *dest);
-    void ConvertSpecialChars(char *dest);
     bool IsNativeChar(uint32_t cp);
     bool IsTextIconChar(uint32_t cp);
     bool IsSpecialChar(uint32_t cp);

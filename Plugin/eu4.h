@@ -97,6 +97,14 @@ struct TextureGFX
 };
 VALIDATE_SIZE(TextureGFX, 0x18)
 
+struct CToken
+{
+    int _Type; //0xF - text
+    char _szVal[512];
+    bool _bExplicitString;
+};
+VALIDATE_SIZE(CToken,520)
+
 struct STextVertex
 {
     CVector3<float> Position;

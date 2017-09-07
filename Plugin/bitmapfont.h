@@ -6,5 +6,3 @@ namespace BitmapFont
 {
     void InitAndPatch();
 }
-
-#pragma message("Fuck you")

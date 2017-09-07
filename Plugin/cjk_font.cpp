@@ -239,7 +239,7 @@ void CJKFont::DrawAllDX9()
     for (size_t index = 0; index < _pages; ++index)
     {
         game_meta.pDX9Device->SetTexture(0, _textures[index].field_0);
-
+        game_meta.pDX9Device->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
         game_meta.pDX9Device->DrawPrimitiveUP(D3DPT_TRIANGLELIST, 2, _buffer[index].data(), sizeof(STextVertex));
 
         _buffer[index].clear();

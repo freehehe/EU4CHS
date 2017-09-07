@@ -9,18 +9,18 @@
 #include "../include/utf8cpp/utf8.h"
 
 using namespace std;
-using namespace std::experimental;
+using namespace experimental;
 
 bool ConvertFile(const filesystem::path &in_file, const filesystem::path &out_file)
 {
-    static std::vector<char> cbuffer;
-    static std::vector<uint32_t> wbuffer;
+    static vector<char> cbuffer;
+    static vector<uint32_t> wbuffer;
 
     fstream iofs{ in_file, ios::in };
 
     if (!iofs)
     {
-        cout << "Something is wrong. Stopped." << std::endl;
+        cout << "Something is wrong. Stopped." << endl;
         return false;
     }
 
@@ -48,7 +48,7 @@ bool ConvertFile(const filesystem::path &in_file, const filesystem::path &out_fi
 
     if (!iofs)
     {
-        cout << "Something is wrong. Stopped." << std::endl;
+        cout << "Something is wrong. Stopped." << endl;
         return false;
     }
 

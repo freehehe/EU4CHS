@@ -62,14 +62,18 @@ namespace BitmapFont
         }
     };
 
-    //获取字符串的宽度，用于计算背景宽度
+    //获取字符串的宽度，用于计算背景宽度，不限最大宽度
     static int __fastcall GetWidthOfString(CBitmapFont * pFont, int edx, const char * text, const int length, bool bUseSpecialChars)
     {
         static const float fIconWidth = 8.0f;
 
         char tag[128];
-        float vTempWidth = 0.0f;
-        int nWidth = 0;
+        float vTempWidth = 0.0f; //当前行宽度
+        int nWidth = 0; //最大行宽度
+
+        //中文中文…
+        //中文english中文
+        //A3A4当英文字符处理
 
         hook_context.cjkFont = CSingleton<CJKFontManager>::Instance().GetFont(pFont->GetFontPath());
 
@@ -166,7 +170,7 @@ namespace BitmapFont
                         {
                             uint32_t next = *(strit + 1);
 
-                            if (Functions::IsNativeChar(unicode) && Functions::IsNativeChar(next))
+                            if (Functions::IsNativeChar(next))
                             {
                                 CBitmapFontCharacterSet *pSet = pFont->GetLatin1CharacterSet();
                                 float fKerning;

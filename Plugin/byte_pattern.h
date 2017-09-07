@@ -113,7 +113,6 @@ class byte_pattern
     bool _processed = false;
 
     std::ptrdiff_t _bmbc[256];
-    std::vector<ptrdiff_t> _bmgs;
 
     void transform_pattern(const char *pattern_literal);
     void get_module_range(memory_pointer module);

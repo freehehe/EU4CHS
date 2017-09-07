@@ -91,18 +91,32 @@ namespace Functions
         utf8::utf32to8(hook_context.wideText.begin(), hook_context.wideText.end(), dest);
     }
 
-    struct CReader_ReadSimpleStatement_0x161_7
+
+
+    bool IsNativeChar(uint32_t cp)
     {
-        void operator()(injector::reg_pack *regs) const
-        {
-            //esi+4 char *source
-            //copy 520 bytes from [esi] to [edi]
-        }
-    };
+        return cp <= 0xFF;
+    }
+
+    bool IsTextIconChar(uint32_t cp)
+    {
+        return isalpha(cp) || isdigit(cp) || cp == '_' || cp == '|';
+    }
+
+    bool IsSpecialChar(uint32_t cp)
+    {
+        return (cp == 0x40 || cp == 0x7B || cp == 0x7D || cp == 0xA3 || cp == 0xA4 || cp == 0xA7);
+    }
 
     void ConvertSpecialChars(char *source)
     {
         string_view source_view(source);
+
+        if (all_of(source_view.begin(), source_view.end(), isascii))
+        {
+            return;
+        }
+
         hook_context.wideText.clear();
         utf8::utf8to32(source_view.begin(), source_view.end(), back_inserter(hook_context.wideText));
 
@@ -125,27 +139,27 @@ namespace Functions
         utf8::utf32to8(hook_context.wideText.begin(), hook_context.wideText.end(), source);
     }
 
-    bool IsNativeChar(uint32_t cp)
+    struct CReader_ReadSimpleStatement_0x161_7
     {
-        return cp <= 0xFF;
-    }
+        void operator()(injector::reg_pack *regs) const
+        {
+            CToken *pSrcToken = (CToken *)(regs->esi);
+            CToken *pDstToken = (CToken *)(regs->edi);
 
-    bool IsTextIconChar(uint32_t cp)
-    {
-        return isalpha(cp) || isdigit(cp) || cp == '_' || cp == '|';
-    }
+            if (pSrcToken->_Type == 0xF)
+            {
+                ConvertSpecialChars(pSrcToken->_szVal);
+            }
 
-    bool IsSpecialChar(uint32_t cp)
-    {
-        return (cp == 0x40 || cp == 0x7B || cp == 0x7D || cp == 0xA3 || cp == 0xA4 || cp == 0xA7);
-    }
+            *pDstToken = *pSrcToken;
+        }
+    };
 
     void InitAndPatch()
     {
         injector::MakeJMP(g_pattern.find_pattern("81 EC B0 00 00 00 53 56 8B F1 8B DA").get(0).integer(-0x18), ConvertUTF8ToLatin1);
 
-        g_pattern.find_pattern("B9 82 00 00 00 F3 A5");
-        injector::MakeInline<CReader_ReadSimpleStatement_0x161_7>(g_pattern.get(0).integer(), g_pattern.get(0).integer(7));
-        
+        g_pattern.find_pattern("C3 8B 73 1C 8D BB 30 04 00 00 83 C6 0C B9 82 00 00 00 F3 A5"); //mov ecx, 0x82; rep movsd
+        injector::MakeInline<CReader_ReadSimpleStatement_0x161_7>(g_pattern.get(0).integer(13), g_pattern.get(0).integer(20));
     }
 }

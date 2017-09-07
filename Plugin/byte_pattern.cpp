@@ -216,7 +216,6 @@ void byte_pattern::clear()
     _range = { 0,0 };
     this->_pattern.clear();
     this->_mask.clear();
-    this->_bmgs.clear();
     this->_results.clear();
     this->_processed = false;
 }
@@ -256,15 +255,12 @@ void byte_pattern::bm_preprocess()
 
         this->_bmbc[bc] = index;
     }
-
-    this->_bmgs.resize(pattern_len, 1);
 }
 
 void byte_pattern::bm_search()
 {
     const uint8_t *pbytes = this->_pattern.data();
     const uint8_t *pmask = this->_mask.data();
-    const ptrdiff_t *pgoodsuffix = this->_bmgs.data();
     size_t pattern_len = this->_pattern.size();
 
     uint8_t *range_begin = reinterpret_cast<uint8_t *>(this->_range.first);
@@ -291,7 +287,7 @@ void byte_pattern::bm_search()
             }
             else
             {
-                range_begin += max(index - this->_bmbc[range_begin[index]], pgoodsuffix[index]);
+                range_begin += max(index - this->_bmbc[range_begin[index]], 1);
             }
         }
     }
