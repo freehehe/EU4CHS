@@ -21,15 +21,12 @@
     <ClCompile Include="byte_pattern.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Hooking.Patterns.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="byte_pattern.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Hooking.Patterns.h">
+    <ClInclude Include="aobscan.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

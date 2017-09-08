@@ -33,6 +33,7 @@ byte_pattern &byte_pattern::set_pattern(const char *pattern_literal)
     this->_results.clear();
     this->_processed = false;
     this->transform_pattern(pattern_literal);
+    this->bm_preprocess();
 
     return *this;
 }
@@ -40,6 +41,7 @@ byte_pattern &byte_pattern::set_pattern(const char *pattern_literal)
 byte_pattern &byte_pattern::set_pattern(const void *data, size_t size)
 {
     this->_pattern.assign(reinterpret_cast<const uint8_t *>(data), reinterpret_cast<const uint8_t *>(data) + size);
+    this->_mask.assign(size, 0xFF);
     this->bm_preprocess();
 
     return *this;
@@ -48,7 +50,7 @@ byte_pattern &byte_pattern::set_pattern(const void *data, size_t size)
 byte_pattern &byte_pattern::set_module(memory_pointer module)
 {
     this->get_module_range(module);
-
+    
     return *this;
 }
 
@@ -180,8 +182,6 @@ void byte_pattern::transform_pattern(const char *pattern_literal)
 
         ++patit;
     }
-
-    this->bm_preprocess();
 }
 
 void byte_pattern::get_module_range(memory_pointer module)
@@ -320,3 +320,4 @@ void byte_pattern::debug_output() const
 
     ofs << endl;
 }
+

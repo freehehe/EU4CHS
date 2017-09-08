@@ -1,20 +1,22 @@
 ﻿#include "byte_pattern.h"
 #include <stdexcept>
 
-extern const HMODULE pattern_default_module = GetModuleHandleA(NULL);
+extern HMODULE pattern_default_module = GetModuleHandleA(NULL);
 byte_pattern g_pattern;
 
-const memory_pointer &byte_pattern::get(std::size_t index) const
+using namespace std;
+
+const memory_pointer &byte_pattern::get(size_t index) const
 {
     if (index >= this->_results.size())
     {
-        std::stringstream sstr;
+        stringstream sstr;
 
         sstr << "Processing pattern: " << this->_literal << "\nTrying to access index " << index << " but only " << this->_results.size() << " results.\nGame will crash.";
 
         MessageBoxA(NULL, sstr.str().c_str(), "byte_pattern: too few results.", MB_OK);
 
-        throw std::out_of_range{ "Pattern: results accessing out of range." };
+        throw out_of_range{ "Pattern: results accessing out of range." };
     }
 
     return this->_results[index];
@@ -30,13 +32,15 @@ byte_pattern &byte_pattern::set_pattern(const char *pattern_literal)
     this->_results.clear();
     this->_processed = false;
     this->transform_pattern(pattern_literal);
+    this->bm_preprocess();
 
     return *this;
 }
 
-byte_pattern &byte_pattern::set_pattern(const void *data, std::size_t size)
+byte_pattern &byte_pattern::set_pattern(const void *data, size_t size)
 {
-    this->_pattern.assign(reinterpret_cast<const std::uint8_t *>(data), reinterpret_cast<const std::uint8_t *>(data) + size);
+    this->_pattern.assign(reinterpret_cast<const uint8_t *>(data), reinterpret_cast<const uint8_t *>(data) + size);
+    this->_mask.assign(size, 0xFF);
     this->bm_preprocess();
 
     return *this;
@@ -51,7 +55,7 @@ byte_pattern &byte_pattern::set_module(memory_pointer module)
 
 byte_pattern &byte_pattern::set_range(memory_pointer beg, memory_pointer end)
 {
-    this->_range = { beg.address(), end.address() };
+    this->_range = { beg.integer(), end.integer() };
 
     return *this;
 }
@@ -74,6 +78,10 @@ byte_pattern &byte_pattern::force_search()
     {
         this->bm_search();
     }
+
+#ifdef _DEBUG
+    debug_output();
+#endif
 
     return *this;
 }
@@ -99,7 +107,7 @@ void byte_pattern::transform_pattern(const char *pattern_literal)
         return (ch >= 'A' && ch <= 'F') || (ch >= 'a' && ch <= 'f') || (ch >= '0' && ch <= '9');
     };
 
-    std::array<char, 2> temp_string{ 0, 0 };
+    char temp_string[2]{ 0, 0 };
 
     if (pattern_literal == nullptr)
     {
@@ -112,7 +120,7 @@ void byte_pattern::transform_pattern(const char *pattern_literal)
     this->_mask.clear();
 
     const char *patit = pattern_literal;
-    const char *patend = (pattern_literal + std::strlen(pattern_literal) + 1);
+    const char *patend = (pattern_literal + strlen(pattern_literal) + 1);
 
     while (patit != patend)
     {
@@ -151,7 +159,8 @@ void byte_pattern::transform_pattern(const char *pattern_literal)
                 return;
             }
 
-            temp_string.fill(0);
+            temp_string[0] = 0;
+            temp_string[1] = 0;
         }
         else
         {
@@ -173,8 +182,6 @@ void byte_pattern::transform_pattern(const char *pattern_literal)
 
         ++patit;
     }
-
-    this->bm_preprocess();
 }
 
 void byte_pattern::get_module_range(memory_pointer module)
@@ -187,10 +194,10 @@ void byte_pattern::get_module_range(memory_pointer module)
             section * sizeof(IMAGE_SECTION_HEADER));
     };
 
-    this->_range.first = module.address();
+    this->_range.first = module.integer();
 
-    PIMAGE_DOS_HEADER dosHeader = module.pointer<IMAGE_DOS_HEADER>();
-    PIMAGE_NT_HEADERS ntHeader = module.pointer<IMAGE_NT_HEADERS>(dosHeader->e_lfanew);
+    PIMAGE_DOS_HEADER dosHeader = module.raw<IMAGE_DOS_HEADER>();
+    PIMAGE_NT_HEADERS ntHeader = module.raw<IMAGE_NT_HEADERS>(dosHeader->e_lfanew);
 
     for (int i = 0; i < ntHeader->FileHeader.NumberOfSections; i++)
     {
@@ -209,17 +216,16 @@ void byte_pattern::clear()
     _range = { 0,0 };
     this->_pattern.clear();
     this->_mask.clear();
-    this->_bmgs.clear();
     this->_results.clear();
     this->_processed = false;
 }
 
-std::size_t byte_pattern::size() const
+size_t byte_pattern::size() const
 {
     return this->_results.size();
 }
 
-bool byte_pattern::has_size(std::size_t expected) const
+bool byte_pattern::has_size(size_t expected) const
 {
     return (this->_results.size() == expected);
 }
@@ -231,13 +237,13 @@ bool byte_pattern::empty() const
 
 void byte_pattern::bm_preprocess()
 {
-    std::ptrdiff_t index;
+    ptrdiff_t index;
 
-    const std::uint8_t *pbytes = this->_pattern.data();
-    const std::uint8_t *pmask = this->_mask.data();
-    std::size_t pattern_len = this->_pattern.size();
+    const uint8_t *pbytes = this->_pattern.data();
+    const uint8_t *pmask = this->_mask.data();
+    size_t pattern_len = this->_pattern.size();
 
-    for (std::uint32_t bc = 0; bc < 256; ++bc)
+    for (uint32_t bc = 0; bc < 256; ++bc)
     {
         for (index = pattern_len - 1; index >= 0; --index)
         {
@@ -249,21 +255,18 @@ void byte_pattern::bm_preprocess()
 
         this->_bmbc[bc] = index;
     }
-
-    this->_bmgs.resize(pattern_len, 1);
 }
 
 void byte_pattern::bm_search()
 {
-    const std::uint8_t *pbytes = this->_pattern.data();
-    const std::uint8_t *pmask = this->_mask.data();
-    const std::ptrdiff_t *pgoodsuffix = this->_bmgs.data();
-    std::size_t pattern_len = this->_pattern.size();
+    const uint8_t *pbytes = this->_pattern.data();
+    const uint8_t *pmask = this->_mask.data();
+    size_t pattern_len = this->_pattern.size();
 
-    std::uint8_t *range_begin = reinterpret_cast<std::uint8_t *>(this->_range.first);
-    std::uint8_t *range_end = reinterpret_cast<std::uint8_t *>(this->_range.second - pattern_len);
+    uint8_t *range_begin = reinterpret_cast<uint8_t *>(this->_range.first);
+    uint8_t *range_end = reinterpret_cast<uint8_t *>(this->_range.second - pattern_len);
 
-    std::ptrdiff_t index;
+    ptrdiff_t index;
 
     __try
     {
@@ -284,7 +287,7 @@ void byte_pattern::bm_search()
             }
             else
             {
-                range_begin += max(index - this->_bmbc[range_begin[index]], pgoodsuffix[index]);
+                range_begin += max(index - this->_bmbc[range_begin[index]], 1);
             }
         }
     }
@@ -292,4 +295,28 @@ void byte_pattern::bm_search()
     {
 
     }
+}
+
+void byte_pattern::debug_output() const
+{
+    ofstream ofs{ "pattern_debug.log", ios::ate };
+
+    ofs << hex << showbase;
+
+    ofs << "Results of pattern: " << _literal << '\n';
+
+    if (size() > 0)
+    {
+        for_each_result(
+            [&ofs](memory_pointer p)
+        {
+            ofs << p.integer() << '\n';
+        });
+    }
+    else
+    {
+        ofs << "None\n";
+    }
+
+    ofs << endl;
 }

@@ -2,36 +2,17 @@
 //https://github.com/ThirteenAG/Hooking.Patterns
 
 #pragma once
-
 #include <windows.h>
-#include <cstdio>
 #include <cstdint>
 #include <cstddef>
-#include <fstream>
-#include <iostream>
 #include <vector>
-#include <tuple>
 #include <utility>
-#include <map>
-#include <unordered_map>
-#include <string>
-#include <array>
-#include <iterator>
 #include <algorithm>
-#include <string_view>
-#include <functional>
 #include <utility>
-#include <cstring>
-#include <cctype>
-#include <optional>
-#include <filesystem>
 #include <sstream>
-#include "../include/utf8cpp/utf8.h"
-#include "../include/injector/hooking.hpp"
-#include "../include/injector/calling.hpp"
-#include "../include/injector/assembly.hpp"
+#include <fstream>
 
-extern const HMODULE pattern_default_module;
+extern HMODULE pattern_default_module;
 
 class memory_pointer
 {
@@ -52,15 +33,80 @@ public:
     {
     }
 
-    std::uintptr_t address(std::ptrdiff_t offset = 0) const
+    memory_pointer(const memory_pointer &rhs) = default;
+
+    std::uintptr_t integer(std::ptrdiff_t offset = 0) const
     {
         return (this->_address + offset);
     }
 
     template<typename T = void>
-    T *pointer(std::ptrdiff_t offset = 0) const
+    T *raw(std::ptrdiff_t offset = 0) const
     {
-        return reinterpret_cast<T *>(this->address(offset));
+        return reinterpret_cast<T *>(this->integer(offset));
+    }
+
+    bool operator==(const memory_pointer &rhs) const
+    {
+        return this->integer() == rhs.integer();
+    }
+
+    bool operator!=(const memory_pointer &rhs) const
+    {
+        return this->integer() != rhs.integer();
+    }
+
+    bool operator>(const memory_pointer &rhs) const
+    {
+        return this->integer() > rhs.integer();
+    }
+
+    bool operator<(const memory_pointer &rhs) const
+    {
+        return this->integer() < rhs.integer();
+    }
+
+    bool operator>=(const memory_pointer &rhs) const
+    {
+        return this->integer() >= rhs.integer();
+    }
+
+    bool operator<=(const memory_pointer &rhs) const
+    {
+        return this->integer() <= rhs.integer();
+    }
+
+    memory_pointer operator+(std::ptrdiff_t offset) const
+    {
+        return memory_pointer{ this->integer(offset) };
+    }
+
+    memory_pointer operator-(std::ptrdiff_t offset) const
+    {
+        return memory_pointer{ this->integer(-offset) };
+    }
+
+    memory_pointer &operator+=(std::ptrdiff_t offset)
+    {
+        this->_address += offset;
+        return *this;
+    }
+
+    memory_pointer &operator-=(std::ptrdiff_t offset)
+    {
+        this->_address -= offset;
+        return *this;
+    }
+
+    operator std::uintptr_t() const
+    {
+        return this->integer();
+    }
+
+    template <typename T>
+    operator T*() const
+    {
+        return this->pointer<T>();
     }
 };
 
@@ -75,7 +121,6 @@ class byte_pattern
     bool _processed = false;
 
     std::ptrdiff_t _bmbc[256];
-    std::vector<ptrdiff_t> _bmgs;
 
     void transform_pattern(const char *pattern_literal);
     void get_module_range(memory_pointer module);
@@ -84,6 +129,8 @@ class byte_pattern
 
     void bm_preprocess();
     void bm_search();
+
+    void debug_output() const;
 
 public:
     byte_pattern();

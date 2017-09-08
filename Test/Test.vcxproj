@@ -87,12 +87,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="byte_pattern.cpp" />
-    <ClCompile Include="Hooking.Patterns.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="aobscan.h" />
     <ClInclude Include="byte_pattern.h" />
-    <ClInclude Include="Hooking.Patterns.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
