@@ -1,15 +1,15 @@
 ﻿#include <iostream>
 #include "byte_pattern.h"
-#include "Hooking.Patterns.h"
+#include <filesystem>
 
 using namespace std;
 using namespace std::experimental;
 
 int main()
 {
-    std::vector<char> buffer;
+    vector<char> buffer;
 
-    filesystem::path source_path{ "E:\\MaintenanceTool.exe" };
+    filesystem::path source_path{ LR"(E:\欧陆风云4 1.22.1 英文原版\欧陆风云4 1.22.1 英文原版\Europa Universalis IV\eu4.exe)" };
 
     auto filesize = filesystem::file_size(source_path);
 
@@ -26,14 +26,13 @@ int main()
 
     g_pattern.set_pattern("80 F? A?");
 
-    hook::range_pattern pattern13((std::uintptr_t)buffer.data(), (std::uintptr_t)buffer.data() + filesize, "80 F? A?");
-
     g_pattern.set_range(buffer.data(), buffer.data() + filesize);
 
-    auto size1 = g_pattern.force_search().size();
-    auto size2 = pattern13.size();
+    g_pattern.force_search();
 
-    cout << size1 << endl << size2 << endl;
+    auto size1 = g_pattern.size();
+
+    cout << size1 << endl;
 
     return 0;
 }

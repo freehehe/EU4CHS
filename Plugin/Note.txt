@@ -20,7 +20,6 @@ NoKerning
 
 只有地图字体需要mipmap
 查找B4 00 00 00
-看看CLexer里面 100BD80
 
 不改A3A4A7的可能性？GetHeightString被换掉了所以不需要？
 Render3d没用
@@ -53,4 +52,7 @@ name = "52X牧有汉化补丁文本"
 path = "mod/eu4chs"
 supported_version = "1.22.2"
 
-soe 982
+TIA
+asama arisu
+magnet:?xt=urn:btih:E0B0709C20B9F79149940A3CF495E7A267C5DCB3
+下了EBOD 206 256 224 228
