@@ -99,7 +99,7 @@ VALIDATE_SIZE(TextureGFX, 0x18)
 
 struct CToken
 {
-    int _Type; //0xF - text
+    int _LexerToken; //0xF - text
     char _szVal[512];
     bool _bExplicitString;
 };

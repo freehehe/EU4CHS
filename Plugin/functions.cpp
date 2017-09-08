@@ -146,7 +146,7 @@ namespace Functions
             CToken *pSrcToken = (CToken *)(regs->esi);
             CToken *pDstToken = (CToken *)(regs->edi);
 
-            if (pSrcToken->_Type == 0xF)
+            if (pSrcToken->_LexerToken == 0xF)
             {
                 ConvertSpecialChars(pSrcToken->_szVal);
             }

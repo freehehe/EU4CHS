@@ -53,4 +53,4 @@ name = "52X牧有汉化补丁文本"
 path = "mod/eu4chs"
 supported_version = "1.22.2"
 
-SOE 984
+soe 982
