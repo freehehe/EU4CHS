@@ -2,7 +2,6 @@
 #include "plugin.h"
 #include "bitmapfont.h"
 #include "functions.h"
-#include "vfs.h"
 #include "byte_pattern.h"
 #include "cjk_fonts.h"
 
@@ -17,11 +16,10 @@ void CPlugin::InitAndPatch(HMODULE hself)
     _game_dir = std::experimental::filesystem::path(module_path).parent_path();
 
     CSingleton<CJKFontManager>::Instance().InitAndPatch();
-    CSingleton<VFSManager>::Instance().InitAndPatch();
     Functions::InitAndPatch();
     BitmapFont::InitAndPatch();
 
-    injector::WriteMemory<uint32_t>(g_pattern.set_pattern("81 FE 00 00 00 01").force_search().get(0).integer(2), INT32_MAX, true);
+    injector::WriteMemory<uint32_t>(g_pattern.set_pattern("81 FE 00 00 00 01").force_search().get(0).integer(2), UINT32_MAX, true);
 
     injector::MakeNOP(g_pattern.set_pattern("0F 94 45 F3 56").force_search().get(0).integer(), 4, true);
 }

@@ -10,11 +10,13 @@ using namespace std::experimental;
 
 struct
 {
+    HMODULE dll;
     FARPROC Direct3DCreate9;
     FARPROC Direct3DCreate9Ex;
 
     void LoadOriginalLibrary(HMODULE module)
     {
+        dll = module;
         Direct3DCreate9 = GetProcAddress(module, "Direct3DCreate9");
         Direct3DCreate9Ex = GetProcAddress(module, "Direct3DCreate9Ex");
     }
@@ -64,6 +66,10 @@ BOOL WINAPI DllMain(HMODULE module, DWORD reason, LPVOID reserved)
     if (reason == DLL_PROCESS_ATTACH)
     {
         Initialize(module);
+    }
+    else if (reason == DLL_PROCESS_DETACH)
+    {
+        FreeLibrary(d3d9meta.dll);
     }
 
     return TRUE;

@@ -8,7 +8,7 @@ using namespace std::experimental;
 
 void CJKFontManager::LoadFonts()
 {
-    filesystem::directory_iterator dirit{ CSingleton<CPlugin>::Instance().GetPluginDirectory() / "eu4chs/fonts" };
+    filesystem::directory_iterator dirit{ CSingleton<CPlugin>::Instance().GetPluginDirectory() / "eu4chs" };
 
     while (dirit != filesystem::directory_iterator{})
     {
@@ -30,7 +30,6 @@ void *CJKFontManager::InitGfxAndLoadTextures(void *pInfo, void *pBool)
     __asm
     {
         mov eax, pMasterContext;
-        mov game_meta.pMasterContext, eax;
         mov eax, [eax + 4];
         mov game_meta.pDX9Device, eax;
     }
@@ -66,6 +65,8 @@ void CJKFontManager::DrawAllDX9(void *a1, int a2, int a3)
 CJKFont * CJKFontManager::GetFont(const CString * fontname)
 {
     const char *cname = fontname->c_str();
+
+    return &_fonts.find(hash<string_view>()("default"))->second;
 
     auto it = _fonts.find(hash<string_view>()(strrchr(cname, '/') + 1));
 

@@ -163,13 +163,13 @@ struct EU4Meta
 {
     std::uintptr_t pfCBitmapFontCharacterSet_GetKerning;
 
-    FARPROC pfPHYSFS_openRead;
-
     std::uintptr_t pfGfxInitDX9;
     std::uintptr_t pfGfxShutdownDX9;
     std::uintptr_t pfGfxDrawDX9;
 
     LPDIRECT3DDEVICE9 pDX9Device;
+
+    STextVertex *pBitmapVertices;
 
     char *pOriginalText;
     char *pWord;

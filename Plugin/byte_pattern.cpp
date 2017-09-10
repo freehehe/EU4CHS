@@ -80,9 +80,7 @@ byte_pattern &byte_pattern::force_search()
         this->bm_search();
     }
 
-#ifdef _DEBUG
     debug_output();
-#endif
 
     return *this;
 }
@@ -299,7 +297,7 @@ void byte_pattern::bm_search()
 
 void byte_pattern::debug_output() const
 {
-    ofstream ofs{ "pattern_debug.log", ios::ate };
+    ofstream ofs{ "pattern_debug.log", ios::app };
 
     ofs << hex << showbase;
 
@@ -318,6 +316,6 @@ void byte_pattern::debug_output() const
         ofs << "None\n";
     }
 
-    ofs << endl;
+    ofs << "--------------------------------------------------------------------------------------" << endl << endl;
 }
 

@@ -23,7 +23,7 @@ public:
     const CharacterValues *GetValue(std::uint32_t unicode);
     TextureGFX *GetTexture(std::uint32_t unicode);
 
-    void AddVerticesDX9(std::uint32_t unicode, STextVertex *pVertices);
+    void AddVerticesDX9(CBitmapFont *pFont, std::uint32_t unicode, STextVertex *pVertices);
     void DrawAllDX9();
 
 private:

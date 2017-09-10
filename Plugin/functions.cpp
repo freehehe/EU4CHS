@@ -91,8 +91,6 @@ namespace Functions
         utf8::utf32to8(hook_context.wideText.begin(), hook_context.wideText.end(), dest);
     }
 
-
-
     bool IsNativeChar(uint32_t cp)
     {
         return cp <= 0xFF;
@@ -110,6 +108,7 @@ namespace Functions
 
     void ConvertSpecialChars(char *source)
     {
+        //传进来的是utf8!!
         string_view source_view(source);
 
         if (all_of(source_view.begin(), source_view.end(), isascii))

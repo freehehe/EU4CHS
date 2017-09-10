@@ -229,8 +229,24 @@ TextureGFX * CJKFont::GetTexture(uint32_t unicode)
     return &_textures[GetValue(unicode)->PageIndex];
 }
 
-void CJKFont::AddVerticesDX9(std::uint32_t unicode, STextVertex * pVertices)
+void CJKFont::AddVerticesDX9(CBitmapFont *pFont, std::uint32_t unicode, STextVertex * pVertices)
 {
+    float width_ratio = (float)*pFont->field<int, 0x4E8>() / _scaleW;
+    float height_ratio = (float)*pFont->field<int, 0x4EC>() / _scaleH;
+
+    pVertices[0].UV.x *= width_ratio;
+    pVertices[0].UV.y *= width_ratio;
+    pVertices[1].UV.x *= width_ratio;
+    pVertices[1].UV.y *= width_ratio;
+    pVertices[2].UV.x *= width_ratio;
+    pVertices[2].UV.y *= width_ratio;
+    pVertices[3].UV.x *= width_ratio;
+    pVertices[3].UV.y *= width_ratio;
+    pVertices[4].UV.x *= width_ratio;
+    pVertices[4].UV.y *= width_ratio;
+    pVertices[5].UV.x *= width_ratio;
+    pVertices[5].UV.y *= width_ratio;
+
     copy_n(pVertices, 6, back_inserter(_buffer[GetValue(unicode)->PageIndex]));
 }
 
@@ -238,10 +254,13 @@ void CJKFont::DrawAllDX9()
 {
     for (size_t index = 0; index < _pages; ++index)
     {
-        game_meta.pDX9Device->SetTexture(0, _textures[index].field_0);
-        game_meta.pDX9Device->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
-        game_meta.pDX9Device->DrawPrimitiveUP(D3DPT_TRIANGLELIST, 2, _buffer[index].data(), sizeof(STextVertex));
+        if (!_buffer[index].empty())
+        {
+            game_meta.pDX9Device->SetTexture(0, _textures[index].field_0);
+            game_meta.pDX9Device->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
+            game_meta.pDX9Device->DrawPrimitiveUP(D3DPT_TRIANGLELIST, _buffer[index].size() / 3, _buffer[index].data(), sizeof(STextVertex));
 
-        _buffer[index].clear();
+            _buffer[index].clear();
+        }
     }
 }
