@@ -20,4 +20,4 @@ EU4Meta::EU4Meta()
     this->pfGfxDrawDX9 = g_pattern.find_pattern("8B 08 85 F6 7F 06").get(0).integer(-0xB);
 }
 
-EU4Meta game_meta;
+EU4Meta g_game;

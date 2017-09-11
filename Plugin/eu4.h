@@ -10,6 +10,12 @@ struct IncompleteClass
     {
         return (T *)(reinterpret_cast<std::uintptr_t>(this) + offset);
     }
+
+    template <typename T, std::uintptr_t offset>
+    T get_field()
+    {
+        return *(T *)(reinterpret_cast<std::uintptr_t>(this) + offset);
+    }
 };
 
 template <typename T>
@@ -127,16 +133,57 @@ struct EU4CharacterValues
 };
 VALIDATE_SIZE(EU4CharacterValues, 0x10)
 
+#pragma pack(push, 1)
+struct CInputEvent
+{
+    int field_0;
+    int field_4;
+    int field_8;
+    char field_C;
+    char field_C_pad[3];
+    int field_10;
+    int field_14;
+    int field_18;
+    int field_1C;
+    int field_20;
+    int field_24;
+    int field_28;
+    int field_2C;
+    int field_30;
+    int field_34;
+    int field_38;
+    int field_3C;
+    int field_40;
+    int field_44;
+    int field_48;
+    int field_4C;
+    int field_50;
+    short field_54;
+    char field_56;
+    char field_56_pad;
+
+    void Init(char character)
+    {
+        memset(this, 0, sizeof(CInputEvent));
+
+        field_C = character;
+        field_38 = 3;
+        field_50 = 2;
+    }
+};
+VALIDATE_SIZE(CInputEvent,0x58)
+#pragma pack(pop)
+
 struct CBitmapFontCharacterSet :IncompleteClass
 {
-    EU4CharacterValues *GetLatin1Value(uint32_t cp)
+    const EU4CharacterValues *GetLatin1Value(uint32_t cp)
     {
-        return field<EU4CharacterValues *, 0>()[cp];
+        return field<const EU4CharacterValues *, 0>()[cp];
     }
 
-    float *GetScaleX()
+    float GetScaleX()
     {
-        return field<float, 0x428>();
+        return get_field<float, 0x428>();
     }
 };
 
@@ -153,7 +200,7 @@ struct CBitmapFont :IncompleteClass
         return field<const CString, 0x9C>();
     }
 
-    EU4CharacterValues *GetLatin1Value(uint32_t cp)
+    const EU4CharacterValues *GetLatin1Value(uint32_t cp)
     {
         return GetLatin1CharacterSet()->GetLatin1Value(cp);
     }
@@ -178,4 +225,4 @@ struct EU4Meta
     EU4Meta();
 };
 
-extern EU4Meta game_meta;
+extern EU4Meta g_game;

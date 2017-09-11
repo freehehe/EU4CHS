@@ -21,9 +21,6 @@ NoKerning
 只有地图字体需要mipmap
 查找B4 00 00 00
 
-不改A3A4A7的可能性？GetHeightString被换掉了所以不需要？
-Render3d没用
-
 3C A? 0F 85
 .text:01096E22 cmp al, 0A3h
 .text:01098D93 cmp al, 0A3h
@@ -55,4 +52,6 @@ supported_version = "1.22.2"
 TIA
 asama arisu
 magnet:?xt=urn:btih:E0B0709C20B9F79149940A3CF495E7A267C5DCB3
-下了EBOD 206 256 224 228
+下了EBOD 206 256 224 228   235 271 MIDD-927_1
+
+目前'ABC中'不能正确间断

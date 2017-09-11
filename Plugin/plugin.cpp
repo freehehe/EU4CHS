@@ -5,6 +5,8 @@
 #include "byte_pattern.h"
 #include "cjk_fonts.h"
 
+CPlugin g_plugin;
+
 void CPlugin::InitAndPatch(HMODULE hself)
 {
     char module_path[512];
@@ -15,7 +17,7 @@ void CPlugin::InitAndPatch(HMODULE hself)
     GetModuleFileNameA(GetModuleHandle(NULL), module_path, 512);
     _game_dir = std::experimental::filesystem::path(module_path).parent_path();
 
-    CSingleton<CJKFontManager>::Instance().InitAndPatch();
+    g_Fonts.InitAndPatch();
     Functions::InitAndPatch();
     BitmapFont::InitAndPatch();
 

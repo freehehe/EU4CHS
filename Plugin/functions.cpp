@@ -11,10 +11,10 @@ namespace Functions
     void __fastcall ConvertUTF8ToLatin1(const char *source, char *dest)
     {
         string_view source_view(source);
-        hook_context.wideText.clear();
-        utf8::utf8to32(source_view.begin(), source_view.end(), back_inserter(hook_context.wideText));
+        g_context.wideText.clear();
+        utf8::utf8to32(source_view.begin(), source_view.end(), back_inserter(g_context.wideText));
 
-        for (uint32_t &cp : hook_context.wideText)
+        for (uint32_t &cp : g_context.wideText)
         {
             switch (cp)
             {
@@ -87,11 +87,11 @@ namespace Functions
             }
         }
 
-        hook_context.wideText.push_back(0);
-        utf8::utf32to8(hook_context.wideText.begin(), hook_context.wideText.end(), dest);
+        g_context.wideText.push_back(0);
+        utf8::utf32to8(g_context.wideText.begin(), g_context.wideText.end(), dest);
     }
 
-    bool IsNativeChar(uint32_t cp)
+    bool IsLatin1Char(uint32_t cp)
     {
         return cp <= 0xFF;
     }
@@ -101,14 +101,60 @@ namespace Functions
         return isalpha(cp) || isdigit(cp) || cp == '_' || cp == '|';
     }
 
-    bool IsSpecialChar(uint32_t cp)
+    uint32_t GetNextUnicode(const char *pText, bool bUseSpecialChars)
     {
-        return (cp == 0x40 || cp == 0x7B || cp == 0x7D || cp == 0xA3 || cp == 0xA4 || cp == 0xA7);
+        utf8::unchecked::iterator<const char *> strit{ pText };
+
+        if (bUseSpecialChars)
+        {
+            auto next = *strit;
+
+            while (IsSpecialChar(next))
+            {
+                if (next == 0x3)
+                {
+                    ++strit;
+
+                    size_t index = 0;
+
+                    while (IsTextIconChar(*strit) && (index < 127))
+                    {
+                        ++index;
+                        ++strit;
+                    }
+                }
+                else if (next == 0x7)
+                {
+                    ++strit;
+                }
+                else if (next == 0x40)
+                {
+                    std::advance(strit, 3);
+                }
+                else if (next == 0x7B)
+                {
+                    std::advance(strit, 2);
+                }
+
+                ++strit;
+                next = *strit;
+            }
+
+            return next;
+        }
+        else
+        {
+            return *strit;
+        }
+    }
+
+    bool IsSpecialChar(uint32_t unicode)
+    {
+        return unicode == 0x3 || unicode == 0x4 || unicode == 0x7 || unicode == 0x40 || unicode == 0x7B;
     }
 
     void ConvertSpecialChars(char *source)
     {
-        //传进来的是utf8!!
         string_view source_view(source);
 
         if (all_of(source_view.begin(), source_view.end(), isascii))
@@ -116,10 +162,10 @@ namespace Functions
             return;
         }
 
-        hook_context.wideText.clear();
-        utf8::utf8to32(source_view.begin(), source_view.end(), back_inserter(hook_context.wideText));
+        g_context.wideText.clear();
+        utf8::utf8to32(source_view.begin(), source_view.end(), back_inserter(g_context.wideText));
 
-        for (uint32_t &cp : hook_context.wideText)
+        for (uint32_t &cp : g_context.wideText)
         {
             switch (cp)
             {
@@ -134,8 +180,8 @@ namespace Functions
             }
         }
 
-        hook_context.wideText.push_back(0);
-        utf8::utf32to8(hook_context.wideText.begin(), hook_context.wideText.end(), source);
+        g_context.wideText.push_back(0);
+        utf8::utf32to8(g_context.wideText.begin(), g_context.wideText.end(), source);
     }
 
     struct CReader_ReadSimpleStatement_0x161_7
@@ -153,12 +199,41 @@ namespace Functions
             *pDstToken = *pSrcToken;
         }
     };
+    
+    struct CSdlEvents_HandlePdxEvents_0x2DE
+    {
+        void operator()(injector::reg_pack *regs) const
+        {
+            CInputEvent temp;
+            char *pText = (char *)(regs->ebp - 0x48);
+
+            std::string_view text_view(pText);
+
+            for (char c : text_view)
+            {
+                temp.Init(c);
+
+                injector::thiscall<void(uint32_t, const CInputEvent *)>::vtbl<3>(regs->ebx, &temp);
+            }
+
+            memset(pText, 0, 32);
+
+            regs->ecx = 0;
+            regs->eax = 0;
+        }
+    };
 
     void InitAndPatch()
     {
+        //yml转码函数
         injector::MakeJMP(g_pattern.find_pattern("81 EC B0 00 00 00 53 56 8B F1 8B DA").get(0).integer(-0x18), ConvertUTF8ToLatin1);
 
+        //转换txt文本中的A3A4A7
         g_pattern.find_pattern("C3 8B 73 1C 8D BB 30 04 00 00 83 C6 0C B9 82 00 00 00 F3 A5"); //mov ecx, 0x82; rep movsd
         injector::MakeInline<CReader_ReadSimpleStatement_0x161_7>(g_pattern.get(0).integer(13), g_pattern.get(0).integer(20));
+
+        //从输入法接受整个字符串
+        g_pattern.find_pattern("8B 4D B8 32 C0"); //mov ecx, [ebp - 0x48]; xor al, al
+        injector::MakeInline<CSdlEvents_HandlePdxEvents_0x2DE>(g_pattern.get(0).integer());
     }
 }

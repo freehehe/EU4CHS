@@ -13,25 +13,25 @@ namespace BitmapFont
     {
         void operator()(injector::reg_pack *regs) const
         {
-            char *pSrc = game_meta.pOriginalText + regs->edi;
-            char *pDst = game_meta.pWord + regs->esi;
+            char *pSrc = g_game.pOriginalText + regs->edi;
+            char *pDst = g_game.pWord + regs->esi;
 
-            hook_context.cjkFont = CSingleton<CJKFontManager>::Instance().GetFont((*(CBitmapFont **)(regs->ebp - 0x10))->GetFontPath());
-            hook_context.unicodeLength = utf8::internal::sequence_length(pSrc);
+            g_context.cjkFont = g_Fonts.GetFont((*(CBitmapFont **)(regs->ebp - 0x10))->GetFontPath());
+            g_context.unicodeLength = utf8::internal::sequence_length(pSrc);
 
-            hook_context.unicode = utf8::unchecked::next(pSrc);
-            hook_context.nextUnicode = utf8::unchecked::next(pSrc);
+            g_context.unicode = utf8::unchecked::next(pSrc);
+            g_context.nextUnicode = utf8::unchecked::next(pSrc);
 
-            regs->eax = hook_context.unicode;
-            utf8::append(hook_context.unicode, pDst);
+            regs->eax = g_context.unicode;
+            utf8::append(g_context.unicode, pDst);
 
-            regs->edi += (hook_context.unicodeLength - 1);
-            regs->esi += hook_context.unicodeLength;
+            regs->edi += (g_context.unicodeLength - 1);
+            regs->esi += g_context.unicodeLength;
             *(uint32_t *)(regs->ebp - 0x30) = regs->edi;
             regs->edx = *(uint32_t *)(regs->ebp - 0x10);
 
             //因为只比较低8位，还是得跳过。。。
-            if (!Functions::IsNativeChar(hook_context.unicode))
+            if (!Functions::IsLatin1Char(g_context.unicode))
             {
                 regs->ecx = 0;
             }
@@ -48,13 +48,13 @@ namespace BitmapFont
         {
             regs->edx = *(uint32_t *)(regs->ebp - 0x34);
 
-            if (Functions::IsNativeChar(hook_context.unicode))
+            if (Functions::IsLatin1Char(g_context.unicode))
             {
-                regs->ecx = (uint32_t)((*(CBitmapFontCharacterSet **)(regs->ebp - 0x34))->GetLatin1Value(hook_context.unicode));
+                regs->ecx = (uint32_t)((*(CBitmapFontCharacterSet **)(regs->ebp - 0x34))->GetLatin1Value(g_context.unicode));
             }
             else
             {
-                regs->ecx = (uint32_t)(&hook_context.cjkFont->GetValue(hook_context.unicode)->EU4Values);
+                regs->ecx = (uint32_t)(&g_context.cjkFont->GetValue(g_context.unicode)->EU4Values);
             }
         }
     };
@@ -63,21 +63,21 @@ namespace BitmapFont
     {
         __asm
         {
-            pop hook_context.ret_addr;
+            pop g_context.ret_addr;
 
-            cmp hook_context.nextUnicode, 0xFF;
+            cmp g_context.nextUnicode, 0xFF;
             ja skip;
-            push hook_context.nextUnicode;
-            push hook_context.unicode;
+            push g_context.nextUnicode;
+            push g_context.unicode;
             mov ecx, [ebp - 0x34];
-            call game_meta.pfCBitmapFontCharacterSet_GetKerning;
+            call g_game.pfCBitmapFontCharacterSet_GetKerning;
             jmp end;
 
         skip:
             xorps xmm0, xmm0;
 
         end:
-            jmp hook_context.ret_addr;
+            jmp g_context.ret_addr;
         }
     }
 
@@ -86,7 +86,7 @@ namespace BitmapFont
         __asm
         {
             //al为0则处理间断
-            pop hook_context.ret_addr;
+            pop g_context.ret_addr;
 
             xor al, al;
             mov dl, 1;
@@ -96,7 +96,7 @@ namespace BitmapFont
             setnz al;
             and dl, al;
 
-            cmp hook_context.unicode, 0xFF; //大于255
+            cmp g_context.unicode, 0xFF; //大于255
             setbe al;
             and dl, al;
 
@@ -105,7 +105,7 @@ namespace BitmapFont
             //and dl, al;
 
             test dl, dl;
-            jmp hook_context.ret_addr;
+            jmp g_context.ret_addr;
         }
     }
 
@@ -113,22 +113,22 @@ namespace BitmapFont
     {
         void operator()(injector::reg_pack *regs) const
         {
-            char *pSrc = game_meta.pText + regs->edi;
+            char *pSrc = g_game.pText + regs->edi;
 
-            hook_context.unicodeLength = utf8::internal::sequence_length(pSrc);
-            hook_context.unicode = utf8::unchecked::next(pSrc);
-            hook_context.nextUnicode = utf8::unchecked::next(pSrc);
-            regs->eax = hook_context.unicode;
-            regs->ecx = hook_context.unicode;
-            regs->edi += (hook_context.unicodeLength - 1);
+            g_context.unicodeLength = utf8::internal::sequence_length(pSrc);
+            g_context.unicode = utf8::unchecked::next(pSrc);
+            g_context.nextUnicode = utf8::unchecked::next(pSrc);
+            regs->eax = g_context.unicode;
+            regs->ecx = g_context.unicode;
+            regs->edi += (g_context.unicodeLength - 1);
 
-            if (Functions::IsNativeChar(hook_context.unicode))
+            if (Functions::IsLatin1Char(g_context.unicode))
             {
-                regs->esi = (uint32_t)((*(CBitmapFontCharacterSet **)(regs->ebp - 0x34))->GetLatin1Value(hook_context.unicode));
+                regs->esi = (uint32_t)((*(CBitmapFontCharacterSet **)(regs->ebp - 0x34))->GetLatin1Value(g_context.unicode));
             }
             else
             {
-                regs->esi = (uint32_t)(&hook_context.cjkFont->GetValue(hook_context.unicode)->EU4Values);
+                regs->esi = (uint32_t)(&g_context.cjkFont->GetValue(g_context.unicode)->EU4Values);
             }
 
             regs->edx = *(uint32_t *)(regs->ebp - 0x34);
@@ -139,23 +139,23 @@ namespace BitmapFont
     {
         __asm
         {
-            pop hook_context.ret_addr;
+            pop g_context.ret_addr;
 
             push ebx;
             mov ebx, edx;
 
-            cmp hook_context.unicode, 0xFF;
+            cmp g_context.unicode, 0xFF;
             jg nonLatin;
             jmp latin;
 
         nonLatin:
             sub dword ptr[ebp - 0x40], 6;
-            mov eax, game_meta.pBitmapVertices;
+            mov eax, g_game.pBitmapVertices;
             lea eax, [eax + ebx * 4];
             push eax;
-            push hook_context.unicode;
+            push g_context.unicode;
             push[ebp - 0x10];
-            mov ecx, hook_context.cjkFont;
+            mov ecx, g_context.cjkFont;
             call CJKFont::AddVerticesDX9;
 
         latin:
@@ -169,7 +169,7 @@ namespace BitmapFont
 
         end:
             pop ebx;
-            jmp hook_context.ret_addr;
+            jmp g_context.ret_addr;
         }
     }
 
@@ -177,14 +177,14 @@ namespace BitmapFont
     {
         __asm
         {
-            pop hook_context.ret_addr;
-            cmp hook_context.nextUnicode, 0xFF;
+            pop g_context.ret_addr;
+            cmp g_context.nextUnicode, 0xFF;
             jg noKerning;
 
-            push hook_context.nextUnicode;
-            push hook_context.unicode;
+            push g_context.nextUnicode;
+            push g_context.unicode;
             lea ecx, [esi + 0xB4];
-            call game_meta.pfCBitmapFontCharacterSet_GetKerning;
+            call g_game.pfCBitmapFontCharacterSet_GetKerning;
 
             jmp end;
 
@@ -192,7 +192,7 @@ namespace BitmapFont
             xorps xmm0, xmm0;
 
         end:
-            jmp hook_context.ret_addr;
+            jmp g_context.ret_addr;
         }
     }
 
@@ -200,9 +200,9 @@ namespace BitmapFont
     {
         __asm
         {
-            pop hook_context.ret_addr;
+            pop g_context.ret_addr;
 
-            jmp hook_context.ret_addr;
+            jmp g_context.ret_addr;
         }
     }
 
@@ -223,7 +223,7 @@ namespace BitmapFont
         float vTempWidth = 0.0f; //当前行宽度
         int nWidth = 0; //最大行宽度
 
-        hook_context.cjkFont = CSingleton<CJKFontManager>::Instance().GetFont(pFont->GetFontPath());
+        g_context.cjkFont = g_Fonts.GetFont(pFont->GetFontPath());
 
         int nSize = length;
 
@@ -232,11 +232,10 @@ namespace BitmapFont
             nSize = strlen(text);
         }
 
-        hook_context.wideText.clear();
+        g_context.wideText.clear();
+        utf8::unchecked::utf8to32(text, text + nSize, back_inserter(g_context.wideText));
 
-        utf8::unchecked::utf8to32(text, text + nSize, back_inserter(hook_context.wideText));
-
-        for (auto strit = hook_context.wideText.begin(); strit < hook_context.wideText.end(); ++strit)
+        for (auto strit = g_context.wideText.begin(); strit < g_context.wideText.end(); ++strit)
         {
             uint32_t unicode = *strit;
 
@@ -258,7 +257,7 @@ namespace BitmapFont
 
                     size_t index = 0;
 
-                    while (Functions::IsTextIconChar(strit[index]) && (index < 127) && (strit < hook_context.wideText.end()))
+                    while (Functions::IsTextIconChar(*strit) && (index < 127) && (strit < g_context.wideText.end()))
                     {
                         Tag[index] = *strit;
                         ++index;
@@ -282,13 +281,13 @@ namespace BitmapFont
             {
                 const EU4CharacterValues *pValues;
 
-                if (Functions::IsNativeChar(unicode))
+                if (Functions::IsLatin1Char(unicode))
                 {
                     pValues = pFont->GetLatin1Value(unicode);
                 }
                 else
                 {
-                    pValues = &hook_context.cjkFont->GetValue(unicode)->EU4Values;
+                    pValues = &g_context.cjkFont->GetValue(unicode)->EU4Values;
                 }
 
                 if (pValues == nullptr)
@@ -301,13 +300,13 @@ namespace BitmapFont
                 }
                 else
                 {
-                    vTempWidth += pValues->xadvance * *pFont->GetLatin1CharacterSet()->GetScaleX();
+                    vTempWidth += pValues->xadvance * pFont->GetLatin1CharacterSet()->GetScaleX();
 
-                    if (pValues->kerning && (strit < (hook_context.wideText.end() - 1)))
+                    if (pValues->kerning && (strit < (g_context.wideText.end() - 1)))
                     {
                         uint32_t next = *(strit + 1);
 
-                        if (Functions::IsNativeChar(next))
+                        if (Functions::IsLatin1Char(next))
                         {
                             CBitmapFontCharacterSet *pSet = pFont->GetLatin1CharacterSet();
                             float fKerning;
@@ -317,7 +316,7 @@ namespace BitmapFont
                                 push next;
                                 push unicode;
                                 mov ecx, pSet;
-                                call game_meta.pfCBitmapFontCharacterSet_GetKerning;
+                                call g_game.pfCBitmapFontCharacterSet_GetKerning;
                                 movss fKerning, xmm0;
                             }
 
@@ -325,7 +324,7 @@ namespace BitmapFont
                         }
                     }
 
-                    if (pValues->h == 0 || !Functions::IsNativeChar(unicode))
+                    if (pValues->h == 0 || !Functions::IsLatin1Char(unicode))
                     {
                         nWidth = max(nWidth, vTempWidth);
                     }
@@ -338,10 +337,24 @@ namespace BitmapFont
 
     static int __fastcall GetHeightOfString(CBitmapFont * pFont, int, const CString *text, int nMaxWidth, int nMaxHeight, const CVector2<int> *BorderSize, bool bUseSpecialChars)
     {
+        //xmm0 fIconWidth 常量8.0
+        //xmm1 临时变量
+        //xmm2 vWordWidth 当前单词宽度
+        //xmm3 vTempWidth 当前行宽度
+        //xmm4 vCurrentLineHeight 当前行高度
+        //xmm5 vHeight 结果
+        //xmm6 vCharaterHeight 默认行高度
+
+        static const float fIconWidth = 8.0f;
+
         char Tag[128];
         float vWordWidth = 0.0f;
         float vTempWidth = 0.0f;
-        float vCharacterHeight
+        float vCharacterHeight = injector::thiscall<int(CBitmapFont *)>::vtbl<12>(pFont);
+        float vHeight = vCharacterHeight;
+        float vCurrentLineHeight = vCharacterHeight;
+        CBitmapFontCharacterSet *pSet = pFont->GetLatin1CharacterSet();
+
         if (nMaxWidth == 0)
         {
             nMaxWidth = 320;
@@ -350,13 +363,144 @@ namespace BitmapFont
         nMaxWidth -= 2 * BorderSize->x;
 
         std::string_view text_view(text->c_str());
+
+        if (text_view.empty())
+        {
+            return vHeight;
+        }
+
+        g_context.cjkFont = g_Fonts.GetFont(pFont->GetFontPath());
+
+        g_context.wideText.clear();
+        utf8::unchecked::utf8to32(text_view.begin(), text_view.end(), back_inserter(g_context.wideText));
+
+        for (auto strit = g_context.wideText.begin(); strit < g_context.wideText.end(); ++strit)
+        {
+            auto unicode = *strit;
+
+            if (bUseSpecialChars)
+            {
+                if (unicode == 0x3)
+                {
+                    ++strit;
+
+                    size_t index = 0;
+
+                    while (Functions::IsTextIconChar(*strit) && (index < 127) && (strit < g_context.wideText.end()))
+                    {
+                        Tag[index] = *strit;
+                        ++index;
+                        ++strit;
+                    }
+
+                    Tag[index] = 0;
+
+                    float fWidth = injector::thiscall<int(CBitmapFont *, const char *)>::vtbl<28>(pFont, Tag);
+                    vWordWidth += fWidth;
+                    vTempWidth += fWidth;
+
+                    if (pFont->get_field<bool, 0x24F0>())
+                    {
+                        float fHeight = injector::thiscall<int(CBitmapFont *, const char *)>::vtbl<29>(pFont, Tag);
+                        vCurrentLineHeight = max(vCurrentLineHeight, fHeight);
+                    }
+                }
+                else if (unicode == 0x7)
+                {
+                    ++strit;
+                }
+                else if (unicode == 0x40)
+                {
+                    strit += 3;
+
+                    float fWidth = injector::thiscall<int(CBitmapFont *)>::vtbl<30>(pFont);
+                    vWordWidth += fWidth;
+                    vTempWidth += fWidth;
+                }
+                else if (unicode == 0x7B)
+                {
+                    strit += 3;
+                    vWordWidth += fIconWidth;
+                    vTempWidth += fIconWidth;
+                }
+            }
+            else
+            {
+                const EU4CharacterValues *pValues;
+
+                if (unicode == ' ' || !Functions::IsLatin1Char(unicode))
+                {
+                    vWordWidth = 0.0f;
+                }
+
+                if (Functions::IsLatin1Char(unicode))
+                {
+                    pValues = pFont->GetLatin1Value(unicode);
+                }
+                else
+                {
+                    pValues = &g_context.cjkFont->GetValue(unicode)->EU4Values;
+                }
+
+                if (pValues == nullptr)
+                {
+                    if (unicode == 0xA || unicode == 0xD)
+                    {
+                        vHeight += vCurrentLineHeight;
+                        vCurrentLineHeight = vCharacterHeight;
+                        vWordWidth = 0.0f;
+                        vTempWidth = 0.0f;
+                    }
+                }
+                else
+                {
+                    float fWidth = pValues->xadvance * pFont->GetLatin1CharacterSet()->GetScaleX();
+                    vWordWidth += fWidth;
+                    vTempWidth += fWidth;
+
+                    if (pValues->kerning)
+                    {
+                        if (strit < (g_context.wideText.end() - 1))
+                        {
+                            float fKerning;
+
+                            auto next = strit[1];
+
+                            __asm
+                            {
+                                push next;
+                                push unicode;
+                                mov ecx, pSet;
+                                call g_game.pfCBitmapFontCharacterSet_GetKerning;
+                                movss fKerning, xmm0;
+                            }
+
+                            vWordWidth += fKerning;
+                            vTempWidth += fKerning;
+                        }
+                    }
+
+                    if (vTempWidth >= nMaxWidth)
+                    {
+                        vHeight += vCurrentLineHeight;
+                        vCurrentLineHeight = vCharacterHeight;
+                        vTempWidth = vWordWidth;
+                        vWordWidth = 0.0f;
+                    }
+                }
+            }
+        }
+
+        return vHeight;
     }
 
     void InitAndPatch()
     {
+        //--------------------------------整个换掉的函数--------------------------------
         injector::MakeJMP(g_pattern.find_pattern("81 EC 8C 00 00 00 53 8B 5D 0C").get(0).integer(-6), GetWidthOfString);
+        injector::MakeJMP(g_pattern.find_pattern("81 EC AC 00 00 00 8B 55 0C").get(0).integer(-6), GetHeightOfString);
 
-        //---------------------字符串解析部分--------------------------------
+        //--------------------------------字符串解析部分--------------------------------
         g_pattern.find_pattern("8A 87 ? ? ? ? 88 86 ? ? ? ? 46");
         injector::MakeInline<CBitmapFont_RenderToScreen_0x690_13>(g_pattern.get(0).integer(), g_pattern.get(0).integer(13));
 
@@ -428,5 +572,10 @@ namespace BitmapFont
         //----------------------------WriteVariable 0xA7----------------------------------------
         injector::WriteMemory<uint8_t>(g_pattern.find_pattern("C6 06 A7").get(0).integer(2), 7, true);
         injector::WriteMemory<uint8_t>(g_pattern.find_pattern("66 C7 06 A7 21").get(0).integer(3), 7, true);
+
+        //RemoveSpecialChars
+        injector::WriteMemory(g_pattern.find_pattern("83 EC 34 6A 05 68").get(0).integer(6), "@{", true);
+
+        g_pattern.find_pattern("83 EC 34 6A 05 68");
     }
 }

@@ -41,7 +41,7 @@ BOOL WINAPI DllMain(HMODULE module, DWORD reason, void *reserved)
 {
     if (reason == DLL_PROCESS_ATTACH)
     {
-        CSingleton<CPlugin>::Instance().InitAndPatch(module);
+        g_plugin.InitAndPatch(module);
     }
 
     return TRUE;

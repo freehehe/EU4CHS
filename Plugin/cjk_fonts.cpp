@@ -3,12 +3,14 @@
 #include "plugin.h"
 #include "byte_pattern.h"
 
+CJKFontManager g_Fonts;
+
 using namespace std;
 using namespace std::experimental;
 
 void CJKFontManager::LoadFonts()
 {
-    filesystem::directory_iterator dirit{ CSingleton<CPlugin>::Instance().GetPluginDirectory() / "eu4chs" };
+    filesystem::directory_iterator dirit{ g_plugin.GetPluginDirectory() / "eu4chs" };
 
     while (dirit != filesystem::directory_iterator{})
     {
@@ -25,16 +27,16 @@ void CJKFontManager::LoadFonts()
 
 void *CJKFontManager::InitGfxAndLoadTextures(void *pInfo, void *pBool)
 {
-    void *pMasterContext = injector::cstd<void *(void *, void *)>::call(game_meta.pfGfxInitDX9, pInfo, pBool);
+    void *pMasterContext = injector::cstd<void *(void *, void *)>::call(g_game.pfGfxInitDX9, pInfo, pBool);
 
     __asm
     {
         mov eax, pMasterContext;
         mov eax, [eax + 4];
-        mov game_meta.pDX9Device, eax;
+        mov g_game.pDX9Device, eax;
     }
 
-    for (auto &font : CSingleton<CJKFontManager>::Instance()._fonts)
+    for (auto &font : g_Fonts._fonts)
     {
         font.second.LoadTexturesDX9();
     }
@@ -44,19 +46,19 @@ void *CJKFontManager::InitGfxAndLoadTextures(void *pInfo, void *pBool)
 
 void CJKFontManager::UnloadTexturesAndShutdownGfx(void *pMasterContext)
 {
-    for (auto &font : CSingleton<CJKFontManager>::Instance()._fonts)
+    for (auto &font : g_Fonts._fonts)
     {
         font.second.UnloadTexturesDX9();
     }
 
-    injector::cstd<void(void *)>::call(game_meta.pfGfxShutdownDX9, pMasterContext);
+    injector::cstd<void(void *)>::call(g_game.pfGfxShutdownDX9, pMasterContext);
 }
 
 void CJKFontManager::DrawAllDX9(void *a1, int a2, int a3)
 {
-    injector::cstd<void(void *, int, int)>::call(game_meta.pfGfxDrawDX9, a1, a2, a3);
+    injector::cstd<void(void *, int, int)>::call(g_game.pfGfxDrawDX9, a1, a2, a3);
 
-    for (auto &font: CSingleton<CJKFontManager>::Instance()._fonts)
+    for (auto &font: g_Fonts._fonts)
     {
         font.second.DrawAllDX9();
     }

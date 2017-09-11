@@ -18,3 +18,4 @@ public:
     void InitAndPatch();
 };
 
+extern CJKFontManager g_Fonts;

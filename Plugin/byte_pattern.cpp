@@ -80,7 +80,9 @@ byte_pattern &byte_pattern::force_search()
         this->bm_search();
     }
 
+#ifdef _DEBUG
     debug_output();
+#endif
 
     return *this;
 }
@@ -106,7 +108,7 @@ void byte_pattern::transform_pattern(const char *pattern_literal)
         return (ch >= 'A' && ch <= 'F') || (ch >= 'a' && ch <= 'f') || (ch >= '0' && ch <= '9');
     };
 
-    array<char, 2> temp_string{ 0, 0 };
+    char temp_string[2]{ 0, 0 };
 
     if (pattern_literal == nullptr)
     {
@@ -158,7 +160,8 @@ void byte_pattern::transform_pattern(const char *pattern_literal)
                 return;
             }
 
-            temp_string.fill(0);
+            temp_string[0] = 0;
+            temp_string[1] = 0;
         }
         else
         {

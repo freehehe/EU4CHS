@@ -29,15 +29,3 @@
 #include "../include/injector/hooking.hpp"
 #include "../include/injector/calling.hpp"
 #include "../include/injector/assembly.hpp"
-
-template <typename T>
-class CSingleton
-{
-public:
-    static T &Instance()
-    {
-        static T _instance;
-
-        return _instance;
-    }
-};

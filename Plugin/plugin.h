@@ -12,3 +12,5 @@ public:
     const std::experimental::filesystem::path &GetGameDirectory() const;
     const std::experimental::filesystem::path &GetPluginDirectory() const;
 };
+
+extern CPlugin g_plugin;
