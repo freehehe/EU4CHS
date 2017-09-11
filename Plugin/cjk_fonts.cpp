@@ -1,4 +1,4 @@
-#include "stdinc.h"
+﻿#include "stdinc.h"
 #include "cjk_fonts.h"
 #include "plugin.h"
 #include "byte_pattern.h"
@@ -66,19 +66,20 @@ void CJKFontManager::DrawAllDX9(void *a1, int a2, int a3)
 
 CJKFont * CJKFontManager::GetFont(const CString * fontname)
 {
-    const char *cname = fontname->c_str();
+    //暂时先按文件名查找
+    const char *cname = (strrchr(fontname->c_str(), '/') + 1);
 
     return &_fonts.find(hash<string_view>()("default"))->second;
 
-    auto it = _fonts.find(hash<string_view>()(strrchr(cname, '/') + 1));
+    auto it = _fonts.find(hash<string_view>()(cname));
 
-    if (it == _fonts.end())
+    if (it != _fonts.end())
     {
         return &it->second;
     }
-    else
+    else 
     {
-        return nullptr;
+        return &_fonts.find(hash<string_view>()("vic_18"))->second;
     }
 }
 

@@ -19,8 +19,8 @@ namespace BitmapFont
             g_context.cjkFont = g_Fonts.GetFont((*(CBitmapFont **)(regs->ebp - 0x10))->GetFontPath());
             g_context.unicodeLength = utf8::internal::sequence_length(pSrc);
 
-            g_context.unicode = utf8::unchecked::next(pSrc);
-            g_context.nextUnicode = utf8::unchecked::next(pSrc);
+            g_context.unicode = utf8::unchecked::peek_next(pSrc);
+            g_context.nextUnicode = Functions::GetNextUnicode(pSrc, *(bool *)(regs->ebp + 0x3C));
 
             regs->eax = g_context.unicode;
             utf8::append(g_context.unicode, pDst);
@@ -575,7 +575,5 @@ namespace BitmapFont
 
         //RemoveSpecialChars
         injector::WriteMemory(g_pattern.find_pattern("83 EC 34 6A 05 68").get(0).integer(6), "@{", true);
-
-        g_pattern.find_pattern("83 EC 34 6A 05 68");
     }
 }

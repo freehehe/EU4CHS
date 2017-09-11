@@ -1,38 +1,57 @@
 ﻿#include <iostream>
-#include "byte_pattern.h"
 #include <filesystem>
+#include <cstring>
+#include <cctype>
+#include "../include/utf8cpp/utf8.h"
 
 using namespace std;
 using namespace std::experimental;
 
-int main()
+bool IsTextIconChar(uint32_t cp)
 {
-    vector<char> buffer;
+    return isalpha(cp) || isdigit(cp) || cp == '_' || cp == '|';
+}
 
-    filesystem::path source_path{ LR"(E:\欧陆风云4 1.22.1 英文原版\欧陆风云4 1.22.1 英文原版\Europa Universalis IV\eu4.exe)" };
+uint32_t GetNextUnicode(const char *pText, bool bUseSpecialChars)
+{
+    utf8::unchecked::iterator<const char *> strit{ pText };
 
-    auto filesize = filesystem::file_size(source_path);
+    uint32_t first = *strit;
 
-    FILE *cFile = fopen(source_path.string().c_str(), "rb");
-
-    if (!cFile)
+    if (bUseSpecialChars)
     {
-        return 0;
+        if (first == 0x3)
+        {
+            ++strit;
+
+            size_t index = 0;
+
+            while (IsTextIconChar(*strit) && (index < 127))
+            {
+                ++index;
+                ++strit;
+            }
+        }
+        else if (first == 0x7)
+        {
+            ++strit;
+        }
+        else if (first == 0x40)
+        {
+            std::advance(strit, 3);
+        }
+        else if (first == 0x7B)
+        {
+            std::advance(strit, 2);
+        }
     }
 
-    buffer.resize(filesize);
-    fread(buffer.data(), filesize, 1, cFile);
-    fclose(cFile);
+    ++strit;
+    return *strit;
+}
 
-    g_pattern.set_pattern("80 F? A?");
-
-    g_pattern.set_range(buffer.data(), buffer.data() + filesize);
-
-    g_pattern.force_search();
-
-    auto size1 = g_pattern.size();
-
-    cout << size1 << endl;
-
+int main()
+{
+    const char *u8test=u8""
     return 0;
 }
