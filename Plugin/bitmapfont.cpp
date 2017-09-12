@@ -19,8 +19,9 @@ namespace BitmapFont
             g_context.cjkFont = g_Fonts.GetFont((*(CBitmapFont **)(regs->ebp - 0x10))->GetFontPath());
             g_context.unicodeLength = utf8::internal::sequence_length(pSrc);
 
-            g_context.unicode = utf8::unchecked::peek_next(pSrc);
-            g_context.nextUnicode = Functions::GetNextUnicode(pSrc, *(bool *)(regs->ebp + 0x3C));
+            g_context.unicode = utf8::unchecked::next(pSrc);
+            g_context.nextUnicode = utf8::unchecked::peek_next(pSrc);
+            g_context.nextDrawableUnicode = Functions::GetNextUnicode(pSrc, *(bool *)(regs->ebp + 0x3C));
 
             regs->eax = g_context.unicode;
             utf8::append(g_context.unicode, pDst);
@@ -100,7 +101,7 @@ namespace BitmapFont
             setbe al;
             and dl, al;
 
-            //cmp hook_context.nextUnicode, 0xFF; //大于255
+            //cmp hook_context.nextDrawableUnicode, 0xFF; //大于255
             //setbe al;
             //and dl, al;
 
@@ -117,7 +118,9 @@ namespace BitmapFont
 
             g_context.unicodeLength = utf8::internal::sequence_length(pSrc);
             g_context.unicode = utf8::unchecked::next(pSrc);
-            g_context.nextUnicode = utf8::unchecked::next(pSrc);
+            g_context.nextUnicode = utf8::unchecked::peek_next(pSrc);
+            g_context.nextDrawableUnicode = Functions::GetNextUnicode(pSrc, *(bool *)(regs->ebp + 0x3C));
+
             regs->eax = g_context.unicode;
             regs->ecx = g_context.unicode;
             regs->edi += (g_context.unicodeLength - 1);
@@ -154,7 +157,7 @@ namespace BitmapFont
             lea eax, [eax + ebx * 4];
             push eax;
             push g_context.unicode;
-            push[ebp - 0x10];
+            push [ebp - 0x10];
             mov ecx, g_context.cjkFont;
             call CJKFont::AddVerticesDX9;
 
@@ -196,7 +199,7 @@ namespace BitmapFont
         }
     }
 
-    __declspec(naked) void CBitmapFont_GeiHeightOfString_OFF_SIZE()
+    __declspec(naked) void CBitmapFont_RenderToTexture_0x_()
     {
         __asm
         {
@@ -206,7 +209,7 @@ namespace BitmapFont
         }
     }
 
-    struct CBitmapFont_GeiHeightOfString_OFF_SIZE
+    struct CBitmapFont_RenderToTexture_0x_
     {
         void operator()(injector::reg_pack *regs) const
         {
@@ -378,7 +381,7 @@ namespace BitmapFont
         {
             auto unicode = *strit;
 
-            if (bUseSpecialChars)
+            if (bUseSpecialChars && (unicode == 0x40 || unicode == 0x7B || unicode == 0x3 || unicode == 0x7))
             {
                 if (unicode == 0x3)
                 {
@@ -496,11 +499,16 @@ namespace BitmapFont
 
     void InitAndPatch()
     {
-        //--------------------------------整个换掉的函数--------------------------------
+#pragma region 整个换掉的函数
         injector::MakeJMP(g_pattern.find_pattern("81 EC 8C 00 00 00 53 8B 5D 0C").get(0).integer(-6), GetWidthOfString);
         injector::MakeJMP(g_pattern.find_pattern("81 EC AC 00 00 00 8B 55 0C").get(0).integer(-6), GetHeightOfString);
+#pragma endregion 整个换掉的函数
 
-        //--------------------------------字符串解析部分--------------------------------
+#pragma region CBitmapFont_RenderToTexture
+
+#pragma endregion CBitmapFont_RenderToTexture
+
+#pragma region CBitmapFont_RenderToScreen
         g_pattern.find_pattern("8A 87 ? ? ? ? 88 86 ? ? ? ? 46");
         injector::MakeInline<CBitmapFont_RenderToScreen_0x690_13>(g_pattern.get(0).integer(), g_pattern.get(0).integer(13));
 
@@ -526,8 +534,22 @@ namespace BitmapFont
         g_pattern.find_pattern("0F B6 87 ? ? ? ? 8D 8E B4 00 00 00");
         injector::MakeNOP(g_pattern.get(0).integer(), 27);
         injector::MakeCALL(g_pattern.get(0).integer(), CBitmapFont_RenderToScreen_0x20E4_27);
+#pragma endregion CBitmapFont_RenderToScreen
 
-        //---------------------------0xA3 0xA4 0xA7-------------------------------
+#pragma region 0xA3 0xA4 0xA7
+        g_pattern.find_pattern("80 3C 30 A?"); //cmp byte ptr [eax + esi], 0xA?
+        g_pattern.for_each_result(
+            [](memory_pointer p)
+        {
+            uint8_t *pb = p.raw<uint8_t>(3);
+            uint8_t b = *pb;
+
+            if (b == 0xA3 || b == 0xA4 || b == 0xA7)
+            {
+                injector::WriteMemory<uint8_t>(pb, b - 0xA0, true);
+            }
+        });
+
         g_pattern.find_pattern("80 3C 38 A?"); //cmp byte ptr [eax + edi], 0xA?
         g_pattern.for_each_result(
             [](memory_pointer p)
@@ -567,13 +589,20 @@ namespace BitmapFont
             }
         });
 
-        //漏网之鱼
+        //-----------------------------------------------------漏网之鱼-----------------------------------------------------
+        injector::WriteMemory<uint8_t>(g_pattern.find_pattern("3C A7 8D 85 84").get(0).integer(1), 7, true); //cmp al, 0A7h; lea eax, [ebp - 0x7C]
+        injector::WriteMemory<uint8_t>(g_pattern.find_pattern("80 3C 31 A7").get(0).integer(3), 7, true); //cmp byte ptr [ecx + esi], 0xA7
 
-        //----------------------------WriteVariable 0xA7----------------------------------------
+
+#pragma endregion 0xA3 0xA4 0xA7
+
+#pragma region WriteVariable 0xA7
         injector::WriteMemory<uint8_t>(g_pattern.find_pattern("C6 06 A7").get(0).integer(2), 7, true);
         injector::WriteMemory<uint8_t>(g_pattern.find_pattern("66 C7 06 A7 21").get(0).integer(3), 7, true);
+#pragma endregion WriteVariable 0xA7
 
-        //RemoveSpecialChars
+#pragma region RemoveSpecialChars
         injector::WriteMemory(g_pattern.find_pattern("83 EC 34 6A 05 68").get(0).integer(6), "@{", true);
+#pragma endregion RemoveSpecialChars
     }
 }

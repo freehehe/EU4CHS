@@ -101,43 +101,21 @@ namespace Functions
         return isalpha(cp) || isdigit(cp) || cp == '_' || cp == '|';
     }
 
-    //Points to first character
+    //Points to next character
     uint32_t GetNextUnicode(const char *pText, bool bUseSpecialChars)
     {
-        utf8::unchecked::iterator<const char *> strit{ pText };
-
-        uint32_t first = *strit;
+        uint32_t next = utf8::unchecked::peek_next(pText);
 
         if (bUseSpecialChars)
         {
-            if (first == 0x3)
+            while (next == 0xA7)
             {
-                ++strit;
-
-                size_t index = 0;
-
-                while (IsTextIconChar(*strit) && (index < 127))
-                {
-                    ++index;
-                    ++strit;
-                }
-            }
-            else if (first == 0x7)
-            {
-                ++strit;
-            }
-            else if (first == 0x40)
-            {
-                std::advance(strit, 3);
-            }
-            else if (first == 0x7B)
-            {
-                std::advance(strit, 2);
+                utf8::unchecked::advance(pText, 2);
+                next = utf8::unchecked::peek_next(pText);
             }
         }
 
-        ++strit;
-        return *strit;
+        return utf8::unchecked::peek_next(pText);
     }
 
     bool IsSpecialChar(uint32_t unicode)

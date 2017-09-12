@@ -1,8 +1,5 @@
 ﻿CTextBuffer::Write时去除的特殊字符 "§¤£@{}" NOP RemoveIf?
 
-SDL_TEXTINPUT 771
-108450E case SDL_TEXTINPUT 只会读取一个字节
-
 http://www.cppblog.com/liangairan/articles/77682.html
 http://www.cnblogs.com/9chu/archive/2012/12/01/2797027.html
 http://blog.csdn.net/xiangzhang321/article/details/8316812
@@ -13,7 +10,7 @@ NoKerning
 字号
 12 14 16 18 22 24 29 35 36 100
 35应该没用
-12 14 16 18 hinting
+12 14 16 18 hinting no smoothing
 
 地图字体 RGB都是64
 外发光200 200 200左右 不透明度100
@@ -21,37 +18,12 @@ NoKerning
 只有地图字体需要mipmap
 查找B4 00 00 00
 
-3C A? 0F 85
-.text:01096E22 cmp al, 0A3h
-.text:01098D93 cmp al, 0A3h
-.text:01099A27 cmp al, 0A3h
-.text:0109BF14 cmp al, 0A3h
-.text:0109DCFB cmp al, 0A3h
-.text:0109E267 cmp al, 0A3h
-.text:01099B18 cmp al, 0A4h
+A3 A4 A7有很多漏网之鱼啊！！！
 
-3C A? 75
-.text:0109ADB5 cmp al, 0A3h
-.text:0109AE0A cmp al, 0A4h
-.text:01098E39 cmp al, 0A4h
-.text:01096ED7 cmp al, 0A4h
-.text:012082E2 cmp al, 0A7h
-.text:0109E17B cmp al, 0A7h
-.text:0109DC3E cmp al, 0A7h
-.text:0109BEA7 cmp al, 0A7h
-.text:0109AD7F cmp al, 0A7h
-.text:010998B6 cmp al, 0A7h
-.text:01098E54 cmp al, 0A7h
-
-用mod取代vfshook?
+credits.txt 中A7为加大字号用
 
 name = "52X牧有汉化补丁文本"
 path = "mod/eu4chs"
 supported_version = "1.22.2"
 
-TIA
-asama arisu
-magnet:?xt=urn:btih:E0B0709C20B9F79149940A3CF495E7A267C5DCB3
-下了EBOD 206 256 224 228   235 271 MIDD-927_1
-
-目前'ABC中'不能正确间断
+手枪+惩戒锤插爆伤

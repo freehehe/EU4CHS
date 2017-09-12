@@ -231,8 +231,8 @@ TextureGFX * CJKFont::GetTexture(uint32_t unicode)
 
 void CJKFont::AddVerticesDX9(CBitmapFont *pFont, std::uint32_t unicode, STextVertex * pVertices)
 {
-    float width_ratio = (float)*pFont->field<int, 0x4E8>() / _scaleW;
-    float height_ratio = (float)*pFont->field<int, 0x4EC>() / _scaleH;
+    float width_ratio = (float)pFont->get_field<int, 0x4E8>() / _scaleW;
+    float height_ratio = (float)pFont->get_field<int, 0x4EC>() / _scaleH;
 
     pVertices[0].UV.x *= width_ratio;
     pVertices[0].UV.y *= width_ratio;

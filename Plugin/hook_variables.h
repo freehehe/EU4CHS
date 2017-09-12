@@ -8,6 +8,7 @@ struct hook_variables
     CJKFont *cjkFont;
     uint32_t unicode;
     uint32_t nextUnicode;
+    uint32_t nextDrawableUnicode;
     ptrdiff_t unicodeLength;
     void *ret_addr;
 };
