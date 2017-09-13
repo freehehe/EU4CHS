@@ -45,6 +45,9 @@
     <ClCompile Include="hook_variables.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="textbuffer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="plugin.h">
@@ -72,6 +75,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="hook_variables.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="textbuffer.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

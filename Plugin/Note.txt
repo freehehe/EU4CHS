@@ -1,29 +1,20 @@
-﻿CTextBuffer::Write时去除的特殊字符 "§¤£@{}" NOP RemoveIf?
-
-http://www.cppblog.com/liangairan/articles/77682.html
-http://www.cnblogs.com/9chu/archive/2012/12/01/2797027.html
-http://blog.csdn.net/xiangzhang321/article/details/8316812
-http://www.cnblogs.com/resound/archive/2010/08/09/1795640.html
-http://www.gad.qq.com/article/detail/15034
-
-NoKerning
+﻿NoKerning
 字号
 12 14 16 18 22 24 29 35 36 100
 35应该没用
 12 14 16 18 hinting no smoothing
 
-地图字体 RGB都是64
-外发光200 200 200左右 不透明度100
+地图字体 64 64 64
+外发光200 200 200 不透明度100 精确5像素
 
 只有地图字体需要mipmap
 查找B4 00 00 00
 
-A3 A4 A7有很多漏网之鱼啊！！！
-
 credits.txt 中A7为加大字号用
+特殊处理
 
 name = "52X牧有汉化补丁文本"
 path = "mod/eu4chs"
 supported_version = "1.22.2"
 
-手枪+惩戒锤插爆伤
+byte_pattern 搜索所有PE Section

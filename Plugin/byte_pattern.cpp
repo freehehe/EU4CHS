@@ -7,7 +7,7 @@ byte_pattern g_pattern;
 
 using namespace std;
 
-const memory_pointer &byte_pattern::get(size_t index) const
+memory_pointer byte_pattern::get(size_t index) const
 {
     if (index >= this->_results.size())
     {
@@ -23,6 +23,11 @@ const memory_pointer &byte_pattern::get(size_t index) const
     return this->_results[index];
 }
 
+memory_pointer byte_pattern::get_first() const
+{
+    return this->get(0);
+}
+
 byte_pattern::byte_pattern()
 {
     set_module();
@@ -31,7 +36,6 @@ byte_pattern::byte_pattern()
 byte_pattern &byte_pattern::set_pattern(const char *pattern_literal)
 {
     this->_results.clear();
-    this->_processed = false;
     this->transform_pattern(pattern_literal);
     this->bm_preprocess();
 
@@ -61,19 +65,9 @@ byte_pattern &byte_pattern::set_range(memory_pointer beg, memory_pointer end)
     return *this;
 }
 
-void byte_pattern::do_search()
-{
-    if (!this->_processed)
-    {
-        this->force_search();
-    }
-}
-
-byte_pattern &byte_pattern::force_search()
+byte_pattern &byte_pattern::search()
 {
     this->_results.clear();
-
-    this->_processed = true;
 
     if (!this->_pattern.empty())
     {
@@ -89,9 +83,26 @@ byte_pattern &byte_pattern::force_search()
 
 byte_pattern & byte_pattern::find_pattern(const char * pattern_literal)
 {
-    this->set_pattern(pattern_literal).force_search();
+    this->set_pattern(pattern_literal).search();
 
     return *this;
+}
+
+memory_pointer byte_pattern::find_first(const char * pattern_literal)
+{
+    return this->find_pattern(pattern_literal).get_first();
+}
+
+byte_pattern & byte_pattern::find_pattern(const void * data, std::size_t size)
+{
+    this->set_pattern(data, size).search();
+
+    return *this;
+}
+
+memory_pointer byte_pattern::find_first(const void * data, std::size_t size)
+{
+    return this->find_pattern(data, size).get_first();
 }
 
 void byte_pattern::transform_pattern(const char *pattern_literal)
@@ -204,7 +215,7 @@ void byte_pattern::get_module_range(memory_pointer module)
     {
         auto sec = getSection(ntHeader, i);
         auto secSize = sec->SizeOfRawData != 0 ? sec->SizeOfRawData : sec->Misc.VirtualSize;
-        if (sec->Characteristics & IMAGE_SCN_MEM_EXECUTE)
+        //if (sec->Characteristics & IMAGE_SCN_MEM_EXECUTE)
             this->_range.second = this->_range.first + sec->VirtualAddress + secSize;
 
         if ((i == ntHeader->FileHeader.NumberOfSections - 1) && this->_range.second == 0)
@@ -218,10 +229,9 @@ void byte_pattern::clear()
     this->_pattern.clear();
     this->_mask.clear();
     this->_results.clear();
-    this->_processed = false;
 }
 
-size_t byte_pattern::size() const
+size_t byte_pattern::count() const
 {
     return this->_results.size();
 }
@@ -306,7 +316,7 @@ void byte_pattern::debug_output() const
 
     ofs << "Results of pattern: " << _literal << '\n';
 
-    if (size() > 0)
+    if (count() > 0)
     {
         for_each_result(
             [&ofs](memory_pointer p)

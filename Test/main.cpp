@@ -24,7 +24,7 @@ uint32_t GetNextUnicode(const char *pText, bool bUseSpecialChars)
 
 int main()
 {
-    const char *u8test = u8"哈1哈§YGC主义GC§!是神圣罗马帝国的官方信仰。只有信仰§YGC主义GC§!的君主才有资格成为皇帝，并且所有的选帝侯必须也信仰§YGC主义GC§!。皇帝可以通过“宗教统一”外交选项逼迫异端成员国转信官方信仰。";
+    const char *u8test = u8"1§YGCC§!是神圣罗马帝国的官方信仰";
     const char *pText = u8test;
 
     cout << hex << showbase;

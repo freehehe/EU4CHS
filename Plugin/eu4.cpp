@@ -1,6 +1,5 @@
 #include "stdinc.h"
 #include "eu4.h"
-#include "byte_pattern.h"
 
 EU4Meta::EU4Meta()
 {
@@ -9,10 +8,10 @@ EU4Meta::EU4Meta()
     this->pText = *g_pattern.get(0).raw<char *>(0xFB - 0x18);
     this->pWord = *g_pattern.get(0).raw<char *>(0x10C - 0x18);
 
-    this->pfCBitmapFontCharacterSet_GetKerning = g_pattern.find_pattern("56 8B F1 0F B6 4D 08").get(0).integer(-3);
+    this->pfCBitmapCharacterSet_GetKerning = g_pattern.find_pattern("56 8B F1 0F B6 4D 08").get(0).integer(-3);
 
-    this->pfGfxInitDX9 = g_pattern.set_pattern("81 EC E8 05 00 00 53 56 57 68 8C 02 00 00").force_search().get(0).integer(-0x18);
-    this->pfGfxShutdownDX9 = g_pattern.set_pattern("56 8B 75 08 8B 4E 04 85 C9 74 0D").force_search().get(0).integer(-3);
+    this->pfGfxInitDX9 = g_pattern.set_pattern("81 EC E8 05 00 00 53 56 57 68 8C 02 00 00").search().get(0).integer(-0x18);
+    this->pfGfxShutdownDX9 = g_pattern.set_pattern("56 8B 75 08 8B 4E 04 85 C9 74 0D").search().get(0).integer(-3);
 
     this->pBitmapVertices = *g_pattern.find_pattern("F3 0F 11 04 95 ? ? ? ? 0F 28 C5").get(0).raw<STextVertex *>(5);
 

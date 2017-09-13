@@ -110,14 +110,10 @@ class byte_pattern
     std::vector<memory_pointer> _results;
     std::string _literal;
 
-    bool _processed = false;
-
     std::ptrdiff_t _bmbc[256];
 
     void transform_pattern(const char *pattern_literal);
     void get_module_range(memory_pointer module);
-
-    void do_search();
 
     void bm_preprocess();
     void bm_search();
@@ -131,13 +127,17 @@ public:
     byte_pattern &set_pattern(const void *data, std::size_t size);
     byte_pattern &set_module(memory_pointer module = pattern_default_module);
     byte_pattern &set_range(memory_pointer beg, memory_pointer end);
-    byte_pattern &force_search();
+    byte_pattern &search();
 
     byte_pattern &find_pattern(const char *pattern_literal);
+    memory_pointer find_first(const char *pattern_literal);
+    byte_pattern &find_pattern(const void *data, std::size_t size);
+    memory_pointer find_first(const void *data, std::size_t size);
 
-    const memory_pointer &get(std::size_t index) const;
+    memory_pointer get(std::size_t index) const;
+    memory_pointer get_first() const;
 
-    std::size_t size() const;
+    std::size_t count() const;
     bool has_size(std::size_t expected) const;
     bool empty() const;
     void clear();

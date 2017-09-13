@@ -174,7 +174,7 @@ struct CInputEvent
 VALIDATE_SIZE(CInputEvent,0x58)
 #pragma pack(pop)
 
-struct CBitmapFontCharacterSet :IncompleteClass
+struct CBitmapCharacterSet :IncompleteClass
 {
     const EU4CharacterValues *GetLatin1Value(uint32_t cp)
     {
@@ -189,9 +189,9 @@ struct CBitmapFontCharacterSet :IncompleteClass
 
 struct CBitmapFont :IncompleteClass
 {
-    CBitmapFontCharacterSet *GetLatin1CharacterSet()
+    CBitmapCharacterSet *GetLatin1CharacterSet()
     {
-        return field<CBitmapFontCharacterSet, 0xB4>();
+        return field<CBitmapCharacterSet, 0xB4>();
     }
 
     const CString *GetFontPath()
@@ -208,7 +208,7 @@ struct CBitmapFont :IncompleteClass
 
 struct EU4Meta
 {
-    std::uintptr_t pfCBitmapFontCharacterSet_GetKerning;
+    std::uintptr_t pfCBitmapCharacterSet_GetKerning;
 
     std::uintptr_t pfGfxInitDX9;
     std::uintptr_t pfGfxShutdownDX9;
@@ -217,6 +217,7 @@ struct EU4Meta
     LPDIRECT3DDEVICE9 pDX9Device;
 
     STextVertex *pBitmapVertices;
+    STextVertex *pVertices3d;
 
     char *pOriginalText;
     char *pWord;

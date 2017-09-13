@@ -1,7 +1,6 @@
 ﻿#include "stdinc.h"
 #include "functions.h"
 #include "eu4.h"
-#include "byte_pattern.h"
 #include "hook_variables.h"
 
 using namespace std;
@@ -91,6 +90,22 @@ namespace Functions
         utf8::utf32to8(g_context.wideText.begin(), g_context.wideText.end(), dest);
     }
 
+    void ConvertLatin1ToUTF8(char * source)
+    {
+        string_view source_view{ source };
+
+        g_context.wideText.clear();
+
+        transform(source_view.begin(), source_view.end(), back_inserter(g_context.wideText), 
+            [](char c) {
+            return *(unsigned char *)&c;
+        });
+
+        g_context.wideText.push_back(0);
+
+        utf8::unchecked::utf32to8(g_context.wideText.begin(), g_context.wideText.end(), source);
+    }
+
     bool IsLatin1Char(uint32_t cp)
     {
         return cp <= 0xFF;
@@ -102,13 +117,13 @@ namespace Functions
     }
 
     //Points to next character
-    uint32_t GetNextUnicode(const char *pText, bool bUseSpecialChars)
+    uint32_t GetNextDrawableUnicode(const char *pText, bool bUseSpecialChars)
     {
         uint32_t next = utf8::unchecked::peek_next(pText);
 
         if (bUseSpecialChars)
         {
-            while (next == 0xA7)
+            while (next == 0x7)
             {
                 utf8::unchecked::advance(pText, 2);
                 next = utf8::unchecked::peek_next(pText);
@@ -116,11 +131,6 @@ namespace Functions
         }
 
         return utf8::unchecked::peek_next(pText);
-    }
-
-    bool IsSpecialChar(uint32_t unicode)
-    {
-        return unicode == 0x3 || unicode == 0x4 || unicode == 0x7 || unicode == 0x40 || unicode == 0x7B;
     }
 
     void ConvertSpecialChars(char *source)
@@ -177,7 +187,7 @@ namespace Functions
             CInputEvent temp;
             char *pText = (char *)(regs->ebp - 0x48);
 
-            std::string_view text_view(pText);
+            string_view text_view(pText);
 
             for (char c : text_view)
             {
@@ -205,5 +215,9 @@ namespace Functions
         //从输入法接受整个字符串
         g_pattern.find_pattern("8B 4D B8 32 C0"); //mov ecx, [ebp - 0x48]; xor al, al
         injector::MakeInline<CSdlEvents_HandlePdxEvents_0x2DE>(g_pattern.get(0).integer());
+
+        //WriteVariable 0xA7
+        injector::WriteMemory<uint8_t>(g_pattern.find_pattern("C6 06 A7").get(0).integer(2), 7, true);
+        injector::WriteMemory<uint8_t>(g_pattern.find_pattern("66 C7 06 A7 21").get(0).integer(3), 7, true);
     }
 }

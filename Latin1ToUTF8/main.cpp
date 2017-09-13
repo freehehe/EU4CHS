@@ -29,6 +29,11 @@ bool ConvertFile(const filesystem::path &in_file, const filesystem::path &out_fi
 
     cbuffer.assign(istreambuf_iterator<char>{ iofs }, istreambuf_iterator<char>{});
 
+    if (all_of(cbuffer.begin(), cbuffer.end(), isascii))
+    {
+        return true;
+    }
+
     if (utf8::is_valid(cbuffer.begin(), cbuffer.end()))
     {
         return true;
