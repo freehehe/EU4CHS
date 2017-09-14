@@ -116,7 +116,7 @@ namespace Functions
         return isalpha(cp) || isdigit(cp) || cp == '_' || cp == '|';
     }
 
-    //Points to next character
+    //Points after first character
     uint32_t GetNextDrawableUnicode(const char *pText, bool bUseSpecialChars)
     {
         uint32_t next = utf8::unchecked::peek_next(pText);

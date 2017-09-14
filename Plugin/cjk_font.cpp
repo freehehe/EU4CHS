@@ -192,9 +192,9 @@ void CJKFont::LoadTexturesDX9()
 {
     for (auto &name : _texturenames)
     {
-        TextureGFX gfx;
+        LPDIRECT3DTEXTURE9 gfx;
 
-        D3DXCreateTextureFromFileW(g_game.pDX9Device, (_workingdir / name).c_str(), &gfx.field_0);
+        D3DXCreateTextureFromFileW(g_game.pDX9Device, (_workingdir / name).c_str(), &gfx);
 
         _textures.emplace_back(gfx);
     }
@@ -204,7 +204,7 @@ void CJKFont::UnloadTexturesDX9()
 {
     for (auto &texture : _textures)
     {
-        texture.field_0->Release();
+        texture->Release();
     }
 
     _textures.clear();
@@ -224,9 +224,9 @@ const CJKFont::CharacterValues *CJKFont::GetValue(uint32_t unicode)
     }
 }
 
-TextureGFX * CJKFont::GetTexture(uint32_t unicode)
+LPDIRECT3DTEXTURE9 CJKFont::GetTexture(uint32_t unicode)
 {
-    return &_textures[GetValue(unicode)->PageIndex];
+    return _textures[GetValue(unicode)->PageIndex];
 }
 
 void CJKFont::AddVerticesDX9(CBitmapFont *pFont, std::uint32_t unicode, STextVertex * pVertices)
@@ -256,7 +256,7 @@ void CJKFont::DrawAllDX9()
     {
         if (!_buffer[index].empty())
         {
-            g_game.pDX9Device->SetTexture(0, _textures[index].field_0);
+            g_game.pDX9Device->SetTexture(0, _textures[index]);
             g_game.pDX9Device->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
             g_game.pDX9Device->DrawPrimitiveUP(D3DPT_TRIANGLELIST, _buffer[index].size() / 3, _buffer[index].data(), sizeof(STextVertex));
 

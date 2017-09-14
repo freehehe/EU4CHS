@@ -2,7 +2,7 @@
 字号
 12 14 16 18 22 24 29 35 36 100
 35应该没用
-12 14 16 18 hinting no smoothing
+12 14 16 18 (新)宋体，Rasterization全不选
 
 地图字体 64 64 64
 外发光200 200 200 不透明度100 精确5像素
@@ -18,3 +18,9 @@ path = "mod/eu4chs"
 supported_version = "1.22.2"
 
 byte_pattern 搜索所有PE Section
+看看CTextBuffer::Write的过滤关键字
+
+GetRequiredSize
+RenderToTexture
+Render3d
+GetActualRealRequiredSizeActually

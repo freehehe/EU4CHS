@@ -21,7 +21,7 @@ public:
     void UnloadTexturesDX9();
 
     const CharacterValues *GetValue(std::uint32_t unicode);
-    TextureGFX *GetTexture(std::uint32_t unicode);
+    LPDIRECT3DTEXTURE9 GetTexture(std::uint32_t unicode);
 
     void AddVerticesDX9(CBitmapFont *pFont, std::uint32_t unicode, STextVertex *pVertices);
     void DrawAllDX9();
@@ -33,7 +33,7 @@ private:
     std::uint16_t _scaleH;
     std::uint16_t _pages;
     std::unordered_map<std::uint32_t, CharacterValues> _values;
-    std::vector<TextureGFX> _textures;
+    std::vector<LPDIRECT3DTEXTURE9> _textures;
     std::vector<std::string> _texturenames;
     std::vector<std::vector<STextVertex>> _buffer;
 

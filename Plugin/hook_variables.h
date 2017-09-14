@@ -8,6 +8,7 @@ struct hook_variables
     CBitmapFont *pFont;
     CBitmapCharacterSet *pSet;
     CJKFont *cjkFont;
+    std::string narrowText;
     std::vector<uint32_t> wideText;
     uint32_t unicode;
     uint32_t nextUnicode;

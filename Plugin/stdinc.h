@@ -16,6 +16,7 @@
 #include <string>
 #include <iterator>
 #include <algorithm>
+#include <numeric>
 #include <string_view>
 #include <functional>
 #include <utility>
@@ -30,4 +31,3 @@
 #include "../include/injector/calling.hpp"
 #include "../include/injector/assembly.hpp"
 #include "byte_pattern.h"
-
