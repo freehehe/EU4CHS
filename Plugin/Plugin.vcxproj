@@ -60,7 +60,6 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <PrecompiledHeaderFile>stdinc.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(DXSDK_DIR)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -77,7 +76,6 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <PrecompiledHeaderFile>stdinc.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(DXSDK_DIR)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <EnableEnhancedInstructionSet>NoExtensions</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -98,7 +96,6 @@
     <ClCompile Include="functions.cpp" />
     <ClCompile Include="cjk_fonts.cpp" />
     <ClCompile Include="cjk_font.cpp" />
-    <ClCompile Include="hook_variables.cpp" />
     <ClCompile Include="plugin.cpp" />
     <ClCompile Include="stdinc.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -113,7 +110,6 @@
     <ClInclude Include="functions.h" />
     <ClInclude Include="cjk_fonts.h" />
     <ClInclude Include="cjk_font.h" />
-    <ClInclude Include="hook_variables.h" />
     <ClInclude Include="stdinc.h" />
     <ClInclude Include="plugin.h" />
     <ClInclude Include="textbuffer.h" />

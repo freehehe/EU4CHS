@@ -2,6 +2,7 @@
 #include "functions.h"
 #include "eu4.h"
 #include "hook_variables.h"
+#include "byte_pattern.h"
 
 using namespace std;
 
@@ -117,7 +118,7 @@ namespace Functions
     }
 
     //Points after first character
-    uint32_t GetNextDrawableUnicode(const char *pText, bool bUseSpecialChars)
+    uint32_t GetNextUnicode(const char *pText, bool bUseSpecialChars)
     {
         uint32_t next = utf8::unchecked::peek_next(pText);
 

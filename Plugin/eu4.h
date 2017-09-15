@@ -176,11 +176,12 @@ struct CBitmapCharacterSet :IncompleteClass
     }
 };
 
+#define CHARSET_OFF 0xB4
 struct CBitmapFont :IncompleteClass
 {
     CBitmapCharacterSet *GetLatin1CharacterSet()
     {
-        return field<CBitmapCharacterSet, 0xB4>();
+        return field<CBitmapCharacterSet, CHARSET_OFF>();
     }
 
     const CString *GetFontPath()

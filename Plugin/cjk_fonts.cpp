@@ -1,6 +1,7 @@
 ﻿#include "stdinc.h"
 #include "cjk_fonts.h"
 #include "plugin.h"
+#include "byte_pattern.h"
 
 CJKFontManager g_Fonts;
 

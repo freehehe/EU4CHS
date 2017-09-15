@@ -1,8 +1,6 @@
 ﻿NoKerning
-字号
-12 14 16 18 22 24 29 35 36 100
-35应该没用
-12 14 16 18 (新)宋体，Rasterization全不选
+12 14 16 (新)宋体，Rasterization全不选
+以后的 Smoothing
 
 地图字体 64 64 64
 外发光200 200 200 不透明度100 精确5像素
@@ -24,3 +22,32 @@ GetRequiredSize
 RenderToTexture
 Render3d
 GetActualRealRequiredSizeActually
+
+A3A4A7不是utf8首字节
+
+Arial12
+Arial12_bold
+garamond_12
+garamond_14
+garamond_14_bold
+flaunch_16b
+garamond_16
+garamond_16_bold
+newsfeed_body // newsfeed_body_16
+flaunch_18b
+standard_18
+standard // standard_18
+vic_18
+vic_18_grey
+vic_18s
+tahoma_20_bold
+standard_22
+vic_22
+vic_22_bl
+vic_22s
+garamond_24
+vic_29
+vic_29s
+vic_36
+vic_36s
+Mapfont // Mapfont_100

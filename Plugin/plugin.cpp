@@ -3,6 +3,7 @@
 #include "bitmapfont.h"
 #include "functions.h"
 #include "cjk_fonts.h"
+#include "byte_pattern.h"
 
 CPlugin g_plugin;
 

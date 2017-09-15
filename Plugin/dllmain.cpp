@@ -1,6 +1,7 @@
 ﻿#include "stdinc.h"
 #include "plugin.h"
 #include "eu4.h"
+#include "byte_pattern.h"
 
 void UTF8ToLatin1View()
 {

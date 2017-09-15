@@ -1,5 +1,6 @@
 ﻿#include "stdinc.h"
 #include "textbuffer.h"
+#include "byte_pattern.h"
 
 namespace TextBuffer
 {

@@ -8,7 +8,8 @@ namespace Functions
     void ConvertLatin1ToUTF8(char *source);
     bool IsLatin1Char(uint32_t cp);
     bool IsTextIconChar(uint32_t cp);
-    uint32_t GetNextDrawableUnicode(const char *pText, bool bUseSpecialChars);
+
+    uint32_t GetNextUnicode(const char *pText, bool bUseSpecialChars);
 
     void InitAndPatch();
 };
