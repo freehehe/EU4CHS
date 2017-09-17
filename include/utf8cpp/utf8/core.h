@@ -113,8 +113,7 @@ namespace internal
         else if ((lead >> 3) == 0x1e)
             return 4;
         else
-#pragma message("utf8.core.h patched for EU4 special characters.")
-            return 1;
+            return 0;
     }
 
     template <typename octet_difference_type>

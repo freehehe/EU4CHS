@@ -194,7 +194,7 @@ void CJKFont::LoadTexturesDX9()
     {
         LPDIRECT3DTEXTURE9 gfx;
 
-        D3DXCreateTextureFromFileW(g_game.pDX9Device, (_workingdir / name).c_str(), &gfx);
+        D3DXCreateTextureFromFileW(g_game.pDX9Device, (_workingdir / name).replace_extension(".dds").c_str(), &gfx);
 
         _textures.emplace_back(gfx);
     }

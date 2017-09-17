@@ -34,11 +34,6 @@ bool ConvertFile(const filesystem::path &in_file, const filesystem::path &out_fi
         return true;
     }
 
-    if (utf8::is_valid(cbuffer.begin(), cbuffer.end()))
-    {
-        return true;
-    }
-
     transform(cbuffer.begin(), cbuffer.end(), back_inserter(wbuffer), 
         [](char character)
     {

@@ -1,7 +1,6 @@
 ﻿#include "stdinc.h"
 #include "functions.h"
 #include "eu4.h"
-#include "hook_variables.h"
 #include "byte_pattern.h"
 
 using namespace std;
@@ -11,10 +10,11 @@ namespace Functions
     void __fastcall ConvertUTF8ToLatin1(const char *source, char *dest)
     {
         string_view source_view(source);
-        g_context.wideText.clear();
-        utf8::utf8to32(source_view.begin(), source_view.end(), back_inserter(g_context.wideText));
 
-        for (uint32_t &cp : g_context.wideText)
+        vector<wchar_t> wideText;
+        utf8::utf8to16(source_view.begin(), source_view.end(), back_inserter(wideText));
+
+        for (wchar_t &cp : wideText)
         {
             switch (cp)
             {
@@ -87,24 +87,23 @@ namespace Functions
             }
         }
 
-        g_context.wideText.push_back(0);
-        utf8::utf32to8(g_context.wideText.begin(), g_context.wideText.end(), dest);
+        wideText.push_back(0);
+        utf8::utf16to8(wideText.begin(), wideText.end(), dest);
     }
 
     void ConvertLatin1ToUTF8(char * source)
     {
         string_view source_view{ source };
+        vector<wchar_t> wideText;
 
-        g_context.wideText.clear();
-
-        transform(source_view.begin(), source_view.end(), back_inserter(g_context.wideText), 
+        transform(source_view.begin(), source_view.end(), back_inserter(wideText), 
             [](char c) {
             return *(unsigned char *)&c;
         });
 
-        g_context.wideText.push_back(0);
+        wideText.push_back(0);
 
-        utf8::unchecked::utf32to8(g_context.wideText.begin(), g_context.wideText.end(), source);
+        utf8::utf16to8(wideText.begin(), wideText.end(), source);
     }
 
     bool IsLatin1Char(uint32_t cp)
@@ -131,22 +130,22 @@ namespace Functions
             }
         }
 
-        return utf8::unchecked::peek_next(pText);
+        return next;
     }
 
     void ConvertSpecialChars(char *source)
     {
         string_view source_view(source);
+        vector<wchar_t> wideText;
 
         if (all_of(source_view.begin(), source_view.end(), isascii))
         {
             return;
         }
 
-        g_context.wideText.clear();
-        utf8::utf8to32(source_view.begin(), source_view.end(), back_inserter(g_context.wideText));
+        utf8::utf8to16(source_view.begin(), source_view.end(), back_inserter(wideText));
 
-        for (uint32_t &cp : g_context.wideText)
+        for (wchar_t &cp : wideText)
         {
             switch (cp)
             {
@@ -161,8 +160,8 @@ namespace Functions
             }
         }
 
-        g_context.wideText.push_back(0);
-        utf8::utf32to8(g_context.wideText.begin(), g_context.wideText.end(), source);
+        wideText.push_back(0);
+        utf8::utf16to8(wideText.begin(), wideText.end(), source);
     }
 
     struct CReader_ReadSimpleStatement_0x161_7
@@ -172,10 +171,7 @@ namespace Functions
             CToken *pSrcToken = (CToken *)(regs->esi);
             CToken *pDstToken = (CToken *)(regs->edi);
 
-            if (pSrcToken->_LexerToken == 0xF)
-            {
-                ConvertSpecialChars(pSrcToken->_szVal);
-            }
+            ConvertSpecialChars(pSrcToken->_szVal);
 
             *pDstToken = *pSrcToken;
         }

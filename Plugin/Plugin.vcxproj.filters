@@ -74,6 +74,9 @@
     <ClInclude Include="textbuffer.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="utf8.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Note.txt" />

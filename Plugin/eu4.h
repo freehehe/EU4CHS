@@ -167,6 +167,11 @@ struct CBitmapCharacterSet :IncompleteClass
 {
     const EU4CharacterValues *GetLatin1Value(uint32_t cp)
     {
+        if (cp == 3 || cp == 4 || cp == 7)
+        {
+            cp += 0xA0;
+        }
+
         return field<const EU4CharacterValues *, 0>()[cp];
     }
 

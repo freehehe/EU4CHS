@@ -58,18 +58,22 @@ void CJKFontManager::DrawAllDX9(void *a1, int a2, int a3)
 {
     injector::cstd<void(void *, int, int)>::call(g_game.pfGfxDrawDX9, a1, a2, a3);
 
+    LPDIRECT3DBASETEXTURE9 original;
+
+    g_game.pDX9Device->GetTexture(0, &original);
+
     for (auto &font: g_Fonts._fonts)
     {
         font.second.DrawAllDX9();
     }
+
+    g_game.pDX9Device->SetTexture(0, original);
 }
 
 CJKFont * CJKFontManager::GetFont(const CString * fontname)
 {
     //暂时先按文件名查找
     const char *cname = (strrchr(fontname->c_str(), '/') + 1);
-
-    return &_fonts.find(hash<string_view>()("default"))->second;
 
     auto it = _fonts.find(hash<string_view>()(cname));
 
