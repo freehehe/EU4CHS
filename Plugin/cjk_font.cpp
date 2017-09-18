@@ -257,7 +257,6 @@ void CJKFont::DrawAllDX9()
         if (!_buffer[index].empty())
         {
             g_game.pDX9Device->SetTexture(0, _textures[index]);
-            g_game.pDX9Device->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
             g_game.pDX9Device->DrawPrimitiveUP(D3DPT_TRIANGLELIST, _buffer[index].size() / 3, _buffer[index].data(), sizeof(STextVertex));
 
             _buffer[index].clear();

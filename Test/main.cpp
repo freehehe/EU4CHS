@@ -1,57 +1,20 @@
-﻿#include <iostream>
-#include <cstdint>
-#include <cstring>
-#include "../include//utf8cpp/utf8.h"
+﻿#include <windows.h>
 
 using namespace std;
 
-void GetTwoUnicode(const char * pText, uint32_t index, uint32_t text_length, uint32_t &first, uint32_t &second, ptrdiff_t &length, bool bUseSpecialChars)
-{
-    second = 0;
-
-    //First
-    if (index < text_length)
-    {
-        length = utf8::internal::sequence_length(pText);
-        first = utf8::unchecked::peek_next(pText + index);
-        index += length;
-    }
-
-    //Second
-    if (index < text_length)
-    {
-        ptrdiff_t second_length = utf8::internal::sequence_length(pText + index);
-        uint32_t temp_second = utf8::unchecked::peek_next(pText + index);
-        index += second_length;
-
-        if (bUseSpecialChars)
-        {
-            while (temp_second == 0x7)
-            {
-                index += 2;
-
-                if (index >= text_length)
-                {
-                    return;
-                }
-
-                temp_second = utf8::unchecked::peek_next(pText + index);
-            }
-        }
-
-        second = temp_second;
-    }
-}
-
 int main()
 {
-    uint32_t first, second;
-    ptrdiff_t length;
-    const char pText[] = u8"哈a哈\x7Y哈\x7!a哈\x3mifa";
+    wchar_t wText[4096];
+   
+    char cText[] = u8R"(KARMA_DESC:0 "Karma increases from : \n - §YHaving a war declared on you§!\n - §YHonoring alliances§!\n - §YReleasing vassals§!\n - §YReleasing nations in peace deals§!\n - §YReturning cores§!\n\nKarma decreases from : \n - §YStarting wars§!\n - §YTaking provinces in peace deals§!")";
+    
+    MultiByteToWideChar(28591, 0, cText, strlen(cText), wText, 4096);
 
-    GetTwoUnicode(pText, 0, strlen(pText), first, second, length, true);
+    MessageBoxW(NULL, wText, L"Fucked text", MB_OK);
 
-    cout << first << second << endl;
+    MultiByteToWideChar(CP_UTF8, 0, cText, strlen(cText), wText, 4096);
+    
+    MessageBoxW(NULL, wText, L"Fucked text", MB_OK);
 
     return 0;
 }

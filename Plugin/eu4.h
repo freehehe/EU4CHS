@@ -79,6 +79,13 @@ struct STextVertex
 };
 VALIDATE_SIZE(STextVertex,0x1C)
 
+struct SSimpleVertex
+{
+    CVector3<float> Position;
+    CVector2<float> UV;
+};
+VALIDATE_SIZE(SSimpleVertex, 0x14)
+
 struct EU4CharacterValues
 {
     int16_t x;
@@ -167,7 +174,7 @@ struct CBitmapCharacterSet :IncompleteClass
 {
     const EU4CharacterValues *GetLatin1Value(uint32_t cp)
     {
-        if (cp == 3 || cp == 4 || cp == 7)
+        if (cp == 0x3 || cp == 0x4 || cp == 0x7)
         {
             cp += 0xA0;
         }

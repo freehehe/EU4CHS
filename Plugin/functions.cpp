@@ -91,21 +91,6 @@ namespace Functions
         utf8::utf16to8(wideText.begin(), wideText.end(), dest);
     }
 
-    void ConvertLatin1ToUTF8(char * source)
-    {
-        string_view source_view{ source };
-        vector<wchar_t> wideText;
-
-        transform(source_view.begin(), source_view.end(), back_inserter(wideText), 
-            [](char c) {
-            return *(unsigned char *)&c;
-        });
-
-        wideText.push_back(0);
-
-        utf8::utf16to8(wideText.begin(), wideText.end(), source);
-    }
-
     bool IsLatin1Char(uint32_t cp)
     {
         return cp <= 0xFF;
@@ -116,21 +101,86 @@ namespace Functions
         return isalpha(cp) || isdigit(cp) || cp == '_' || cp == '|';
     }
 
-    //Points after first character
-    uint32_t GetNextUnicode(const char *pText, bool bUseSpecialChars)
+    void GetTwoUnicode(const char * pText, uint32_t index, uint32_t text_length, uint32_t &first, ptrdiff_t &first_length, uint32_t &second, bool bUseSpecialChars)
     {
-        uint32_t next = utf8::unchecked::peek_next(pText);
+        second = 0;
 
-        if (bUseSpecialChars)
+        try
         {
-            while (next == 0x7)
+            //First
+            if (index < text_length)
             {
-                utf8::unchecked::advance(pText, 2);
-                next = utf8::unchecked::peek_next(pText);
+                first_length = utf8::internal::sequence_length(pText);
+                first = utf8::peek_next(pText + index, pText + text_length);
+                index += first_length;
+            }
+
+            //Second
+            if (index < text_length)
+            {
+                ptrdiff_t second_length = utf8::internal::sequence_length(pText + index);
+                uint32_t temp_second = utf8::peek_next(pText + index, pText + text_length);
+
+                if (bUseSpecialChars)
+                {
+                    while (temp_second == 0x7)
+                    {
+                        index += 2;
+
+                        if (index >= text_length)
+                        {
+                            return;
+                        }
+
+                        temp_second = utf8::peek_next(pText + index, pText + text_length);
+                    }
+                }
+
+                second = temp_second;
             }
         }
+        catch (const utf8::invalid_utf8&)
+        {
+            wchar_t text[4096];
 
-        return next;
+            MultiByteToWideChar(28591, 0, pText, text_length, text, 4096);
+            MessageBoxW(NULL, text, L"Fucked text", MB_OK);
+        }
+    }
+
+    void GetTwoUnicode(std::vector<wchar_t>::iterator pText, std::vector<wchar_t>::iterator pEnd, uint32_t & first, uint32_t & second, bool bUseSpecialChars)
+    {
+        second = 0;
+
+        //First
+        if (pText < pEnd)
+        {
+            first = *pText;
+            ++pText;
+        }
+
+        //Second
+        if (pText < pEnd)
+        {
+            uint32_t temp_second = *pText;
+
+            if (bUseSpecialChars)
+            {
+                while (temp_second == 0x7)
+                {
+                    pText += 2;
+
+                    if (pText >= pEnd)
+                    {
+                        return;
+                    }
+
+                    temp_second = *pText;
+                }
+            }
+
+            second = temp_second;
+        }
     }
 
     void ConvertSpecialChars(char *source)
@@ -216,5 +266,6 @@ namespace Functions
         //WriteVariable 0xA7
         injector::WriteMemory<uint8_t>(g_pattern.find_pattern("C6 06 A7").get(0).integer(2), 7, true);
         injector::WriteMemory<uint8_t>(g_pattern.find_pattern("66 C7 06 A7 21").get(0).integer(3), 7, true);
+
     }
 }
