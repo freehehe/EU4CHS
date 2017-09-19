@@ -39,7 +39,7 @@ namespace BitmapFont
 
             g_context.cjkFont = g_Fonts.GetFont(g_context.pFont->GetFontPath());
 
-            g_context.textLength = *(uint32_t *)(regs->ebp - 0);
+            g_context.textLength = *(uint32_t *)(regs->ebp - 0x30);
             g_context.useSpecialChars = *(bool *)(regs->ebp + 0x3C);
 
             Functions::GetTwoUnicode(
@@ -71,15 +71,15 @@ namespace BitmapFont
     {
         void operator()(injector::reg_pack *regs) const
         {
-            regs->edx = *(uint32_t *)(regs->ebp - 0x34);
+            regs->edx = (uint32_t)g_context.pSet;
 
             if (Functions::IsLatin1Char(g_context.unicode))
             {
-                regs->ecx = (uint32_t)((*(CBitmapCharacterSet **)(regs->ebp - 0x34))->GetLatin1Value(g_context.unicode));
+                regs->ecx = (uint32_t)g_context.pSet->GetLatin1Value(g_context.unicode);
             }
             else
             {
-                regs->ecx = (uint32_t)(&g_context.cjkFont->GetValue(g_context.unicode)->EU4Values);
+                regs->ecx = (uint32_t)&g_context.cjkFont->GetValue(g_context.unicode)->EU4Values;
             }
         }
     };
@@ -92,7 +92,11 @@ namespace BitmapFont
 
             cmp g_context.nextUnicode, 0xFF;
             ja skip;
+            mov ecx, 0xA3;
+            mov eax, g_context.unicode;
+            cmp eax, 3;
 
+            cmovz eax, ecx;
             push g_context.nextUnicode;
             push g_context.unicode;
             mov ecx, [ebp - 0x34];
