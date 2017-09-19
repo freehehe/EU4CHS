@@ -13,11 +13,11 @@ memory_pointer byte_pattern::get(size_t index) const
     {
         stringstream sstr;
 
-        sstr << "Processing pattern: " << this->_literal << "\nTrying to access index " << index << " but only " << this->_results.size() << " results.\nGame will crash.";
+        sstr << "Processing pattern: " << this->_literal << "\nTrying to access index " << index << " but only " << this->_results.size() << " results.";
 
         MessageBoxA(NULL, sstr.str().c_str(), "byte_pattern: too few results.", MB_OK);
 
-        terminate();
+        return memory_pointer{};
     }
 
     return this->_results[index];

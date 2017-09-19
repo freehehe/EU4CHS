@@ -1,4 +1,4 @@
-#include <fstream>
+﻿#include <fstream>
 #include <filesystem>
 #include <string>
 #include <vector>
@@ -99,6 +99,8 @@ void generate_table(const filesystem::path &folder)
 
     wbuffer.clear();
 
+    wbuffer.push_back(0xFEFF); //不然Bitmap font generator不认
+
     for (auto &line : char_matrix)
     {
         copy(line.begin(), line.end(), back_inserter(wbuffer));
@@ -119,8 +121,8 @@ void generate_table(const filesystem::path &folder)
 
 int main(int argc, char **argv)
 {
-    enumerate_chars("D:\\eu4text");
-    generate_table("D:\\eu4text");
+    enumerate_chars("E:\\eu4text");
+    generate_table("E:\\eu4text");
 
     return 0;
 }

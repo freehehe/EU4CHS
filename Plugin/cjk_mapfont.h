@@ -2,7 +2,7 @@
 #include "stdinc.h"
 #include "eu4.h"
 
-class CJKFont
+class CJKMapFont
 {
 public:
     struct CharacterValues
@@ -13,7 +13,7 @@ public:
 
     static const std::uint32_t invalid_replacement = L'？';
 
-    CJKFont(const std::experimental::filesystem::path &fntname);
+    CJKMapFont(const std::experimental::filesystem::path &fntname);
 
     void InitWithFile(const std::experimental::filesystem::path &fntname);
 
@@ -22,10 +22,10 @@ public:
 
     const CharacterValues *GetValue(std::uint32_t unicode);
 
-    void AddVerticesDX9(CBitmapFont *pFont, std::uint32_t unicode, STextVertex *pVertices);
+    void AddVerticesDX9(CBitmapFont *pFont, std::uint32_t unicode, SProvinceTextVertex *pVertices);
     void DrawAllDX9();
 
-protected:
+private:
     bool _initialized;
     std::experimental::filesystem::path _workingdir;
     std::uint16_t _scaleW;
@@ -36,7 +36,8 @@ protected:
 
     std::vector<LPDIRECT3DTEXTURE9> _textures;
     std::vector<std::string> _texturenames;
-    std::vector<std::vector<STextVertex>> _vertices;
+    std::vector<std::vector<SProvinceTextVertex>> _vertices;
+    std::vector<std::vector<UINT>> _indices;
 
     void ReadInfoBlock(FILE *file);
     void ReadCommonBlock(FILE *file);

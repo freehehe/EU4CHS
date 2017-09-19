@@ -12,6 +12,7 @@
 #include <tuple>
 #include <utility>
 #include <map>
+#include <memory>
 #include <unordered_map>
 #include <string>
 #include <iterator>

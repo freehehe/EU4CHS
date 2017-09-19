@@ -53,3 +53,8 @@ vic_29s
 vic_36
 vic_36s
 Mapfont // Mapfont_100
+
+CEU3GraphicalMap::ctor里面定义地图字体tahoma_60
+CCountryNameCollection::RenderNames
+CCountryNameCollection::AddNudgedNames
+CGenerateNamesWork::AddNameArea

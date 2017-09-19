@@ -1,5 +1,5 @@
 ﻿#include "stdinc.h"
-#include "cjk_font.h"
+#include "cjk_mapfont.h"
 #include "functions.h"
 
 using namespace std;
@@ -16,7 +16,7 @@ union UnicodeCharPair
     uint64_t _packed;
 };
 
-CJKFont::CJKFont(const filesystem::path & fntname)
+CJKMapFont::CJKMapFont(const filesystem::path & fntname)
 {
     _initialized = false;
     _values.reserve(45000);
@@ -24,14 +24,14 @@ CJKFont::CJKFont(const filesystem::path & fntname)
     InitWithFile(fntname);
 }
 
-void CJKFont::ReadInfoBlock(FILE * file)
+void CJKMapFont::ReadInfoBlock(FILE * file)
 {
     uint32_t block_size;
     fread(&block_size, 4, 1, file);
     fseek(file, block_size, SEEK_CUR);
 }
 
-void CJKFont::ReadCommonBlock(FILE * file)
+void CJKMapFont::ReadCommonBlock(FILE * file)
 {
 #pragma pack(push,1)
     struct CommonBlock
@@ -66,7 +66,7 @@ void CJKFont::ReadCommonBlock(FILE * file)
     _pages = common_block.pages;
 }
 
-void CJKFont::ReadPagesBlock(FILE *file)
+void CJKMapFont::ReadPagesBlock(FILE *file)
 {
     uint32_t block_size;
     fread(&block_size, 4, 1, file);
@@ -86,7 +86,7 @@ void CJKFont::ReadPagesBlock(FILE *file)
     delete[]buffer;
 }
 
-void CJKFont::ReadCharsBlock(FILE * file)
+void CJKMapFont::ReadCharsBlock(FILE * file)
 {
     struct BinaryCharValues
     {
@@ -129,14 +129,14 @@ void CJKFont::ReadCharsBlock(FILE * file)
     }
 }
 
-void CJKFont::ReadKerningsBlock(FILE * file)
+void CJKMapFont::ReadKerningsBlock(FILE * file)
 {
     uint32_t block_size;
     fread(&block_size, 4, 1, file);
     fseek(file, block_size, SEEK_CUR);
 }
 
-void CJKFont::InitWithFile(const filesystem::path &fntname)
+void CJKMapFont::InitWithFile(const filesystem::path &fntname)
 {
     unsigned char block_type;
 
@@ -184,11 +184,12 @@ void CJKFont::InitWithFile(const filesystem::path &fntname)
 
     _vertices.clear();
     _vertices.resize(_pages);
-    
+    _indices.resize(_pages);
+
     _initialized = true;
 }
 
-void CJKFont::LoadTexturesDX9()
+void CJKMapFont::LoadTexturesDX9()
 {
     for (auto &name : _texturenames)
     {
@@ -200,7 +201,7 @@ void CJKFont::LoadTexturesDX9()
     }
 }
 
-void CJKFont::UnloadTexturesDX9()
+void CJKMapFont::UnloadTexturesDX9()
 {
     for (auto &texture : _textures)
     {
@@ -210,7 +211,7 @@ void CJKFont::UnloadTexturesDX9()
     _textures.clear();
 }
 
-const CJKFont::CharacterValues *CJKFont::GetValue(uint32_t unicode)
+const CJKMapFont::CharacterValues *CJKMapFont::GetValue(uint32_t unicode)
 {
     auto it = _values.find(unicode);
 
@@ -224,7 +225,7 @@ const CJKFont::CharacterValues *CJKFont::GetValue(uint32_t unicode)
     }
 }
 
-void CJKFont::AddVerticesDX9(CBitmapFont *pFont, std::uint32_t unicode, STextVertex * pVertices)
+void CJKMapFont::AddVerticesDX9(CBitmapFont *pFont, std::uint32_t unicode, SProvinceTextVertex * pVertices)
 {
     float width_ratio = (float)pFont->get_field<int, 0x4E8>() / _scaleW;
     float height_ratio = (float)pFont->get_field<int, 0x4EC>() / _scaleH;
@@ -245,16 +246,23 @@ void CJKFont::AddVerticesDX9(CBitmapFont *pFont, std::uint32_t unicode, STextVer
     copy_n(pVertices, 6, back_inserter(_vertices[GetValue(unicode)->PageIndex]));
 }
 
-void CJKFont::DrawAllDX9()
+void CJKMapFont::DrawAllDX9()
 {
     for (size_t index = 0; index < _pages; ++index)
     {
         if (!_vertices[index].empty())
         {
             g_game.pDX9Device->SetTexture(0, _textures[index]);
-            g_game.pDX9Device->DrawPrimitiveUP(D3DPT_TRIANGLELIST, _vertices[index].size() / 3, _vertices[index].data(), sizeof(STextVertex));
 
-            _vertices[index].clear();
+            g_game.pDX9Device->DrawIndexedPrimitiveUP(
+                D3DPT_TRIANGLELIST, 
+                0, 
+                _vertices[index].size(),
+                _vertices[index].size() / 3, 
+                _indices[index].data(), 
+                D3DFORMAT::D3DFMT_INDEX16,
+                _vertices[index].data(),
+                sizeof(SProvinceTextVertex));
         }
     }
 }

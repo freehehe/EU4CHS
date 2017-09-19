@@ -91,6 +91,7 @@
   <ItemGroup>
     <ClCompile Include="bitmapfont.cpp" />
     <ClCompile Include="byte_pattern.cpp" />
+    <ClCompile Include="cjk_mapfont.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="eu4.cpp" />
     <ClCompile Include="functions.cpp" />
@@ -106,6 +107,7 @@
   <ItemGroup>
     <ClInclude Include="bitmapfont.h" />
     <ClInclude Include="byte_pattern.h" />
+    <ClInclude Include="cjk_mapfont.h" />
     <ClInclude Include="eu4.h" />
     <ClInclude Include="functions.h" />
     <ClInclude Include="cjk_fonts.h" />
@@ -113,7 +115,6 @@
     <ClInclude Include="stdinc.h" />
     <ClInclude Include="plugin.h" />
     <ClInclude Include="textbuffer.h" />
-    <ClInclude Include="utf8.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Note.txt" />

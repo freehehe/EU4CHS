@@ -15,6 +15,12 @@ class memory_pointer
     };
 
 public:
+    memory_pointer()
+        :_pointer{}
+    {
+
+    }
+
     memory_pointer(void *pointer)
         : _pointer(pointer)
     {
