@@ -320,7 +320,7 @@ namespace BitmapFont
     {
         void operator()(injector::reg_pack *regs) const
         {
-            g_context.textLength = *(uint32_t *)(regs->ebp + 0x34);
+            g_context.textLength = *(uint32_t *)(regs->ebp - 0x38);
 
             Functions::GetTwoUnicode(
                 (const char *)regs->eax,
@@ -345,14 +345,20 @@ namespace BitmapFont
         }
     };
 
-    __declspec(naked) void CBitmapFont_RenderToTexture_GenVertices()
+    __declspec(naked) void CBitmapFont_RenderToTexture_GenVertices_7() //10983CE
     {
         __asm
         {
             pop g_context.ret_addr;
 
-            dec dword ptr[ebp - 0x2C];
-            mov eax, [ebp - 0x14];
+            cmp g_context.unicode, 0xFF;
+            jg cjk;
+
+            inc dword ptr[ebp + 0x24];
+            jmp end;
+
+        cjk:
+            mov eax, [ebp + 0x14];
             lea eax, [eax + edi * 4];
             push eax;
             push g_context.unicode;
@@ -360,6 +366,34 @@ namespace BitmapFont
             mov ecx, g_context.cjkFont;
             call CJKFont::AddVerticesDX9;
 
+        end:
+            mov edx, [ebp + 0x24];
+            mov edi, [ebp - 0x10];
+
+            jmp g_context.ret_addr;
+        }
+    }
+
+    __declspec(naked) void CBitmapFont_RenderToTexture_GetKerning_16() //1098418
+    {
+        __asm
+        {
+            pop g_context.ret_addr;
+
+            cmp g_context.nextUnicode, 0xFF;
+            jg noKerning;
+
+            push g_context.nextUnicode;
+            push g_context.unicode;
+            mov ecx, g_context.pSet;
+            call g_game.pfCBitmapCharacterSet_GetKerning;
+
+            jmp end;
+
+        noKerning:
+            xorps xmm0, xmm0;
+
+        end:
             jmp g_context.ret_addr;
         }
     }
