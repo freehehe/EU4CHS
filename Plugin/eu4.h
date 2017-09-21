@@ -179,7 +179,14 @@ struct CBitmapCharacterSet :IncompleteClass
             cp += 0xA0;
         }
 
-        return field<const EU4CharacterValues *, 0>()[cp];
+        EU4CharacterValues *result = field<EU4CharacterValues *, 0>()[cp];
+
+        if (result)
+        {
+            result->kerning = false;
+        }
+
+        return result;
     }
 
     float GetScale()
