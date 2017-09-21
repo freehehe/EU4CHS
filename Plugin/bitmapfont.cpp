@@ -93,8 +93,30 @@ namespace BitmapFont
             cmp g_context.nextUnicode, 0xFF;
             ja skip;
 
-            push g_context.nextUnicode;
-            push g_context.unicode;
+            mov eax, g_context.nextUnicode;
+            mov ecx, 0xA3;
+            cmp eax, 3;
+            cmovz eax, ecx;
+            mov ecx, 0xA4;
+            cmp eax, 4;
+            cmovz eax, ecx;
+            mov ecx, 0xA7;
+            cmp eax, 7;
+            cmovz eax, ecx;
+            push eax;
+
+            mov eax, g_context.unicode;
+            mov ecx, 0xA3;
+            cmp eax, 3;
+            cmovz eax, ecx;
+            mov ecx, 0xA4;
+            cmp eax, 4;
+            cmovz eax, ecx;
+            mov ecx, 0xA7;
+            cmp eax, 7;
+            cmovz eax, ecx;
+            push eax;
+
             mov ecx, [ebp - 0x34];
             call g_game.pfCBitmapCharacterSet_GetKerning;
             jmp end;
@@ -1423,25 +1445,11 @@ namespace BitmapFont
         injector::WriteMemory<uint8_t>(g_pattern.find_pattern("80 7C 06 FF A7").get(0).integer(4), 7, true); //cmp byte ptr[esi + eax -1], 0xA7
         injector::WriteMemory<uint8_t>(g_pattern.find_pattern("80 3C 06 A7").get(0).integer(3), 7, true); //cmp byte ptr[esi + eax], 0xA7
 
-        g_pattern.find_pattern("A3 61 64 6D").for_each_result( //£adm
-            [](memory_pointer p)
-        {
-            injector::WriteMemory<uint8_t>(p.raw<uint8_t>(), 3, true);
-        });
-
-        g_pattern.find_pattern("A3 64 69 70").for_each_result( //£dip
-            [](memory_pointer p)
-        {
-            injector::WriteMemory<uint8_t>(p.raw<uint8_t>(), 3, true);
-        });
-
-        g_pattern.find_pattern("A3 6D 69 6C").for_each_result( //£mil
-            [](memory_pointer p)
-        {
-            injector::WriteMemory<uint8_t>(p.raw<uint8_t>(), 3, true);
-        });
+        //A3 - 03
+        //CCountry::CreateNewHeir
+        //CUnit::GetToolTip
 
         //CBitmapFont__RemoveSpecialChars待定
-        injector::WriteMemory(g_pattern.find_pattern("83 EC 34 6A 05 68").get(0).integer(6), "\7@{\3\4", true);
+        injector::WriteMemory(g_pattern.find_pattern("83 EC 34 6A 05 68").get(0).integer(6), "@{", true);
     }
 }

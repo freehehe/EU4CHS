@@ -131,7 +131,9 @@ public:
 
     byte_pattern &set_pattern(const char *pattern_literal);
     byte_pattern &set_pattern(const void *data, std::size_t size);
-    byte_pattern &set_module(memory_pointer module = pattern_default_module);
+
+    byte_pattern &set_module();
+    byte_pattern &set_module(memory_pointer module);
     byte_pattern &set_range(memory_pointer beg, memory_pointer end);
     byte_pattern &search();
 
