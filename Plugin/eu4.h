@@ -181,10 +181,11 @@ struct CBitmapCharacterSet :IncompleteClass
 
         EU4CharacterValues *result = field<EU4CharacterValues *, 0>()[cp];
 
+/*
         if (result)
         {
             result->kerning = false;
-        }
+        }*/
 
         return result;
     }

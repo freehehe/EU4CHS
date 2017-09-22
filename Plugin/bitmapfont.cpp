@@ -92,13 +92,43 @@ namespace BitmapFont
 
             cmp g_context.nextUnicode, 0xFF;
             ja skip;
-            mov ecx, 0xA3;
-            mov eax, g_context.unicode;
-            cmp eax, 3;
 
+            mov eax, g_context.unicode;
+            mov ecx, 0xA3;
+            cmp eax, 3;
             cmovz eax, ecx;
-            push g_context.nextUnicode;
-            push g_context.unicode;
+            jmp push_first;
+
+            mov ecx, 0xA4;
+            cmp eax, 4;
+            cmovz eax, ecx;
+            jmp push_first;
+
+            mov ecx, 0xA7;
+            cmp eax, 7;
+            cmovz eax, ecx;
+
+        push_first:
+            push eax;
+
+            mov eax, g_context.nextUnicode;
+            mov ecx, 0xA3;
+            cmp eax, 3;
+            cmovz eax, ecx;
+            jmp push_second;
+
+            mov ecx, 0xA4;
+            cmp eax, 4;
+            cmovz eax, ecx;
+            jmp push_second;
+
+            mov ecx, 0xA7;
+            cmp eax, 7;
+            cmovz eax, ecx;
+
+        push_second:
+            push eax;
+
             mov ecx, [ebp - 0x34];
             call g_game.pfCBitmapCharacterSet_GetKerning;
             jmp end;
