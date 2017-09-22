@@ -51,6 +51,13 @@ byte_pattern &byte_pattern::set_pattern(const void *data, size_t size)
     return *this;
 }
 
+byte_pattern & byte_pattern::set_module()
+{
+    static HMODULE default_module = GetModuleHandleA(NULL);
+
+    return set_module(default_module);
+}
+
 byte_pattern &byte_pattern::set_module(memory_pointer module)
 {
     this->get_module_range(module);
@@ -215,7 +222,8 @@ void byte_pattern::get_module_range(memory_pointer module)
     {
         auto sec = getSection(ntHeader, i);
         auto secSize = sec->SizeOfRawData != 0 ? sec->SizeOfRawData : sec->Misc.VirtualSize;
-        //if (sec->Characteristics & IMAGE_SCN_MEM_EXECUTE)
+
+        if (sec->Characteristics & IMAGE_SCN_MEM_EXECUTE)
             this->_range.second = this->_range.first + sec->VirtualAddress + secSize;
 
         if ((i == ntHeader->FileHeader.NumberOfSections - 1) && this->_range.second == 0)
