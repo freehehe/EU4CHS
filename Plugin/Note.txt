@@ -1,6 +1,5 @@
 ﻿NoKerning
-12 14 16 (新)宋体，Rasterization全不选
-以后的 Smoothing
+12 14 16 18(新)宋体，Rasterization全不选
 
 地图用0x14大小的Vertex
 
@@ -17,15 +16,7 @@ name = "52X牧有汉化补丁文本"
 path = "mod/eu4chs"
 supported_version = "1.22.2"
 
-byte_pattern 搜索所有PE Section
 看看CTextBuffer::Write的过滤关键字
-
-GetRequiredSize
-RenderToTexture
-Render3d
-GetActualRealRequiredSizeActually
-
-A3A4A7不是utf8首字节
 
 Arial12
 Arial12_bold
@@ -53,6 +44,8 @@ vic_29s
 vic_36
 vic_36s
 Mapfont // Mapfont_100
+
+字体纹理随Latin1字体纹理
 
 CEU3GraphicalMap::ctor里面定义地图字体tahoma_60
 CCountryNameCollection::RenderNames

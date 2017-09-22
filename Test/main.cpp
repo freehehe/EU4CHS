@@ -1,5 +1,7 @@
-﻿#include <windows.h>
-#include <iostream>
+﻿#include <iostream>
+#include <cstdint>
+#include <cstdio>
+#include <string_view>
 
 using namespace std;
 
