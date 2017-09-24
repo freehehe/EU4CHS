@@ -109,6 +109,7 @@
     <ClInclude Include="byte_pattern.h" />
     <ClInclude Include="cjk_mapfont.h" />
     <ClInclude Include="eu4.h" />
+    <ClInclude Include="eu4_utf8.hpp" />
     <ClInclude Include="functions.h" />
     <ClInclude Include="cjk_fonts.h" />
     <ClInclude Include="cjk_font.h" />

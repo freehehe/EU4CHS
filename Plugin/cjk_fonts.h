@@ -8,8 +8,6 @@ class CJKFontManager
     std::unordered_map<std::string, CJKFont> _NormalFonts;
     std::unique_ptr<CJKMapFont> _MapFont;
 
-    static constexpr auto aa = sizeof(std::string);
-
     void LoadFonts();
 
 public:

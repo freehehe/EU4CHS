@@ -1,5 +1,6 @@
 ﻿#include "stdinc.h"
 #include "cjk_fonts.h"
+#include "cjk_mapfont.h"
 #include "plugin.h"
 #include "byte_pattern.h"
 
@@ -51,7 +52,7 @@ void *CJKFontManager::InitGfxAndLoadTextures(void *pInfo, void *pBool)
         font.second.LoadTexturesDX9();
     }
 
-    _MapFont->LoadTexturesDX9();
+    g_Fonts._MapFont->LoadTexturesDX9();
 
     return pMasterContext;
 }
@@ -63,7 +64,7 @@ void CJKFontManager::UnloadTexturesAndShutdownGfx(void *pMasterContext)
         font.second.UnloadTexturesDX9();
     }
 
-    _MapFont->UnloadTexturesDX9();
+    g_Fonts._MapFont->UnloadTexturesDX9();
 
     injector::cstd<void(void *)>::call(g_game.pfGfxShutdownDX9, pMasterContext);
 }
@@ -90,7 +91,7 @@ void CJKFontManager::DrawMapFontDX9()
 
     g_game.pDX9Device->GetTexture(0, &original);
 
-    _MapFont->DrawAllDX9();
+    g_Fonts._MapFont->DrawAllDX9();
 
     g_game.pDX9Device->SetTexture(0, original);
 }

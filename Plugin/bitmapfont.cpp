@@ -271,10 +271,8 @@ namespace BitmapFont
             //dl为0则处理间断
             pop g_context.ret_addr;
 
-            xor al, al;
-
             //高度不为0 && 前字节<=255 && 后字节<=255
-            cmp[ecx]EU4CharacterValues.h, 0; //高度为0
+            cmp [eax]EU4CharacterValues.h, 0; //高度为0
             setnz al;
             mov dl, al;
 
@@ -307,7 +305,7 @@ namespace BitmapFont
                 g_context.useSpecialChars);
 
             regs->edi += (g_context.unicodeLength - 1);
-            *(uint32_t *)(regs->ebp - 0x30) = regs->edi;
+            *(uint32_t *)(regs->ebp - 0x10) = regs->edi;
 
             if (Functions::IsLatin1Char(g_context.unicode))
             {
@@ -342,6 +340,7 @@ namespace BitmapFont
             call CJKFont::AddVerticesDX9;
 
         end:
+            mov ecx, [ebp - 0x9C];
             mov edx, [ebp + 0x24];
             mov edi, [ebp - 0x10];
 
@@ -1303,10 +1302,11 @@ namespace BitmapFont
     {
         injector::MakeJMP(g_pattern.find_pattern("81 EC 8C 00 00 00 53 8B 5D 0C").get(0).integer(-6), GetWidthOfString);
         injector::MakeJMP(g_pattern.find_pattern("81 EC AC 00 00 00 8B 55 0C").get(0).integer(-6), GetHeightOfString);
-        injector::MakeJMP(g_pattern.find_first("81 EC 0C 03 00 00 8B 45 0C").integer(-0x18), GetActualRequiredSize);
-        injector::MakeJMP(g_pattern.find_first("81 EC CC 00 00 00 53 56 57 8B 7D 08 89 4D F0").integer(-0x18), GetRequiredSize);
-        injector::MakeJMP(g_pattern.find_first("81 EC 04 01 00 00 53 8B 5D 0C 56").integer(-0x18), GetActualRealRequiredSizeActually);
+        //injector::MakeJMP(g_pattern.find_first("81 EC 0C 03 00 00 8B 45 0C").integer(-0x18), GetActualRequiredSize);
+        //injector::MakeJMP(g_pattern.find_first("81 EC CC 00 00 00 53 56 57 8B 7D 08 89 4D F0").integer(-0x18), GetRequiredSize);
+        //injector::MakeJMP(g_pattern.find_first("81 EC 04 01 00 00 53 8B 5D 0C 56").integer(-0x18), GetActualRealRequiredSizeActually);
 
+#pragma region RenderToScreen
         g_pattern.find_pattern("8A 87 ? ? ? ? 88 86 ? ? ? ? 46");
         injector::MakeInline<CBitmapFont_RenderToScreen_GetChar_13>(g_pattern.get(0).integer(), g_pattern.get(0).integer(13));
 
@@ -1316,7 +1316,6 @@ namespace BitmapFont
         g_pattern.find_pattern("8A 04 38 FF 75 A8");
         injector::MakeNOP(g_pattern.get(0).integer(), 20);
         injector::MakeCALL(g_pattern.get(0).integer(), CBitmapFont_GetKerning);
-
 
         g_pattern.find_pattern("66 83 79 06 00");
         injector::MakeCALL(g_pattern.get(0).integer(), CBitmapFont_RenderToScreen_Delim);
@@ -1332,9 +1331,32 @@ namespace BitmapFont
         g_pattern.find_pattern("0F B6 87 ? ? ? ? 8D 8E B4 00 00 00");
         injector::MakeNOP(g_pattern.get(0).integer(), 27);
         injector::MakeCALL(g_pattern.get(0).integer(), CBitmapFont_GetKerning);
-        
+#pragma endregion RenderToScreen
+
+#pragma region RenderToTexture
+/*
         g_pattern.find_pattern("8A 04 30 0F B6 C0 8B 84 87 B4 00 00 00");
         injector::MakeInline<CBitmapFont_RenderToTexture_GetCharInfo_13>(g_pattern.get(0).integer(), g_pattern.get(0).integer(13));
+
+        g_pattern.find_pattern("8A 04 30 88 85 3C FF FF FF");
+        injector::MakeNOP(g_pattern.get(0).integer(-9), 6);
+        injector::MakeNOP(g_pattern.get(0).integer(), 20);
+        injector::MakeCALL(g_pattern.get(0).integer(), CBitmapFont_GetKerning);
+
+        g_pattern.find_pattern("66 83 78 06 00 0F 85 15 03 00 00");
+        injector::MakeCALL(g_pattern.get(0).integer(), CBitmapFont_RenderToTexture_Delim);
+
+        g_pattern.find_pattern("0F B6 04 38 8B 04 81");
+        injector::MakeInline<CBitmapFont_RenderToTexture_GetCharInfo_7>(g_pattern.get(0).integer(), g_pattern.get(0).integer(7));
+
+        g_pattern.find_pattern("8B 55 24 8B 7D F0 42");
+        injector::MakeNOP(g_pattern.get(0).integer(), 7);
+        injector::MakeCALL(g_pattern.get(0).integer(), CBitmapFont_RenderToTexture_GenVertices_7);
+
+        g_pattern.find_pattern("0F B6 44 38 01 50");
+        injector::MakeNOP(g_pattern.get(0).integer(), 22);
+        injector::MakeCALL(g_pattern.get(0).integer(), CBitmapFont_GetKerning);*/
+#pragma endregion RenderToTexture
 
         //cmp byte ptr [eax + esi], 0xA?
         g_pattern.find_pattern("80 3C 30 A?").for_each_result(
@@ -1390,7 +1412,6 @@ namespace BitmapFont
 
         //-----------------------------------------------------漏网之鱼-----------------------------------------------------
         injector::WriteMemory<uint8_t>(g_pattern.find_pattern("3C A7 8D 45 84").get(0).integer(1), 7, true); //cmp al, 0A7h; lea eax, [ebp - 0x7C]
-        injector::WriteMemory<uint8_t>(g_pattern.find_pattern("80 3C 31 A7").get(0).integer(3), 7, true); //cmp byte ptr [ecx + esi], 0xA7
         injector::WriteMemory<uint8_t>(g_pattern.find_pattern("80 7C 06 FF A7").get(0).integer(4), 7, true); //cmp byte ptr[esi + eax -1], 0xA7
         injector::WriteMemory<uint8_t>(g_pattern.find_pattern("80 3C 06 A7").get(0).integer(3), 7, true); //cmp byte ptr[esi + eax], 0xA7
 

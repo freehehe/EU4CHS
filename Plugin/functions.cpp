@@ -139,13 +139,6 @@ namespace Functions
                 second = temp_second;
             }
         }
-        catch (const utf8::invalid_utf8&)
-        {
-            wchar_t text[4096];
-
-            MultiByteToWideChar(28591, 0, pText, text_length, text, 4096);
-            MessageBoxW(NULL, text, L"Fucked text", MB_OK);
-        }
     }
 
     void GetTwoUnicode(std::vector<wchar_t>::iterator pText, std::vector<wchar_t>::iterator pEnd, uint32_t & first, uint32_t & second, bool bUseSpecialChars)

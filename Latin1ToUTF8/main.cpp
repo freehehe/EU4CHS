@@ -13,8 +13,8 @@ using namespace experimental;
 
 bool ConvertFile(const filesystem::path &in_file, const filesystem::path &out_file)
 {
-    static vector<char> cbuffer;
-    static vector<uint32_t> wbuffer;
+    vector<char> cbuffer;
+    vector<uint32_t> wbuffer;
 
     fstream iofs{ in_file, ios::in };
 
@@ -24,9 +24,6 @@ bool ConvertFile(const filesystem::path &in_file, const filesystem::path &out_fi
         return false;
     }
 
-    cbuffer.clear();
-    wbuffer.clear();
-
     cbuffer.assign(istreambuf_iterator<char>{ iofs }, istreambuf_iterator<char>{});
 
     if (all_of(cbuffer.begin(), cbuffer.end(), isascii))
@@ -34,11 +31,19 @@ bool ConvertFile(const filesystem::path &in_file, const filesystem::path &out_fi
         return true;
     }
 
-    transform(cbuffer.begin(), cbuffer.end(), back_inserter(wbuffer), 
-        [](char character)
+    if (utf8::is_valid(cbuffer.begin(), cbuffer.end()))
     {
-        return *(unsigned char *)&character;
-    });
+        cout << in_file.string() << endl;
+        utf8::utf8to32(cbuffer.begin(), cbuffer.end(), back_inserter(wbuffer));
+    }
+    else
+    {
+        transform(cbuffer.begin(), cbuffer.end(), back_inserter(wbuffer),
+            [](char character)
+        {
+            return *(unsigned char *)&character;
+        });
+    }
 
     iofs.close();
 
