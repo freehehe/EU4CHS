@@ -116,8 +116,6 @@ VALIDATE_SIZE(CInputEvent,0x58)
 
 struct EU4Meta
 {
-    std::uintptr_t pfCBitmapCharacterSet_GetKerning;
-
     LPDIRECT3DDEVICE9 pDX9Device;
     std::uintptr_t pfGfxInitDX9;
     std::uintptr_t pfGfxShutdownDX9;

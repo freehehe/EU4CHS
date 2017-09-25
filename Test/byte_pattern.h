@@ -2,7 +2,9 @@
 //https://github.com/ThirteenAG/Hooking.Patterns
 
 #pragma once
-#include "stdinc.h"
+#include <windows.h>
+#include <vector>
+#include <utility>
 
 extern HMODULE pattern_default_module;
 

@@ -1,6 +1,8 @@
-﻿#include "stdinc.h"
-#include "byte_pattern.h"
+﻿#include "byte_pattern.h"
+#include <sstream>
+#include <fstream>
 
+extern HMODULE pattern_default_module = GetModuleHandleA(NULL);
 byte_pattern g_pattern;
 
 using namespace std;

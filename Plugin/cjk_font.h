@@ -32,7 +32,7 @@ protected:
     std::uint16_t _scaleH;
     std::uint16_t _pages;
 
-    std::unordered_map<std::uint32_t, CharacterValues> _values;
+    std::array<std::unique_ptr<CharacterValues>, 0x10000> _values;
 
     std::vector<LPDIRECT3DTEXTURE9> _textures;
     std::vector<std::string> _texturenames;

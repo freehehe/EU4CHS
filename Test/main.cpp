@@ -2,8 +2,12 @@
 #include <cstdint>
 #include <cstdio>
 #include <string_view>
+#include <string>
+#include <iterator>
+#include <vector>
+#include "byte_pattern.h"
 
-using namespace std;
+//£¤§
 
 int main()
 {

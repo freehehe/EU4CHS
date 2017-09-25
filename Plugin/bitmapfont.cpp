@@ -84,51 +84,6 @@ namespace BitmapFont
         }
     };
 
-    __declspec(naked) void CBitmapFont_GetKerning() //1098EDE
-    {
-        __asm
-        {
-            pop g_context.ret_addr;
-
-            cmp g_context.nextUnicode, 0xFF;
-            ja skip;
-
-            mov eax, g_context.nextUnicode;
-            mov ecx, 0xA3;
-            cmp eax, 3;
-            cmovz eax, ecx;
-            mov ecx, 0xA4;
-            cmp eax, 4;
-            cmovz eax, ecx;
-            mov ecx, 0xA7;
-            cmp eax, 7;
-            cmovz eax, ecx;
-            push eax;
-
-            mov eax, g_context.unicode;
-            mov ecx, 0xA3;
-            cmp eax, 3;
-            cmovz eax, ecx;
-            mov ecx, 0xA4;
-            cmp eax, 4;
-            cmovz eax, ecx;
-            mov ecx, 0xA7;
-            cmp eax, 7;
-            cmovz eax, ecx;
-            push eax;
-
-            mov ecx, g_context.pSet;
-            call g_game.pfCBitmapCharacterSet_GetKerning;
-            jmp end;
-
-        skip:
-            xorps xmm0, xmm0;
-
-        end:
-            jmp g_context.ret_addr;
-        }
-    }
-
     __declspec(naked) void CBitmapFont_RenderToScreen_Delim() //1098F0A
     {
         __asm
@@ -456,37 +411,6 @@ namespace BitmapFont
                 {
                     vTempWidth += pValues->xadvance * pSet->GetScale();
 
-                    if (pValues->kerning && (strit < (wideText.end() - 1)))
-                    {
-                        uint32_t next = strit[1];
-
-                        if (Functions::IsLatin1Char(next))
-                        {
-                            float fKerning;
-
-                            if (unicode == 0x3 || unicode == 0x4 || unicode == 0x7)
-                            {
-                                unicode += 0xA0;
-                            }
-
-                            if (next == 0x3 || next == 0x4 || next == 0x7)
-                            {
-                                next += 0xA0;
-                            }
-
-                            __asm
-                            {
-                                push next;
-                                push unicode;
-                                mov ecx, pSet;
-                                call g_game.pfCBitmapCharacterSet_GetKerning;
-                                movss fKerning, xmm0;
-                            }
-
-                            vTempWidth += fKerning;
-                        }
-                    }
-
                     if (pValues->h == 0 || !Functions::IsLatin1Char(unicode))
                     {
                         nWidth = max(nWidth, vTempWidth);
@@ -620,41 +544,6 @@ namespace BitmapFont
                     vWordWidth += fWidth;
                     vTempWidth += fWidth;
 
-                    if (pValues->kerning)
-                    {
-                        if (strit < (wideText.end() - 1))
-                        {
-                            auto next = strit[1];
-
-                            if (Functions::IsLatin1Char(next))
-                            {
-                                float fKerning;
-
-                                if (unicode == 0x3 || unicode == 0x4 || unicode == 0x7)
-                                {
-                                    unicode += 0xA0;
-                                }
-
-                                if (next == 0x3 || next == 0x4 || next == 0x7)
-                                {
-                                    next += 0xA0;
-                                }
-
-                                __asm
-                                {
-                                    push next;
-                                    push unicode;
-                                    mov ecx, pSet;
-                                    call g_game.pfCBitmapCharacterSet_GetKerning;
-                                    movss fKerning, xmm0;
-                                }
-
-                                vWordWidth += fKerning;
-                                vTempWidth += fKerning;
-                            }
-                        }
-                    }
-
                     if (vTempWidth >= nMaxWidth)
                     {
                         vHeight += vCurrentLineHeight;
@@ -763,28 +652,6 @@ namespace BitmapFont
                         vWordWidth += fWidth;
                         vTempWidth += fWidth;
 
-                        if (pValues->kerning && strit < (wideText.end() - 1))
-                        {
-                            uint32_t next = strit[1];
-
-                            if (Functions::IsLatin1Char(next))
-                            {
-                                float fKerning;
-
-                                __asm
-                                {
-                                    push next;
-                                    push unicode;
-                                    mov ecx, pSet;
-                                    call g_game.pfCBitmapCharacterSet_GetKerning;
-                                    movss fKerning, xmm0;
-                                }
-
-                                vWordWidth += fKerning;
-                                vTempWidth += fKerning;
-                            }
-                        }
-
                         if (pValues->h == 0 || !Functions::IsLatin1Char(unicode))
                         {
                             if (vTempWidth > nMaxWidth)
@@ -860,6 +727,11 @@ namespace BitmapFont
     {
         static const float fIconWidth = 8.0f;
 
+        //edi OriginalText
+        //ebx: NewText
+
+        //xmm4 vHeight
+
         char Tag[128];
 
         float vWordWidth = 0.0f;
@@ -868,12 +740,16 @@ namespace BitmapFont
         CBitmapCharacterSet *pSet = pFont->GetLatin1CharacterSet();
         CJKFont *cjkFont = g_Fonts.GetFont(pFont->GetFontPath());
 
+        std::string Result{ OriginalText->c_str() };
+        std::string_view source_view{ OriginalText->c_str() };
+
+        std::vector<wchar_t> wideText;
+        utf8::utf8to16(source_view.begin(), source_view.end(), std::back_inserter(wideText));
+
         int nDefaultLineHeight = pFont->get_field<int, 0x4D4>() * pSet->GetScale();
         int nCurrentLineHeight = nDefaultLineHeight;
         float vHeight = nDefaultLineHeight;
         int nWidth = 0;
-
-        std::string Result;
 
         if (nMaxWidth == 0)
         {
@@ -885,13 +761,9 @@ namespace BitmapFont
 
         if (OriginalText->length() == 0)
         {
+            NewText->assign(Result.c_str());
             return;
         }
-
-        std::string_view source_view{ OriginalText->c_str() };
-
-        std::vector<wchar_t> wideText;
-        utf8::utf8to16(source_view.begin(), source_view.end(), std::back_inserter(wideText));
 
         for (auto strit = wideText.begin(); strit < wideText.end(); ++strit)
         {
@@ -962,28 +834,6 @@ namespace BitmapFont
                     vWordWidth += fWidth;
                     vTempWidth += fWidth;
 
-                    if (pValues->kerning && strit < (wideText.end() - 1))
-                    {
-                        uint32_t next = strit[1];
-
-                        if (Functions::IsLatin1Char(next))
-                        {
-                            float fKerning;
-
-                            __asm
-                            {
-                                push next;
-                                push unicode;
-                                mov ecx, pSet;
-                                call g_game.pfCBitmapCharacterSet_GetKerning;
-                                movss fKerning, xmm0;
-                            }
-
-                            vWordWidth += fKerning;
-                            vTempWidth += fKerning;
-                        }
-                    }
-
                     if (vTempWidth >= nMaxWidth)
                     {
                         vHeight += nCurrentLineHeight;
@@ -1043,8 +893,6 @@ namespace BitmapFont
                 }
             }
         }
-
-        NewText->assign(Result.c_str());
     }
 
     static void __fastcall GetActualRealRequiredSizeActually(CBitmapFont *pFont, int, const CString *OriginalText, CString *NewText, int nMaxWidth, int nMaxHeight, CVector2<unsigned int> *BorderSize, bool bWholeWordOnly, bool bAddBreaksToNewText, bool bUseSpecialChars)
@@ -1155,29 +1003,7 @@ namespace BitmapFont
                 {
                     float fWidth = pValues->xadvance * pSet->GetScale();
                     vWordWidth += fWidth;
-                    vTempWidth += fWidth;
-
-                    if (pValues->kerning && strit < (wideText.end() - 1))
-                    {
-                        uint32_t next = strit[1];
-
-                        if (Functions::IsLatin1Char(next))
-                        {
-                            float fKerning;
-
-                            __asm
-                            {
-                                push next;
-                                push unicode;
-                                mov ecx, pSet;
-                                call g_game.pfCBitmapCharacterSet_GetKerning;
-                                movss fKerning, xmm0;
-                            }
-
-                            vWordWidth += fKerning;
-                            vTempWidth += fKerning;
-                        }
-                    }
+                    vTempWidth += fWidth;                    
 
                     if (vTempWidth >= nMaxWidth)
                     {
@@ -1300,22 +1126,22 @@ namespace BitmapFont
 
     void InitAndPatch()
     {
-        injector::MakeJMP(g_pattern.find_pattern("81 EC 8C 00 00 00 53 8B 5D 0C").get(0).integer(-6), GetWidthOfString);
-        injector::MakeJMP(g_pattern.find_pattern("81 EC AC 00 00 00 8B 55 0C").get(0).integer(-6), GetHeightOfString);
+        //去掉Kerning
+        injector::MakeNOP(g_pattern.find_first("C6 40 0E 01 5F").integer(), 4);
+
+        //整个换掉的函数
+        injector::MakeJMP(g_pattern.find_first("81 EC 8C 00 00 00 53 8B 5D 0C").integer(-6), GetWidthOfString);
+        injector::MakeJMP(g_pattern.find_first("81 EC AC 00 00 00 8B 55 0C").integer(-6), GetHeightOfString);
         //injector::MakeJMP(g_pattern.find_first("81 EC 0C 03 00 00 8B 45 0C").integer(-0x18), GetActualRequiredSize);
-        //injector::MakeJMP(g_pattern.find_first("81 EC CC 00 00 00 53 56 57 8B 7D 08 89 4D F0").integer(-0x18), GetRequiredSize);
+        injector::MakeJMP(g_pattern.find_first("81 EC CC 00 00 00 53 56 57 8B 7D 08 89 4D F0").integer(-0x18), GetRequiredSize);
         //injector::MakeJMP(g_pattern.find_first("81 EC 04 01 00 00 53 8B 5D 0C 56").integer(-0x18), GetActualRealRequiredSizeActually);
 
-#pragma region RenderToScreen
+        //RenderToScreen
         g_pattern.find_pattern("8A 87 ? ? ? ? 88 86 ? ? ? ? 46");
         injector::MakeInline<CBitmapFont_RenderToScreen_GetChar_13>(g_pattern.get(0).integer(), g_pattern.get(0).integer(13));
 
         g_pattern.find_pattern("8B 55 CC 0F B6 C0 8B 0C 82");
         injector::MakeInline<CBitmapFont_RenderToScreen_GetCharInfo_9>(g_pattern.get(0).integer(), g_pattern.get(0).integer(9));
-
-        g_pattern.find_pattern("8A 04 38 FF 75 A8");
-        injector::MakeNOP(g_pattern.get(0).integer(), 20);
-        injector::MakeCALL(g_pattern.get(0).integer(), CBitmapFont_GetKerning);
 
         g_pattern.find_pattern("66 83 79 06 00");
         injector::MakeCALL(g_pattern.get(0).integer(), CBitmapFont_RenderToScreen_Delim);
@@ -1328,20 +1154,9 @@ namespace BitmapFont
         injector::MakeNOP(g_pattern.get(0).integer(7), 19);
         injector::MakeCALL(g_pattern.get(0).integer(7), CBitmapFont_RenderToScreen_GenVertices_19);
 
-        g_pattern.find_pattern("0F B6 87 ? ? ? ? 8D 8E B4 00 00 00");
-        injector::MakeNOP(g_pattern.get(0).integer(), 27);
-        injector::MakeCALL(g_pattern.get(0).integer(), CBitmapFont_GetKerning);
-#pragma endregion RenderToScreen
-
-#pragma region RenderToTexture
-/*
+        //RenderToTexture
         g_pattern.find_pattern("8A 04 30 0F B6 C0 8B 84 87 B4 00 00 00");
         injector::MakeInline<CBitmapFont_RenderToTexture_GetCharInfo_13>(g_pattern.get(0).integer(), g_pattern.get(0).integer(13));
-
-        g_pattern.find_pattern("8A 04 30 88 85 3C FF FF FF");
-        injector::MakeNOP(g_pattern.get(0).integer(-9), 6);
-        injector::MakeNOP(g_pattern.get(0).integer(), 20);
-        injector::MakeCALL(g_pattern.get(0).integer(), CBitmapFont_GetKerning);
 
         g_pattern.find_pattern("66 83 78 06 00 0F 85 15 03 00 00");
         injector::MakeCALL(g_pattern.get(0).integer(), CBitmapFont_RenderToTexture_Delim);
@@ -1353,11 +1168,7 @@ namespace BitmapFont
         injector::MakeNOP(g_pattern.get(0).integer(), 7);
         injector::MakeCALL(g_pattern.get(0).integer(), CBitmapFont_RenderToTexture_GenVertices_7);
 
-        g_pattern.find_pattern("0F B6 44 38 01 50");
-        injector::MakeNOP(g_pattern.get(0).integer(), 22);
-        injector::MakeCALL(g_pattern.get(0).integer(), CBitmapFont_GetKerning);*/
-#pragma endregion RenderToTexture
-
+        //A3 A4 A7
         //cmp byte ptr [eax + esi], 0xA?
         g_pattern.find_pattern("80 3C 30 A?").for_each_result(
             [](memory_pointer p)
@@ -1410,16 +1221,39 @@ namespace BitmapFont
             }
         });
 
-        //-----------------------------------------------------漏网之鱼-----------------------------------------------------
-        injector::WriteMemory<uint8_t>(g_pattern.find_pattern("3C A7 8D 45 84").get(0).integer(1), 7, true); //cmp al, 0A7h; lea eax, [ebp - 0x7C]
-        injector::WriteMemory<uint8_t>(g_pattern.find_pattern("80 7C 06 FF A7").get(0).integer(4), 7, true); //cmp byte ptr[esi + eax -1], 0xA7
-        injector::WriteMemory<uint8_t>(g_pattern.find_pattern("80 3C 06 A7").get(0).integer(3), 7, true); //cmp byte ptr[esi + eax], 0xA7
+        //cmp al, 0A7h; lea eax, [ebp - 0x7C]
+        injector::WriteMemory<uint8_t>(g_pattern.find_first("3C A7 8D 45 84").integer(1), 7, true); 
 
-        //A3 - 03
-        //CCountry::CreateNewHeir
-        //CUnit::GetToolTip
+        //cmp byte ptr[esi + eax -1], 0xA7
+        injector::WriteMemory<uint8_t>(g_pattern.find_first("80 7C 06 FF A7").integer(4), 7, true);
 
-        //CBitmapFont__RemoveSpecialChars待定
-        injector::WriteMemory(g_pattern.find_pattern("83 EC 34 6A 05 68").get(0).integer(6), "@{", true);
+        //cmp byte ptr[esi + eax], 0xA7
+        injector::WriteMemory<uint8_t>(g_pattern.find_first("80 3C 06 A7").integer(3), 7, true);
+
+        //WriteVariable 0xA7
+        injector::WriteMemory<uint8_t>(g_pattern.find_first("C6 06 A7").integer(2), 7, true);
+        injector::WriteMemory<uint8_t>(g_pattern.find_first("66 C7 06 A7 21").integer(3), 7, true);
+
+        //运行时连接字符串中的0xA3
+        g_pattern.find_pattern("A3 61 64 6D").for_each_result( //£adm
+            [](memory_pointer p)
+        {
+            injector::WriteMemory<uint8_t>(p.integer(), 3, true);
+        });
+
+        g_pattern.find_pattern("A3 64 69 70").for_each_result( //£dip
+            [](memory_pointer p)
+        {
+            injector::WriteMemory<uint8_t>(p.integer(), 3, true);
+        });
+
+        g_pattern.find_pattern("A3 6D 69 6C").for_each_result( //£mil
+            [](memory_pointer p)
+        {
+            injector::WriteMemory<uint8_t>(p.integer(), 3, true);
+        });
+
+        //CBitmapFont__RemoveSpecialChars
+        injector::WriteMemory(g_pattern.find_first("83 EC 34 6A 05 68").integer(6), "@{", true);
     }
 }

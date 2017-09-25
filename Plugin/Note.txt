@@ -1,20 +1,25 @@
-﻿NoKerning
+﻿eu4utf8
+只有向下读取功能，对无效前导字节按一字节处理
+£¤§
+
+全部去掉NoKerning!
+
+有双引号的token不是实际值
+
 12 14 16 18(新)宋体，Rasterization全不选
 
 地图用0x14大小的Vertex
 
-地图字体 64 64 64
+地图字体 64 64 64 有透明
 外发光200 200 200 不透明度100 精确5像素
 
 只有地图字体需要mipmap
 查找B4 00 00 00
 
 credits.txt 中A7为加大字号用
-特殊处理
+特殊处理或换掉
 
-name = "52X牧有汉化补丁文本"
-path = "mod/eu4chs"
-supported_version = "1.22.2"
+不需要处理txt中的A3 A4 A7
 
 看看CTextBuffer::Write的过滤关键字
 
@@ -83,6 +88,8 @@ launcher.gui language_bg.dds所属expanded window
 4飞龙2审判2白杨2冥界爪2灵气戒指
 
 editbin /dynamicbase:no "D:\Steam\steamapps\common\Europa Universalis IV\eu4.exe"
+
+
 
 貌似不用转txt里的A3A4A7
 ...

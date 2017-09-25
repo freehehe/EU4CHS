@@ -20,10 +20,6 @@ void CPlugin::InitAndPatch(HMODULE hself)
     g_Fonts.InitAndPatch();
     Functions::InitAndPatch();
     BitmapFont::InitAndPatch();
-
-    injector::WriteMemory<uint32_t>(g_pattern.set_pattern("81 FE 00 00 00 01").search().get(0).integer(2), UINT32_MAX, true);
-
-    injector::MakeNOP(g_pattern.set_pattern("0F 94 45 F3 56").search().get(0).integer(), 4, true);
 }
 
 const std::experimental::filesystem::path & CPlugin::GetGameDirectory() const

@@ -100,75 +100,37 @@ namespace Functions
     {
         return isalpha(cp) || isdigit(cp) || cp == '_' || cp == '|';
     }
-
+    
     void GetTwoUnicode(const char * pText, uint32_t index, uint32_t text_length, uint32_t &first, ptrdiff_t &first_length, uint32_t &second, bool bUseSpecialChars)
     {
         second = 0;
 
-        try
-        {
-            //First
-            if (index < text_length)
-            {
-                first_length = utf8::internal::sequence_length(pText);
-                first = utf8::peek_next(pText + index, pText + text_length);
-                index += first_length;
-            }
-
-            //Second
-            if (index < text_length)
-            {
-                ptrdiff_t second_length = utf8::internal::sequence_length(pText + index);
-                uint32_t temp_second = utf8::peek_next(pText + index, pText + text_length);
-
-                if (bUseSpecialChars)
-                {
-                    while (temp_second == 0x7)
-                    {
-                        index += 2;
-
-                        if (index >= text_length)
-                        {
-                            return;
-                        }
-
-                        temp_second = utf8::peek_next(pText + index, pText + text_length);
-                    }
-                }
-
-                second = temp_second;
-            }
-        }
-    }
-
-    void GetTwoUnicode(std::vector<wchar_t>::iterator pText, std::vector<wchar_t>::iterator pEnd, uint32_t & first, uint32_t & second, bool bUseSpecialChars)
-    {
-        second = 0;
-
         //First
-        if (pText < pEnd)
+        if (index < text_length)
         {
-            first = *pText;
-            ++pText;
+            first_length = utf8::internal::sequence_length(pText);
+            first = utf8::peek_next(pText + index, pText + text_length);
+            index += first_length;
         }
 
         //Second
-        if (pText < pEnd)
+        if (index < text_length)
         {
-            uint32_t temp_second = *pText;
+            ptrdiff_t second_length = utf8::internal::sequence_length(pText + index);
+            uint32_t temp_second = utf8::peek_next(pText + index, pText + text_length);
 
             if (bUseSpecialChars)
             {
                 while (temp_second == 0x7)
                 {
-                    pText += 2;
+                    index += 2;
 
-                    if (pText >= pEnd)
+                    if (index >= text_length)
                     {
                         return;
                     }
 
-                    temp_second = *pText;
+                    temp_second = utf8::peek_next(pText + index, pText + text_length);
                 }
             }
 
@@ -176,50 +138,6 @@ namespace Functions
         }
     }
 
-    void ConvertSpecialChars(char *source)
-    {
-        string_view source_view(source);
-        vector<wchar_t> wideText;
-
-        if (all_of(source_view.begin(), source_view.end(), isascii))
-        {
-            return;
-        }
-
-        utf8::utf8to16(source_view.begin(), source_view.end(), back_inserter(wideText));
-
-        for (wchar_t &cp : wideText)
-        {
-            switch (cp)
-            {
-            case 0xA3:
-            case 0xA4:
-            case 0xA7:
-                cp -= 0xA0;
-                break;
-
-            default:
-                break;
-            }
-        }
-
-        wideText.push_back(0);
-        utf8::utf16to8(wideText.begin(), wideText.end(), source);
-    }
-
-    struct CReader_ReadSimpleStatement_0x161_7
-    {
-        void operator()(injector::reg_pack *regs) const
-        {
-            CToken *pSrcToken = (CToken *)(regs->esi);
-            CToken *pDstToken = (CToken *)(regs->edi);
-
-            ConvertSpecialChars(pSrcToken->_szVal);
-
-            *pDstToken = *pSrcToken;
-        }
-    };
-    
     struct CSdlEvents_HandlePdxEvents_0x2DE
     {
         void operator()(injector::reg_pack *regs) const
@@ -246,19 +164,15 @@ namespace Functions
     void InitAndPatch()
     {
         //yml转码函数
-        injector::MakeJMP(g_pattern.find_pattern("81 EC B0 00 00 00 53 56 8B F1 8B DA").get(0).integer(-0x18), ConvertUTF8ToLatin1);
+        injector::MakeJMP(g_pattern.find_first("81 EC B0 00 00 00 53 56 8B F1 8B DA").integer(-0x18), ConvertUTF8ToLatin1);
 
-        //转换txt文本中的A3A4A7
-        g_pattern.find_pattern("C3 8B 73 1C 8D BB 30 04 00 00 83 C6 0C B9 82 00 00 00 F3 A5"); //mov ecx, 0x82; rep movsd
-        injector::MakeInline<CReader_ReadSimpleStatement_0x161_7>(g_pattern.get(0).integer(13), g_pattern.get(0).integer(20));
+        //从输入接受整个字符串
+        //mov ecx, [ebp - 0x48]; xor al, al
+        injector::MakeInline<CSdlEvents_HandlePdxEvents_0x2DE>(g_pattern.find_first("8B 4D B8 32 C0").integer());
 
-        //从输入法接受整个字符串
-        g_pattern.find_pattern("8B 4D B8 32 C0"); //mov ecx, [ebp - 0x48]; xor al, al
-        injector::MakeInline<CSdlEvents_HandlePdxEvents_0x2DE>(g_pattern.get(0).integer());
+        //校验总是成功
+        injector::MakeNOP(g_pattern.find_first("0F 94 45 F3 56").integer(), 4, true);
 
-        //WriteVariable 0xA7
-        injector::WriteMemory<uint8_t>(g_pattern.find_pattern("C6 06 A7").get(0).integer(2), 7, true);
-        injector::WriteMemory<uint8_t>(g_pattern.find_pattern("66 C7 06 A7 21").get(0).integer(3), 7, true);
 
     }
 }

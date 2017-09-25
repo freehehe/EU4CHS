@@ -19,7 +19,6 @@ union UnicodeCharPair
 CJKMapFont::CJKMapFont(const filesystem::path & fntname)
 {
     _initialized = false;
-    _values.reserve(45000);
 
     InitWithFile(fntname);
 }
@@ -125,7 +124,10 @@ void CJKMapFont::ReadCharsBlock(FILE * file)
 
         uint32_t unicode = binary.code;
 
-        _values.emplace(unicode, values);
+        if (unicode < 0x10000)
+        {
+            _values[unicode] = make_unique<CharacterValues>(values);
+        }
     }
 }
 
@@ -213,15 +215,13 @@ void CJKMapFont::UnloadTexturesDX9()
 
 const CJKMapFont::CharacterValues *CJKMapFont::GetValue(uint32_t unicode)
 {
-    auto it = _values.find(unicode);
-
-    if (it != _values.end())
+    if (unicode < 0x10000)
     {
-        return &it->second;
+        return _values[unicode].get();
     }
     else
     {
-        return &_values.find(invalid_replacement)->second;
+        return _values[invalid_replacement].get();
     }
 }
 

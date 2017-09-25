@@ -1,4 +1,4 @@
-#include <filesystem>
+﻿#include <filesystem>
 #include <fstream>
 #include <string>
 #include <vector>
@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-        ConvertDirectory("D:/Steam/steamapps/common/Europa Universalis IV", "C:/u8text");
+        ConvertDirectory("E:/欧陆风云4 1.22.1 英文原版/欧陆风云4 1.22.1 英文原版/Europa Universalis IV", "C:/u8text");
     }
 
     return 0;

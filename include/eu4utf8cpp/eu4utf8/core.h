@@ -29,15 +29,17 @@ DEALINGS IN THE SOFTWARE.
 #define UTF8_FOR_CPP_CORE_H_2675DCD0_9480_4c0c_B92A_CC14C027B731
 
 #include <iterator>
+#include <cstdint>
 
-namespace utf8
+namespace eu4utf8
 {
     // The typedefs for 8-bit, 16-bit and 32-bit unsigned integers
     // You may need to change them to match your system.
     // These typedefs have the same names as ones from cstdint, or boost/cstdint
+/*
     typedef unsigned char   uint8_t;
     typedef unsigned short  uint16_t;
-    typedef unsigned int    uint32_t;
+    typedef unsigned int    uint32_t;*/
 
 // Helper code - not intended to be directly called by the library users. May be changed at any time
 namespace internal
@@ -68,7 +70,7 @@ namespace internal
     template<typename octet_type>
     inline bool is_trail(octet_type oc)
     {
-        return ((utf8::internal::mask8(oc) >> 6) == 0x2);
+        return ((eu4utf8::internal::mask8(oc) >> 6) == 0x2);
     }
 
     template <typename u16>
@@ -92,14 +94,14 @@ namespace internal
     template <typename u32>
     inline bool is_code_point_valid(u32 cp)
     {
-        return (cp <= CODE_POINT_MAX && !utf8::internal::is_surrogate(cp));
+        return (cp <= CODE_POINT_MAX && !eu4utf8::internal::is_surrogate(cp));
     }
 
     template <typename octet_iterator>
     inline typename std::iterator_traits<octet_iterator>::difference_type
     sequence_length(octet_iterator lead_it)
     {
-        uint8_t lead = utf8::internal::mask8(*lead_it);
+        uint8_t lead = eu4utf8::internal::mask8(*lead_it);
         if (lead < 0x80)
             return 1;
         else if ((lead >> 5) == 0x6)
@@ -109,26 +111,7 @@ namespace internal
         else if ((lead >> 3) == 0x1e)
             return 4;
         else
-            return 0;
-    }
-
-    template <typename octet_difference_type>
-    inline bool is_overlong_sequence(uint32_t cp, octet_difference_type length)
-    {
-        if (cp < 0x80) {
-            if (length != 1) 
-                return true;
-        }
-        else if (cp < 0x800) {
-            if (length != 2) 
-                return true;
-        }
-        else if (cp < 0x10000) {
-            if (length != 3) 
-                return true;
-        }
-
-        return false;
+            return 1;
     }
 
     enum utf_error {UTF8_OK, NOT_ENOUGH_ROOM, INVALID_LEAD, INCOMPLETE_SEQUENCE, OVERLONG_SEQUENCE, INVALID_CODE_POINT};
@@ -140,7 +123,7 @@ namespace internal
         if (++it == end)
             return NOT_ENOUGH_ROOM;
 
-        if (!utf8::internal::is_trail(*it))
+        if (!eu4utf8::internal::is_trail(*it))
             return INCOMPLETE_SEQUENCE;
         
         return UTF8_OK;
@@ -155,7 +138,7 @@ namespace internal
         if (it == end)
             return NOT_ENOUGH_ROOM;
 
-        code_point = utf8::internal::mask8(*it);
+        code_point = eu4utf8::internal::mask8(*it);
 
         return UTF8_OK;
     }
@@ -166,7 +149,7 @@ namespace internal
         if (it == end) 
             return NOT_ENOUGH_ROOM;
         
-        code_point = utf8::internal::mask8(*it);
+        code_point = eu4utf8::internal::mask8(*it);
 
         UTF8_CPP_INCREASE_AND_RETURN_ON_ERROR(it, end)
 
@@ -181,11 +164,11 @@ namespace internal
         if (it == end)
             return NOT_ENOUGH_ROOM;
             
-        code_point = utf8::internal::mask8(*it);
+        code_point = eu4utf8::internal::mask8(*it);
 
         UTF8_CPP_INCREASE_AND_RETURN_ON_ERROR(it, end)
 
-        code_point = ((code_point << 12) & 0xffff) + ((utf8::internal::mask8(*it) << 6) & 0xfff);
+        code_point = ((code_point << 12) & 0xffff) + ((eu4utf8::internal::mask8(*it) << 6) & 0xfff);
 
         UTF8_CPP_INCREASE_AND_RETURN_ON_ERROR(it, end)
 
@@ -200,15 +183,15 @@ namespace internal
         if (it == end)
            return NOT_ENOUGH_ROOM;
 
-        code_point = utf8::internal::mask8(*it);
+        code_point = eu4utf8::internal::mask8(*it);
 
         UTF8_CPP_INCREASE_AND_RETURN_ON_ERROR(it, end)
 
-        code_point = ((code_point << 18) & 0x1fffff) + ((utf8::internal::mask8(*it) << 12) & 0x3ffff);
+        code_point = ((code_point << 18) & 0x1fffff) + ((eu4utf8::internal::mask8(*it) << 12) & 0x3ffff);
 
         UTF8_CPP_INCREASE_AND_RETURN_ON_ERROR(it, end)
 
-        code_point += (utf8::internal::mask8(*it) << 6) & 0xfff;
+        code_point += (eu4utf8::internal::mask8(*it) << 6) & 0xfff;
 
         UTF8_CPP_INCREASE_AND_RETURN_ON_ERROR(it, end)
 
@@ -229,7 +212,7 @@ namespace internal
         uint32_t cp = 0;
         // Determine the sequence length based on the lead octet
         typedef typename std::iterator_traits<octet_iterator>::difference_type octet_difference_type;
-        const octet_difference_type length = utf8::internal::sequence_length(it);
+        const octet_difference_type length = eu4utf8::internal::sequence_length(it);
 
         // Get trail octets and calculate the code point
         utf_error err = UTF8_OK;
@@ -237,30 +220,26 @@ namespace internal
             case 0: 
                 return INVALID_LEAD;
             case 1:
-                err = utf8::internal::get_sequence_1(it, end, cp);
+                err = eu4utf8::internal::get_sequence_1(it, end, cp);
                 break;
             case 2:
-                err = utf8::internal::get_sequence_2(it, end, cp);
+                err = eu4utf8::internal::get_sequence_2(it, end, cp);
             break;
             case 3:
-                err = utf8::internal::get_sequence_3(it, end, cp);
+                err = eu4utf8::internal::get_sequence_3(it, end, cp);
             break;
             case 4:
-                err = utf8::internal::get_sequence_4(it, end, cp);
+                err = eu4utf8::internal::get_sequence_4(it, end, cp);
             break;
         }
 
         if (err == UTF8_OK) {
             // Decoding succeeded. Now, security checks...
-            if (utf8::internal::is_code_point_valid(cp)) {
-                if (!utf8::internal::is_overlong_sequence(cp, length)){
-                    // Passed! Return here.
-                    code_point = cp;
-                    ++it;
-                    return UTF8_OK;
-                }
-                else
-                    err = OVERLONG_SEQUENCE;
+            if (eu4utf8::internal::is_code_point_valid(cp)) {
+                // Passed! Return here.
+                code_point = cp;
+                ++it;
+                return UTF8_OK;
             }
             else 
                 err = INVALID_CODE_POINT;
@@ -274,7 +253,7 @@ namespace internal
     template <typename octet_iterator>
     inline utf_error validate_next(octet_iterator& it, octet_iterator end) {
         uint32_t ignored;
-        return utf8::internal::validate_next(it, end, ignored);
+        return eu4utf8::internal::validate_next(it, end, ignored);
     }
 
 } // namespace internal
@@ -289,7 +268,7 @@ namespace internal
     {
         octet_iterator result = start;
         while (result != end) {
-            utf8::internal::utf_error err_code = utf8::internal::validate_next(result, end);
+            eu4utf8::internal::utf_error err_code = eu4utf8::internal::validate_next(result, end);
             if (err_code != internal::UTF8_OK)
                 return result;
         }
@@ -299,27 +278,27 @@ namespace internal
     template <typename octet_iterator>
     inline bool is_valid(octet_iterator start, octet_iterator end)
     {
-        return (utf8::find_invalid(start, end) == end);
+        return (eu4utf8::find_invalid(start, end) == end);
     }
 
     template <typename octet_iterator>
     inline bool starts_with_bom (octet_iterator it, octet_iterator end)
     {
         return (
-            ((it != end) && (utf8::internal::mask8(*it++)) == bom[0]) &&
-            ((it != end) && (utf8::internal::mask8(*it++)) == bom[1]) &&
-            ((it != end) && (utf8::internal::mask8(*it))   == bom[2])
+            ((it != end) && (eu4utf8::internal::mask8(*it++)) == bom[0]) &&
+            ((it != end) && (eu4utf8::internal::mask8(*it++)) == bom[1]) &&
+            ((it != end) && (eu4utf8::internal::mask8(*it))   == bom[2])
            );
     }
-	
+    
     //Deprecated in release 2.3 
     template <typename octet_iterator>
     inline bool is_bom (octet_iterator it)
     {
         return (
-            (utf8::internal::mask8(*it++)) == bom[0] &&
-            (utf8::internal::mask8(*it++)) == bom[1] &&
-            (utf8::internal::mask8(*it))   == bom[2]
+            (eu4utf8::internal::mask8(*it++)) == bom[0] &&
+            (eu4utf8::internal::mask8(*it++)) == bom[1] &&
+            (eu4utf8::internal::mask8(*it))   == bom[2]
            );
     }
 } // namespace utf8
