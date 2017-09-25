@@ -29,15 +29,17 @@ DEALINGS IN THE SOFTWARE.
 #define UTF8_FOR_CPP_CORE_H_2675DCD0_9480_4c0c_B92A_CC14C027B731
 
 #include <iterator>
+#include <cstdint>
 
 namespace utf8
 {
     // The typedefs for 8-bit, 16-bit and 32-bit unsigned integers
     // You may need to change them to match your system.
     // These typedefs have the same names as ones from cstdint, or boost/cstdint
+/*
     typedef unsigned char   uint8_t;
     typedef unsigned short  uint16_t;
-    typedef unsigned int    uint32_t;
+    typedef unsigned int    uint32_t;*/
 
 // Helper code - not intended to be directly called by the library users. May be changed at any time
 namespace internal
@@ -311,7 +313,7 @@ namespace internal
             ((it != end) && (utf8::internal::mask8(*it))   == bom[2])
            );
     }
-	
+    
     //Deprecated in release 2.3 
     template <typename octet_iterator>
     inline bool is_bom (octet_iterator it)

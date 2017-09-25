@@ -89,8 +89,6 @@ launcher.gui language_bg.dds所属expanded window
 
 editbin /dynamicbase:no "D:\Steam\steamapps\common\Europa Universalis IV\eu4.exe"
 
-
-
 貌似不用转txt里的A3A4A7
 ...
 TUT_BAS_CHAPTER01_PAGE05_OBJECTIVES: "To continue you must §MZoom out§! so you can see all of Europe."

@@ -729,7 +729,9 @@ namespace BitmapFont
 
         //edi OriginalText
         //ebx: NewText
-
+        //xmm0 8.0
+        //xmm2 vTempWidth
+        //xmm3 vWordWidth
         //xmm4 vHeight
 
         char Tag[128];
@@ -741,10 +743,9 @@ namespace BitmapFont
         CJKFont *cjkFont = g_Fonts.GetFont(pFont->GetFontPath());
 
         std::string Result{ OriginalText->c_str() };
-        std::string_view source_view{ OriginalText->c_str() };
 
         std::vector<wchar_t> wideText;
-        utf8::utf8to16(source_view.begin(), source_view.end(), std::back_inserter(wideText));
+        utf8::utf8to16(Result.begin(), Result.end(), std::back_inserter(wideText));
 
         int nDefaultLineHeight = pFont->get_field<int, 0x4D4>() * pSet->GetScale();
         int nCurrentLineHeight = nDefaultLineHeight;
@@ -806,8 +807,8 @@ namespace BitmapFont
 
                     if (pFont->get_field<bool, 0x24F0>())
                     {
-                        float fHeight = injector::thiscall<int(CBitmapFont *, const char *)>::vtbl<29>(pFont, Tag);
-                        nCurrentLineHeight = max(nCurrentLineHeight, fHeight);
+                        int Height = injector::thiscall<int(CBitmapFont *, const char *)>::vtbl<29>(pFont, Tag);
+                        nCurrentLineHeight = max(nCurrentLineHeight, Height);
                     }
                 }
                 else if (unicode == 0x7)
@@ -842,19 +843,20 @@ namespace BitmapFont
 
                         if (vHeight > nMaxHeight)
                         {
-                            auto index = strit - wideText.begin();
-
-                            if (index > 3)
+                            if (strit - wideText.begin() > 3)
                             {
-                                utf8::utf16to8(wideText.begin(), strit - 3, back_inserter(Result));
+                                Result.clear();
+                                utf8::utf16to8(wideText.begin(), strit - 4, back_inserter(Result));
                                 Result += " ...";
                             }
                             else
                             {
                                 Result = "...";
+                                return;
                             }
 
-                            break;
+                            NewText->assign(Result.c_str());
+                            return;
                         }
                         else
                         {
@@ -875,24 +877,27 @@ namespace BitmapFont
 
                         if (vHeight > nMaxHeight)
                         {
-                            auto index = strit - wideText.begin();
-
-                            if (index > 4)
+                            if ((strit - wideText.begin()) > 4)
                             {
-                                utf8::utf16to8(wideText.begin(), strit - 3, back_inserter(Result));
+                                Result.clear();
+                                utf8::utf16to8(wideText.begin(), strit - 4, back_inserter(Result));
                                 Result += " ...";
                             }
                             else
                             {
-                                Result = "...";
+                                Result.clear();
+                                utf8::utf16to8(wideText.begin(), strit, back_inserter(Result));
                             }
 
-                            break;
+                            NewText->assign(Result.c_str());
+                            return;
                         }
                     }
                 }
             }
         }
+
+        NewText->assign(Result.c_str());
     }
 
     static void __fastcall GetActualRealRequiredSizeActually(CBitmapFont *pFont, int, const CString *OriginalText, CString *NewText, int nMaxWidth, int nMaxHeight, CVector2<unsigned int> *BorderSize, bool bWholeWordOnly, bool bAddBreaksToNewText, bool bUseSpecialChars)
