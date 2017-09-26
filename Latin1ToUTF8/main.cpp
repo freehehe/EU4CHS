@@ -26,24 +26,16 @@ bool ConvertFile(const filesystem::path &in_file, const filesystem::path &out_fi
 
     cbuffer.assign(istreambuf_iterator<char>{ iofs }, istreambuf_iterator<char>{});
 
-    if (all_of(cbuffer.begin(), cbuffer.end(), isascii))
+    if (utf8::is_valid(cbuffer.begin(), cbuffer.end()))
     {
         return true;
     }
 
-    if (utf8::is_valid(cbuffer.begin(), cbuffer.end()))
+    transform(cbuffer.begin(), cbuffer.end(), back_inserter(wbuffer),
+        [](char character)
     {
-        cout << in_file.string() << endl;
-        utf8::utf8to32(cbuffer.begin(), cbuffer.end(), back_inserter(wbuffer));
-    }
-    else
-    {
-        transform(cbuffer.begin(), cbuffer.end(), back_inserter(wbuffer),
-            [](char character)
-        {
-            return *(unsigned char *)&character;
-        });
-    }
+        return *(unsigned char *)&character;
+    });
 
     iofs.close();
 
@@ -94,7 +86,8 @@ int main(int argc, char *argv[])
     }
     else
     {
-        ConvertDirectory("E:/欧陆风云4 1.22.1 英文原版/欧陆风云4 1.22.1 英文原版/Europa Universalis IV", "C:/u8text");
+        //ConvertDirectory("E:/欧陆风云4 1.22.1 英文原版/欧陆风云4 1.22.1 英文原版/Europa Universalis IV", "C:/u8text");
+        ConvertDirectory("D:/Steam/steamapps/common/Europa Universalis IV", "C:/u8text");
     }
 
     return 0;

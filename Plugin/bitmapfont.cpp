@@ -583,7 +583,19 @@ namespace BitmapFont
             std::string_view source_view{ OriginalText->c_str() };
 
             std::vector<wchar_t> wideText;
-            utf8::utf8to16(source_view.begin(), source_view.end(), std::back_inserter(wideText));
+
+            try
+            {
+                utf8::utf8to16(source_view.begin(), source_view.end(), std::back_inserter(wideText));
+            }
+            catch (const std::exception&)
+            {
+                wchar_t text[4096];
+                MultiByteToWideChar(28591, 0, OriginalText->c_str(), -1, text, 4096);
+                //MessageBoxW(NULL, text, L"Fucked text", MB_OK);
+
+                throw;
+            }
 
             for (auto strit = wideText.begin(); strit < wideText.end() && nLines != 52; ++strit)
             {

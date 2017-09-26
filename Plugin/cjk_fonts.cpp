@@ -51,7 +51,10 @@ void *CJKFontManager::InitGfxAndLoadTextures(void *pInfo, void *pBool)
         font.second.LoadTexturesDX9();
     }
 
-    g_Fonts._MapFont->LoadTexturesDX9();
+    if (g_Fonts._MapFont)
+    {
+        g_Fonts._MapFont->LoadTexturesDX9();
+    }
 
     return pMasterContext;
 }
@@ -63,7 +66,10 @@ void CJKFontManager::UnloadTexturesAndShutdownGfx(void *pMasterContext)
         font.second.UnloadTexturesDX9();
     }
 
-    g_Fonts._MapFont->UnloadTexturesDX9();
+    if (g_Fonts._MapFont)
+    {
+        g_Fonts._MapFont->UnloadTexturesDX9();
+    }
 
     injector::cstd<void(void *)>::call(g_game.pfGfxShutdownDX9, pMasterContext);
 }
