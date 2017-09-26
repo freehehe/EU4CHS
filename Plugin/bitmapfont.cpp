@@ -1,5 +1,4 @@
-﻿#include "stdinc.h"
-#include "plugin.h"
+﻿#include "plugin.h"
 #include "bitmapfont.h"
 #include "functions.h"
 #include "eu4.h"
@@ -323,7 +322,7 @@ namespace BitmapFont
         }
     };
 
-    static int __fastcall GetWidthOfString(CBitmapFont * pFont, int, const char * Text, const int nLength, bool bUseSpecialChars)
+    static int __fastcall GetWidthOfString(CBitmapFont * pFont, int edx, const char * Text, const int nLength, bool bUseSpecialChars)
     {
         static const float fIconWidth = 8.0f;
 
@@ -422,7 +421,7 @@ namespace BitmapFont
         return max(nWidth, vTempWidth);
     }
 
-    static int __fastcall GetHeightOfString(CBitmapFont * pFont, int, const CString *text, int nMaxWidth, int nMaxHeight, const CVector2<int> *BorderSize, bool bUseSpecialChars)
+    static int __fastcall GetHeightOfString(CBitmapFont * pFont, int edx, const CString *text, int nMaxWidth, int nMaxHeight, const CVector2<int> *BorderSize, bool bUseSpecialChars)
     {
         //xmm0 fIconWidth 常量8.0
         //xmm1 临时变量
@@ -558,7 +557,7 @@ namespace BitmapFont
         return vHeight;
     }
 
-    static int __fastcall GetActualRequiredSize(CBitmapFont *pFont, int, const CString *OriginalText, int nMaxWidth, int nMaxHeight, CVector2<unsigned int> *BorderSize, CVector2<short> *NeededSize, bool bUseSpecialChars)
+    static int __fastcall GetActualRequiredSize(CBitmapFont *pFont, int edx, const CString *OriginalText, int nMaxWidth, int nMaxHeight, CVector2<int> *BorderSize, CVector2<short> *NeededSize, bool bUseSpecialChars)
     {
         static const float fIconWidth = 8.0f;
 
@@ -578,8 +577,8 @@ namespace BitmapFont
         {
             nMaxWidth = 320;
         }
-
-        if (OriginalText->length() != 0)
+        
+        if (OriginalText->length() > 0)
         {
             std::string_view source_view{ OriginalText->c_str() };
 
@@ -629,8 +628,8 @@ namespace BitmapFont
 
                     if (pFont->get_field<bool, 0x24F0>())
                     {
-                        float fHeight = injector::thiscall<int(CBitmapFont *, const char *)>::vtbl<29>(pFont, Tag);
-                        nCurrentLineHeight = max(nCurrentLineHeight, fHeight);
+                        int Height = injector::thiscall<int(CBitmapFont *, const char *)>::vtbl<29>(pFont, Tag);
+                        nCurrentLineHeight = max(nCurrentLineHeight, Height);
                     }
                 }
                 else
@@ -656,8 +655,6 @@ namespace BitmapFont
                         {
                             if (vTempWidth > nMaxWidth)
                             {
-                                nWidth = max(nWidth, vTempWidth);
-
                                 nLinesHeight[nLines] = nCurrentLineHeight;
                                 ++nLines;
                                 nCurrentLineHeight = nDefaultLineHeight;
@@ -671,7 +668,7 @@ namespace BitmapFont
                         {
                             int width = (nMaxWidth - 2 * BorderSize->x);
 
-                            if (vTempWidth >= width  && vWordWidth > 50.0f)
+                            if (vTempWidth >= width && vWordWidth > 50.0f)
                             {
                                 nLinesHeight[nLines] = nCurrentLineHeight;
                                 ++nLines;
@@ -718,12 +715,12 @@ namespace BitmapFont
         int nSumHeight = std::accumulate(std::begin(nLinesHeight), std::end(nLinesHeight), 0);
 
         NeededSize->x = (nWidth + BorderSize->x * 2);
-        NeededSize->y = BorderSize->y * 2 + (BorderSize->y < 0 ? 30.0f : 0.0f) + nSumHeight;
+        NeededSize->y = (BorderSize->y * 2 + (BorderSize->y < 0 ? 30.0f : 0.0f) + nSumHeight);
 
         return nLines;
     }
 
-    static void __fastcall GetRequiredSize(CBitmapFont *pFont, int, const CString *OriginalText, CString *NewText, int nMaxWidth, int nMaxHeight, CVector2<unsigned int> *BorderSize, bool bUseSpecialChars)
+    static void __fastcall GetRequiredSize(CBitmapFont *pFont, int edx, const CString *OriginalText, CString *NewText, int nMaxWidth, int nMaxHeight, CVector2<int> *BorderSize, bool bUseSpecialChars)
     {
         static const float fIconWidth = 8.0f;
 
@@ -900,9 +897,15 @@ namespace BitmapFont
         NewText->assign(Result.c_str());
     }
 
-    static void __fastcall GetActualRealRequiredSizeActually(CBitmapFont *pFont, int, const CString *OriginalText, CString *NewText, int nMaxWidth, int nMaxHeight, CVector2<unsigned int> *BorderSize, bool bWholeWordOnly, bool bAddBreaksToNewText, bool bUseSpecialChars)
+    static void __fastcall GetActualRealRequiredSizeActually(CBitmapFont *pFont, int edx, const CString *Text, CString *NewText, int nMaxWidth, int nMaxHeight, CVector2<int> *BorderSize, bool bWholeWordOnly, bool bAddBreaksToNewText, bool bUseSpecialChars)
     {
         static const float fIconWidth = 8.0f;
+
+        //edi Text
+        //ebx NewText
+        //xmm2 vWordWidth
+        //xmm3 vTempWidth
+        //xmm4 vHeight
 
         char Tag[128];
 
@@ -912,8 +915,7 @@ namespace BitmapFont
         int nDefaultLineHeight = pFont->get_field<int, 0x4D4>() * pSet->GetScale();
         int nCurrentLineHeight = nDefaultLineHeight;
         int nWidth = 0;
-        std::vector<wchar_t>::iterator nLastIndexOfWholeWord;
-        std::vector<wchar_t>::iterator nCurrentLineStartIndex;
+
         float vWordWidth = 0.0f;
         float vTempWidth = 0.0f;
         float vHeight = nDefaultLineHeight;
@@ -928,189 +930,181 @@ namespace BitmapFont
         nMaxWidth -= 2 * BorderSize->x;
         nMaxHeight -= 2 * BorderSize->y;
 
-        std::string_view source_view{ OriginalText->c_str() };
-
         std::vector<wchar_t> wideText;
+        std::string_view source_view{ Text->c_str() };
         utf8::utf8to16(source_view.begin(), source_view.end(), std::back_inserter(wideText));
-        nLastIndexOfWholeWord = wideText.begin();
-        nCurrentLineStartIndex = wideText.begin();
 
-        for (auto strit = wideText.begin(); strit < wideText.end(); ++strit)
+        std::vector<wchar_t>::iterator nLastIndexOfWholeWord = wideText.begin();
+        std::vector<wchar_t>::iterator nCurrentLineStartIndex = wideText.begin();
+
+        if (Text->length() != 0)
         {
-            auto unicode = *strit;
-
-            if (bUseSpecialChars && (unicode == 0x40 || unicode == 0x7B || unicode == 0x3 || unicode == 0x7))
+            for (auto strit = wideText.begin(); strit < wideText.end(); ++strit)
             {
-                if (unicode == 0x40)
-                {
-                    strit += 3;
+                auto unicode = *strit;
 
-                    float fWidth = injector::thiscall<int(CBitmapFont *)>::vtbl<30>(pFont);
-                    vWordWidth += fWidth;
-                    vTempWidth += fWidth;
-                }
-                else if (unicode == 0x7B)
+                if (bUseSpecialChars && (unicode == 0x40 || unicode == 0x7B || unicode == 0x3 || unicode == 0x7))
                 {
-                    strit += 3;
-                    vWordWidth += fIconWidth;
-                    vTempWidth += fIconWidth;
-                }
-                else if (unicode == 0x3)
-                {
-                    ++strit;
-
-                    size_t index = 0;
-
-                    while (Functions::IsTextIconChar(*strit) && (index < 127) && (strit < wideText.end()))
+                    if (unicode == 0x40)
                     {
-                        Tag[index] = *strit;
-                        ++index;
+                        strit += 3;
+
+                        float fWidth = injector::thiscall<int(CBitmapFont *)>::vtbl<30>(pFont);
+                        vWordWidth += fWidth;
+                        vTempWidth += fWidth;
+                    }
+                    else if (unicode == 0x7B)
+                    {
+                        strit += 3;
+                        vWordWidth += fIconWidth;
+                        vTempWidth += fIconWidth;
+                    }
+                    else if (unicode == 0x3)
+                    {
+                        ++strit;
+
+                        size_t index = 0;
+
+                        while (Functions::IsTextIconChar(*strit) && (index < 127) && (strit < wideText.end()))
+                        {
+                            Tag[index] = *strit;
+                            ++index;
+                            ++strit;
+                        }
+
+                        Tag[index] = 0;
+
+                        float fWidth = injector::thiscall<int(CBitmapFont *, const char *)>::vtbl<28>(pFont, Tag);
+                        vWordWidth += fWidth;
+                        vTempWidth += fWidth;
+
+                        if (pFont->get_field<bool, 0x24F0>())
+                        {
+                            float fHeight = injector::thiscall<int(CBitmapFont *, const char *)>::vtbl<29>(pFont, Tag);
+                            nCurrentLineHeight = max(nCurrentLineHeight, fHeight);
+                        }
+                    }
+                    else if (unicode == 0x7)
+                    {
                         ++strit;
                     }
-
-                    Tag[index] = 0;
-
-                    float fWidth = injector::thiscall<int(CBitmapFont *, const char *)>::vtbl<28>(pFont, Tag);
-                    vWordWidth += fWidth;
-                    vTempWidth += fWidth;
-
-                    if (pFont->get_field<bool, 0x24F0>())
-                    {
-                        float fHeight = injector::thiscall<int(CBitmapFont *, const char *)>::vtbl<29>(pFont, Tag);
-                        nCurrentLineHeight = max(nCurrentLineHeight, fHeight);
-                    }
-                }
-                else if (unicode == 0x7)
-                {
-                    ++strit;
-                }
-            }
-            else
-            {
-                if (unicode == ' ' || !Functions::IsLatin1Char(unicode))
-                {
-                    vWordWidth = 0.0f;
-                    nLastIndexOfWholeWord = strit;
-                }
-
-                const EU4CharacterValues *pValues;
-
-                if (Functions::IsLatin1Char(unicode))
-                {
-                    pValues = pFont->GetLatin1Value(unicode);
                 }
                 else
                 {
-                    pValues = &cjkFont->GetValue(unicode)->EU4Values;
-                }
-
-                if (pValues)
-                {
-                    float fWidth = pValues->xadvance * pSet->GetScale();
-                    vWordWidth += fWidth;
-                    vTempWidth += fWidth;                    
-
-                    if (vTempWidth >= nMaxWidth)
+                    if (unicode == ' ' || !Functions::IsLatin1Char(unicode))
                     {
-                        vHeight += nCurrentLineHeight;
-                        nCurrentLineHeight = nDefaultLineHeight;
-                        vTempWidth = vWordWidth;
+                        vWordWidth = 0.0f;
+                        nLastIndexOfWholeWord = strit;
+                    }
 
-                        if (bAddBreaksToNewText)
+                    const EU4CharacterValues *pValues;
+
+                    if (Functions::IsLatin1Char(unicode))
+                    {
+                        pValues = pFont->GetLatin1Value(unicode);
+                    }
+                    else
+                    {
+                        pValues = &cjkFont->GetValue(unicode)->EU4Values;
+                    }
+
+                    if (pValues)
+                    {
+                        float fWidth = pValues->xadvance * pSet->GetScale();
+                        vWordWidth += fWidth;
+                        vTempWidth += fWidth;
+
+                        if (vTempWidth >= nMaxWidth)
                         {
-                            if (nLastIndexOfWholeWord > nCurrentLineStartIndex)
+                            vHeight += nCurrentLineHeight;
+                            nCurrentLineHeight = nDefaultLineHeight;
+                            vTempWidth = vWordWidth;
+
+                            if (bAddBreaksToNewText)
                             {
-                                utf8::utf16to8(nCurrentLineStartIndex, nLastIndexOfWholeWord, back_inserter(Result));
-                                Result += '\n';
-                                nCurrentLineStartIndex = nLastIndexOfWholeWord + 1;
+                                if (nLastIndexOfWholeWord > nCurrentLineStartIndex)
+                                {
+                                    utf8::utf16to8(nCurrentLineStartIndex, nLastIndexOfWholeWord, back_inserter(Result));
+                                    Result += '\n';
+                                    nCurrentLineStartIndex = nLastIndexOfWholeWord + 1;
+                                }
+                                else
+                                {
+                                    utf8::utf16to8(nCurrentLineStartIndex, strit, back_inserter(Result));
+                                    Result += '\n';
+                                    nLastIndexOfWholeWord = strit;
+                                    nCurrentLineStartIndex = strit;
+                                    vTempWidth = 0.0f;
+                                }
+                            }
+
+                            if (vHeight > nMaxHeight)
+                            {
+                                if (!bAddBreaksToNewText)
+                                {
+                                    if (bWholeWordOnly)
+                                    {
+                                        utf8::utf16to8(wideText.begin(), nLastIndexOfWholeWord, back_inserter(Result));
+                                    }
+                                    else
+                                    {
+                                        if (strit - wideText.begin() > 4)
+                                        {
+                                            utf8::utf16to8(wideText.begin(), strit, back_inserter(Result));
+                                        }
+                                        else
+                                        {
+                                            utf8::utf16to8(wideText.begin(), strit - 4, back_inserter(Result));
+                                            Result += " ...";
+                                        }
+                                    }
+                                }
+
+                                NewText->assign(Result.c_str());
+                                return;
                             }
                             else
                             {
-                                utf8::utf16to8(nCurrentLineStartIndex, strit, back_inserter(Result));
-                                Result += '\n';
-                                nLastIndexOfWholeWord = strit;
-                                nCurrentLineStartIndex = strit;
-                                vTempWidth = 0.0f;
+                                vWordWidth = 0.0f;
                             }
-                        }
-
-                        if (vHeight > nMaxHeight)
-                        {
-                            if (!bAddBreaksToNewText)
-                            {
-                                if (bWholeWordOnly)
-                                {
-                                    Result.clear();
-                                    utf8::utf16to8(wideText.begin(), nLastIndexOfWholeWord, back_inserter(Result));
-                                }
-                                else
-                                {
-                                    if (strit - wideText.begin() > 4)
-                                    {
-                                        Result.clear();
-                                        utf8::utf16to8(wideText.begin(), strit, back_inserter(Result));
-                                    }
-                                    else
-                                    {
-                                        Result.clear();
-                                        utf8::utf16to8(wideText.begin(), strit - 4, back_inserter(Result));
-                                        Result += " ...";
-                                    }
-                                }
-                            }
-
-                            NewText->assign(Result.c_str());
-                            return;
-                        }
-                        else
-                        {
-                            vWordWidth = 0.0f;
                         }
                     }
-                }
-                else
-                {
-                    if (unicode == 0xA || unicode == 0xD)
+                    else
                     {
-                        vHeight += nCurrentLineHeight;
-                        nCurrentLineHeight = nDefaultLineHeight;
-                        vWordWidth = 0.0f;
-                        vTempWidth = 0.0f;
-                        nLastIndexOfWholeWord = strit;
-
-                        if (bAddBreaksToNewText)
+                        if (unicode == 0xA || unicode == 0xD)
                         {
-                            Result += '\n';
-                            utf8::utf16to8(nCurrentLineStartIndex, strit, back_inserter(Result));
-                        }
+                            vHeight += nCurrentLineHeight;
+                            nCurrentLineHeight = nDefaultLineHeight;
+                            vWordWidth = 0.0f;
+                            vTempWidth = 0.0f;
+                            nLastIndexOfWholeWord = strit;
 
-                        if (vHeight > nMaxHeight)
-                        {
-                            if (!bAddBreaksToNewText)
+                            if (bAddBreaksToNewText)
                             {
-                                if (bWholeWordOnly)
+                                utf8::utf16to8(nCurrentLineStartIndex, strit, back_inserter(Result));
+                                Result += '\n';
+
+                                nCurrentLineStartIndex = strit + 1;
+                            }
+
+                            if (vHeight > nMaxHeight)
+                            {
+                                if (!bAddBreaksToNewText)
                                 {
-                                    Result.clear();
-                                    utf8::utf16to8(wideText.begin(), nLastIndexOfWholeWord, back_inserter(Result));
-                                }
-                                else
-                                {
-                                    if (strit - wideText.begin() > 4)
+                                    if (!bWholeWordOnly && (strit - wideText.begin()) > 4)
                                     {
-                                        Result.clear();
-                                        utf8::utf16to8(wideText.begin(), strit, back_inserter(Result));
+                                        utf8::utf16to8(wideText.begin(), strit - 4, std::back_inserter(Result));
+                                        Result += " ...";
                                     }
                                     else
                                     {
-                                        Result.clear();
-                                        utf8::utf16to8(wideText.begin(), strit - 4, back_inserter(Result));
-                                        Result += " ...";
+                                        utf8::utf16to8(wideText.begin(), strit, std::back_inserter(Result));
                                     }
                                 }
-                            }
 
-                            NewText->assign(Result.c_str());
-                            return;
+                                NewText->assign(Result.c_str());
+                                return;
+                            }
                         }
                     }
                 }
@@ -1119,14 +1113,13 @@ namespace BitmapFont
 
         if (bAddBreaksToNewText)
         {
-            utf8::utf16to8(nCurrentLineStartIndex, wideText.end(), back_inserter(Result));
+            utf8::utf16to8(nCurrentLineStartIndex, wideText.end(), std::back_inserter(Result));
+            NewText->assign(Result.c_str());
         }
         else
         {
-            Result = OriginalText->c_str();
+            NewText->assign(Text->c_str());
         }
-
-        NewText->assign(Result.c_str());
     }
 
     void InitAndPatch()
@@ -1137,9 +1130,9 @@ namespace BitmapFont
         //整个换掉的函数
         injector::MakeJMP(g_pattern.find_first("81 EC 8C 00 00 00 53 8B 5D 0C").integer(-6), GetWidthOfString);
         injector::MakeJMP(g_pattern.find_first("81 EC AC 00 00 00 8B 55 0C").integer(-6), GetHeightOfString);
-        //injector::MakeJMP(g_pattern.find_first("81 EC 0C 03 00 00 8B 45 0C").integer(-0x18), GetActualRequiredSize);
+        injector::MakeJMP(g_pattern.find_first("81 EC 0C 03 00 00 8B 45 0C").integer(-0x18), GetActualRequiredSize);
         injector::MakeJMP(g_pattern.find_first("81 EC CC 00 00 00 53 56 57 8B 7D 08 89 4D F0").integer(-0x18), GetRequiredSize);
-        //injector::MakeJMP(g_pattern.find_first("81 EC 04 01 00 00 53 8B 5D 0C 56").integer(-0x18), GetActualRealRequiredSizeActually);
+        injector::MakeJMP(g_pattern.find_first("81 EC 04 01 00 00 53 8B 5D 0C 56").integer(-0x18), GetActualRealRequiredSizeActually);
 
         //RenderToScreen
         g_pattern.find_pattern("8A 87 ? ? ? ? 88 86 ? ? ? ? 46");

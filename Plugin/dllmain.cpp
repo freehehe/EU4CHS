@@ -1,5 +1,4 @@
-﻿#include "stdinc.h"
-#include "plugin.h"
+﻿#include "plugin.h"
 #include "eu4.h"
 #include "byte_pattern.h"
 

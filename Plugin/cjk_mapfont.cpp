@@ -1,5 +1,4 @@
-﻿#include "stdinc.h"
-#include "cjk_mapfont.h"
+﻿#include "cjk_mapfont.h"
 #include "functions.h"
 
 using namespace std;
@@ -215,7 +214,7 @@ void CJKMapFont::UnloadTexturesDX9()
 
 const CJKMapFont::CharacterValues *CJKMapFont::GetValue(uint32_t unicode)
 {
-    if (unicode < 0x10000)
+    if (unicode < 0x10000 && _values[unicode])
     {
         return _values[unicode].get();
     }
@@ -260,7 +259,7 @@ void CJKMapFont::DrawAllDX9()
                 _vertices[index].size(),
                 _vertices[index].size() / 3, 
                 _indices[index].data(), 
-                D3DFORMAT::D3DFMT_INDEX16,
+                D3DFORMAT::D3DFMT_INDEX32,
                 _vertices[index].data(),
                 sizeof(SProvinceTextVertex));
         }

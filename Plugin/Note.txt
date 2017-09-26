@@ -1,12 +1,8 @@
-﻿eu4utf8
-只有向下读取功能，对无效前导字节按一字节处理
-£¤§
+﻿£¤§
 
-全部去掉NoKerning!
-
-有双引号的token不是实际值
-
-12 14 16 18(新)宋体，Rasterization全不选
+12 14 16 (新)宋体，Rasterization全不选
+noto sans用更大字号匹配宋体的大小
+新宋体18对应notoregular 25
 
 地图用0x14大小的Vertex
 
@@ -19,12 +15,7 @@
 credits.txt 中A7为加大字号用
 特殊处理或换掉
 
-不需要处理txt中的A3 A4 A7
-
 看看CTextBuffer::Write的过滤关键字
-
-b 粗体柔和黑色阴影
-_bold 粗体
 
 Arial12
 Arial12_bold

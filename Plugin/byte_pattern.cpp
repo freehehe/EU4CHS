@@ -1,5 +1,4 @@
-﻿#include "stdinc.h"
-#include "byte_pattern.h"
+﻿#include "byte_pattern.h"
 
 byte_pattern g_pattern;
 

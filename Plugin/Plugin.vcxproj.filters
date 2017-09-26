@@ -30,9 +30,6 @@
     <ClCompile Include="eu4.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="stdinc.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="byte_pattern.cpp">
       <Filter>源文件</Filter>
     </ClCompile>

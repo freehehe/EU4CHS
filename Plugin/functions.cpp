@@ -1,5 +1,4 @@
-﻿#include "stdinc.h"
-#include "functions.h"
+﻿#include "functions.h"
 #include "eu4.h"
 #include "byte_pattern.h"
 
@@ -108,7 +107,7 @@ namespace Functions
         //First
         if (index < text_length)
         {
-            first_length = utf8::internal::sequence_length(pText);
+            first_length = utf8::internal::sequence_length(pText + index);
             first = utf8::peek_next(pText + index, pText + text_length);
             index += first_length;
         }
@@ -131,6 +130,41 @@ namespace Functions
                     }
 
                     temp_second = utf8::peek_next(pText + index, pText + text_length);
+                }
+            }
+
+            second = temp_second;
+        }
+    }
+
+    void GetTwoUnicode(std::vector<wchar_t>::iterator pText, std::vector<wchar_t>::iterator pEnd, uint32_t & first, uint32_t & second, bool bUseSpecialChars)
+    {
+        second = 0;
+
+        //First
+        if (pText < pEnd)
+        {
+            first = *pText;
+            ++pText;
+        }
+
+        //Second
+        if (pText < pEnd)
+        {
+            uint32_t temp_second = *pText;
+
+            if (bUseSpecialChars)
+            {
+                while (temp_second == 0x7)
+                {
+                    pText += 2;
+
+                    if (pText >= pEnd)
+                    {
+                        return;
+                    }
+
+                    temp_second = *pText;
                 }
             }
 

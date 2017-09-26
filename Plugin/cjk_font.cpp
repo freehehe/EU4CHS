@@ -1,5 +1,4 @@
-﻿#include "stdinc.h"
-#include "cjk_font.h"
+﻿#include "cjk_font.h"
 #include "functions.h"
 
 using namespace std;
@@ -214,7 +213,7 @@ void CJKFont::UnloadTexturesDX9()
 
 const CJKFont::CharacterValues *CJKFont::GetValue(uint32_t unicode)
 {
-    if (unicode < 0x10000)
+    if (unicode < 0x10000 && _values[unicode])
     {
         return _values[unicode].get();
     }

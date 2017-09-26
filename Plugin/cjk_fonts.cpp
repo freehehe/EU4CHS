@@ -1,5 +1,4 @@
-﻿#include "stdinc.h"
-#include "cjk_fonts.h"
+﻿#include "cjk_fonts.h"
 #include "cjk_mapfont.h"
 #include "plugin.h"
 #include "byte_pattern.h"
