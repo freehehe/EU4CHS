@@ -1,8 +1,10 @@
 ﻿£¤§
 
-12 14 16 (新)宋体，Rasterization全不选
-noto sans用更大字号匹配宋体的大小
-新宋体18对应notoregular 25
+3D Ripper DX
+
+CEU3GraphicalMap
+1.21.1 0x33C
+1.16.3 0x398
 
 地图用0x14大小的Vertex
 
@@ -10,52 +12,61 @@ noto sans用更大字号匹配宋体的大小
 外发光200 200 200 不透明度100 精确5像素
 
 只有地图字体需要mipmap
-查找B4 00 00 00
 
 credits.txt 中A7为加大字号用
 特殊处理或换掉
 
 看看CTextBuffer::Write的过滤关键字
 
-Arial12
-Arial12_bold
-garamond_12
-garamond_14
-garamond_14_bold
-flaunch_16b
-garamond_16
-garamond_16_bold
-newsfeed_body //16 描边 阴影
-flaunch_18b
-standard_18
-standard // standard_18
-vic_18
-vic_18_grey
-vic_18s
-tahoma_20_bold
-standard_22
-vic_22
-vic_22_bl
-vic_22s
-garamond_24
-vic_29
-vic_29s
-vic_36
-vic_36s
-Mapfont // Mapfont_100
+noto sans regular字号 + 6=新宋体大小
+
+vic_22_bl 28
+
+Arial12 18
+garamond_12 18
+garamond_14 20
+garamond_16 22
+newsfeed_body //16 描边 阴影 22
+standard_18 24
+standard // standard_18 24
+vic_18 24
+vic_18_grey 24
+vic_18s 24
+standard_22 28
+vic_22 28
+
+vic_22s 28
+garamond_24 30
+vic_29 35
+vic_29s 35
+vic_36 42
+vic_36s 42
+
+Arial12_bold 18
+garamond_14_bold 20
+garamond_16_bold 22
+flaunch_16b 22
+flaunch_18b 24
+tahoma_20_bold 26
+
+Mapfont // Mapfont_100 106 padding 8 spacing 1
 
 字体纹理随Latin1字体纹理
+
+Rest: //Render3d
+FillVertexBuffer
 
 CEU3GraphicalMap::ctor里面定义地图字体tahoma_60
 CCountryNameCollection::RenderNames
 CCountryNameCollection::AddNudgedNames
 CGenerateNamesWork::AddNameArea
+CEU3GraphicalMap::GenerateProvinceNames
 
 不搞定地图字体造成utf8cpp接受到莫名字节
 FontManager绘制时只绘制当前字体！！
 
 languages.yml增加l_schinese
-pdx_launcher\game\interface\launcher.gui 语言按钮排版
+pdx_launcher/game/interface/launcher.gui 语言按钮排版
 
 				gridBoxType = {
 					name = "elements"
@@ -65,8 +76,8 @@ pdx_launcher\game\interface\launcher.gui 语言按钮排版
 					max_slots_horizontal = 1
 					format = "UPPER_LEFT"
 
-pdx_launcher\common\interface\common_core.gfx 增加中国国旗
-pdx_launcher\common\gfx\interface\Chinese_flag.dds 国旗贴图
+pdx_launcher/common/interface/common_core.gfx 增加中国国旗
+pdx_launcher/common/gfx/interface/Chinese_flag.dds 国旗贴图
 
 战嚎 15
 蹂躏 15
@@ -82,4 +93,4 @@ pdx_launcher\common\gfx\interface\Chinese_flag.dds 国旗贴图
 碎甲 15
 4飞龙2审判2白杨2冥界爪2灵气戒指
 
-editbin /dynamicbase:no "D:\Steam\steamapps\common\Europa Universalis IV\eu4.exe"
+editbin /dynamicbase:no "D:/Steam/steamapps/common/Europa Universalis IV/eu4.exe"

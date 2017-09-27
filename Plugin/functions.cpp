@@ -1,6 +1,5 @@
 ﻿#include "functions.h"
 #include "eu4.h"
-#include "byte_pattern.h"
 
 using namespace std;
 
@@ -206,7 +205,5 @@ namespace Functions
 
         //校验总是成功
         injector::MakeNOP(g_pattern.find_first("0F 94 45 F3 56").integer(), 4, true);
-
-
     }
 }

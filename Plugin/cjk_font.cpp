@@ -229,17 +229,17 @@ void CJKFont::AddVerticesDX9(CBitmapFont *pFont, std::uint32_t unicode, STextVer
     float height_ratio = (float)pFont->get_field<int, 0x4EC>() / _scaleH;
 
     pVertices[0].UV.x *= width_ratio;
-    pVertices[0].UV.y *= width_ratio;
+    pVertices[0].UV.y *= height_ratio;
     pVertices[1].UV.x *= width_ratio;
-    pVertices[1].UV.y *= width_ratio;
+    pVertices[1].UV.y *= height_ratio;
     pVertices[2].UV.x *= width_ratio;
-    pVertices[2].UV.y *= width_ratio;
+    pVertices[2].UV.y *= height_ratio;
     pVertices[3].UV.x *= width_ratio;
-    pVertices[3].UV.y *= width_ratio;
+    pVertices[3].UV.y *= height_ratio;
     pVertices[4].UV.x *= width_ratio;
-    pVertices[4].UV.y *= width_ratio;
+    pVertices[4].UV.y *= height_ratio;
     pVertices[5].UV.x *= width_ratio;
-    pVertices[5].UV.y *= width_ratio;
+    pVertices[5].UV.y *= height_ratio;
 
     copy_n(pVertices, 6, back_inserter(_vertices[GetValue(unicode)->PageIndex]));
 }

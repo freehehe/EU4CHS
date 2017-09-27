@@ -1,14 +1,13 @@
 ﻿#include "cjk_fonts.h"
 #include "cjk_mapfont.h"
 #include "plugin.h"
-#include "byte_pattern.h"
 
 CJKFontManager g_Fonts;
 
 using namespace std;
 using namespace std::experimental;
 
-void CJKFontManager::LoadFonts()
+void CJKFontManager::LoadFontsData()
 {
     filesystem::directory_iterator dirit{ g_plugin.GetPluginDirectory() / "eu4chs" };
 
@@ -35,43 +34,13 @@ void CJKFontManager::LoadFonts()
     }
 }
 
-void *CJKFontManager::InitGfxAndLoadTextures(void *pInfo, void *pBool)
+void *CJKFontManager::OnDX9Init(void *pInfo, void *pBool)
 {
-    void *pMasterContext = injector::cstd<void *(void *, void *)>::call(g_game.pfGfxInitDX9, pInfo, pBool);
+    IncompleteClass *pMasterContext = injector::cstd<IncompleteClass *(void *, void *)>::call(g_game.pfGfxInitDX9, pInfo, pBool);
 
-    __asm
-    {
-        mov eax, pMasterContext;
-        mov eax, [eax + 4];
-        mov g_game.pDX9Device, eax;
-    }
-
-    for (auto &font : g_Fonts._NormalFonts)
-    {
-        font.second.LoadTexturesDX9();
-    }
-
-    if (g_Fonts._MapFont)
-    {
-        g_Fonts._MapFont->LoadTexturesDX9();
-    }
+    g_game.pDX9Device = pMasterContext->get_field<LPDIRECT3DDEVICE9, 4>();
 
     return pMasterContext;
-}
-
-void CJKFontManager::UnloadTexturesAndShutdownGfx(void *pMasterContext)
-{
-    for (auto &font : g_Fonts._NormalFonts)
-    {
-        font.second.UnloadTexturesDX9();
-    }
-
-    if (g_Fonts._MapFont)
-    {
-        g_Fonts._MapFont->UnloadTexturesDX9();
-    }
-
-    injector::cstd<void(void *)>::call(g_game.pfGfxShutdownDX9, pMasterContext);
 }
 
 void CJKFontManager::DrawNormalFontsDX9(void *a1, int a2, int a3)
@@ -103,10 +72,7 @@ void CJKFontManager::DrawMapFontDX9()
 
 CJKFont * CJKFontManager::GetFont(const CString * fontname)
 {
-    //暂时先按文件名查找
-    const char *cname = (strrchr(fontname->c_str(), '/') + 1);
-
-    auto it = _NormalFonts.find(cname);
+    auto it = _NormalFonts.find(filesystem::path{ fontname->c_str() }.stem().string());
 
     if (it != _NormalFonts.end())
     {
@@ -118,19 +84,40 @@ CJKFont * CJKFontManager::GetFont(const CString * fontname)
     }
 }
 
+int __fastcall CJKFontManager::AddTextureHook(void *pTextureHandler, int edx, const CString *TextureFileName, void *Settings, bool bLoadTexture, bool bSaveAlpha)
+{
+    g_Fonts.GetFont(TextureFileName)->LoadTexturesDX9();
+
+    return injector::thiscall<int(void *, const CString *, void *, bool, bool)>::call(g_game.pfCTextureHandler_AddTexture, pTextureHandler, TextureFileName, Settings, bLoadTexture, bSaveAlpha);
+}
+
+struct RemoveTextureHook
+{
+    void operator()(injector::reg_pack *regs) const
+    {
+        CBitmapFont *pFont = (CBitmapFont *)regs->edi;
+
+        g_Fonts.GetFont(pFont->GetFontPath())->UnloadTexturesDX9();
+
+        injector::thiscall<int(uint32_t, int, void *, int)>::call(g_game.pfCTextureHandler_AddTexture, regs->esi, *(uint32_t *)(regs->ebp - 0x10), nullptr, 0);
+    }
+};
+
 void CJKFontManager::InitAndPatch()
 {
-    LoadFonts();
+    LoadFontsData();
 
     //_GfxSetRenderType
     g_pattern.find_pattern("83 F9 02 0F 85 35 03 00 00");
 
-    //injector::WriteMemory(g_pattern.get(0).address(0x344), InitGfxAndLoadTextures, true);
-    injector::WriteMemory(*g_pattern.get(0).raw<std::uintptr_t>(0x340), InitGfxAndLoadTextures, true);
-
-    //injector::WriteMemory(g_pattern.get(0).address(0x34E), UnloadTexturesAndShutdownGfx, true);
-    injector::WriteMemory(*g_pattern.get(0).raw<std::uintptr_t>(0x34A), UnloadTexturesAndShutdownGfx, true);
+    //injector::WriteMemory(g_pattern.get(0).address(0x344), OnDX9Init, true);
+    injector::WriteMemory(*g_pattern.get(0).raw<std::uintptr_t>(0x340), OnDX9Init, true);
 
     //injector::WriteMemory(g_pattern.get(0).address(0x3E4), InitGfxAndLoadTextures, true);
     injector::WriteMemory(*g_pattern.get(0).raw<std::uintptr_t>(0x3E0), DrawNormalFontsDX9, true);
+
+    g_pattern.find_pattern("6A 00 6A 00 FF 75 F0 8B CE E8"); //10959CF
+    injector::MakeInline<RemoveTextureHook>(g_pattern.get(0).raw(), g_pattern.get(0).raw(14));
+
+    injector::MakeCALL(g_pattern.find_first("E8 ? ? ? ? 8B 4F 30 89 87 E0 04 00 00").raw(), AddTextureHook); //10963EE
 }

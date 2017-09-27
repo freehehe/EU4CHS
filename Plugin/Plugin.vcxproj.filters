@@ -30,9 +30,6 @@
     <ClCompile Include="eu4.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="byte_pattern.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="cjk_fonts.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -60,9 +57,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="functions.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="byte_pattern.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="cjk_fonts.h">

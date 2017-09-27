@@ -8,11 +8,13 @@ class CJKFontManager
     std::unordered_map<std::string, CJKFont> _NormalFonts;
     std::unique_ptr<CJKMapFont> _MapFont;
 
-    void LoadFonts();
+    void LoadFontsData();
 
 public:
-    static void *InitGfxAndLoadTextures(void *, void *);
-    static void UnloadTexturesAndShutdownGfx(void *);
+    static void *OnDX9Init(void *, void *);
+
+    static int __fastcall AddTextureHook(void *pTextureHandler, int edx, const CString *TextureFileName, void *Settings, bool bLoadTexture, bool bSaveAlpha);
+
     static void DrawNormalFontsDX9(void *, int, int);
     static void DrawMapFontDX9();
 

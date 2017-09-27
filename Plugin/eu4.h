@@ -64,7 +64,7 @@ struct CCursorPosition
 
 struct CToken
 {
-    int _LexerToken; //0xF - text
+    int _LexerToken;
     char _szVal[512];
     bool _bExplicitString;
 };
@@ -117,11 +117,16 @@ VALIDATE_SIZE(CInputEvent,0x58)
 struct EU4Meta
 {
     LPDIRECT3DDEVICE9 pDX9Device;
+
     std::uintptr_t pfGfxInitDX9;
     std::uintptr_t pfGfxShutdownDX9;
     std::uintptr_t pfGfxDrawDX9;
 
+    std::uintptr_t pfCTextureHandler_AddTexture;
+    std::uintptr_t pfCTextureHandler_RemoveTextureInternal;
+
     STextVertex *pBitmapVertices;
+    STextVertex *pVertices3d;
 
     std::uintptr_t pfCString_Assign;
 
@@ -177,15 +182,7 @@ struct CBitmapCharacterSet :IncompleteClass
             cp += 0xA0;
         }
 
-        EU4CharacterValues *result = field<EU4CharacterValues *, 0>()[cp];
-
-/*
-        if (result)
-        {
-            result->kerning = false;
-        }*/
-
-        return result;
+        return field<EU4CharacterValues *, 0>()[cp];
     }
 
     float GetScale()
@@ -204,7 +201,6 @@ struct CBitmapFont :IncompleteClass
 
     const CString *GetFontPath()
     {
-        //e.g.  gfx/fonts/vic18
         return field<const CString, 0x9C>();
     }
 
