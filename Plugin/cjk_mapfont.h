@@ -12,6 +12,6 @@ public:
     void DrawAllDX9();
 
 protected:
-    std::vector<std::vector<SProvinceTextVertex>> _vertices;
+    std::vector<std::vector<SProvinceTextVertex>> _Vertices;
     std::vector<std::vector<UINT>> _indices;
 };

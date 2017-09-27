@@ -1,6 +1,10 @@
 ﻿£¤§
 
+CBitmapFont内有40个顶点缓存，hash一样则直接渲染
+
 3D Ripper DX
+
+CJKFont放到Charset的index 0
 
 CEU3GraphicalMap
 1.21.1 0x33C

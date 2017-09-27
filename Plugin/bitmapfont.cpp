@@ -50,7 +50,7 @@ namespace BitmapFont
                 g_context.useSpecialChars);
 
             regs->eax = g_context.unicode;
-            utf8::append(g_context.unicode, g_game.pWord + regs->esi);
+            utf8::unchecked::append(g_context.unicode, g_game.pWord + regs->esi);
 
             regs->edi += (g_context.unicodeLength - 1);
             regs->esi += g_context.unicodeLength;
@@ -77,7 +77,7 @@ namespace BitmapFont
             }
             else
             {
-                regs->ecx = (uint32_t)(&g_context.cjkFont->GetValue(g_context.unicode)->EU4Values);
+                regs->ecx = (uint32_t)(&g_context.cjkFont->GetValue(g_context.unicode)->Value);
             }
         }
     };
@@ -140,7 +140,7 @@ namespace BitmapFont
             }
             else
             {
-                regs->esi = (uint32_t)(&g_context.cjkFont->GetValue(g_context.unicode)->EU4Values);
+                regs->esi = (uint32_t)(&g_context.cjkFont->GetValue(g_context.unicode)->Value);
             }
 
             regs->edx = (uint32_t)g_context.pSet;
@@ -340,7 +340,7 @@ namespace BitmapFont
         }
 
         std::vector<wchar_t> wideText;
-        utf8::utf8to16(Text, Text + nRealSize, back_inserter(wideText));
+        utf8::unchecked::utf8to16(Text, Text + nRealSize, back_inserter(wideText));
 
         for (auto strit = wideText.begin(); strit < wideText.end(); ++strit)
         {
@@ -394,7 +394,7 @@ namespace BitmapFont
                 }
                 else
                 {
-                    pValues = &cjkFont->GetValue(unicode)->EU4Values;
+                    pValues = &cjkFont->GetValue(unicode)->Value;
                 }
 
                 if (pValues == nullptr)
@@ -456,7 +456,7 @@ namespace BitmapFont
         }
 
         std::vector<wchar_t> wideText;
-        utf8::utf8to16(text_view.begin(), text_view.end(), back_inserter(wideText));
+        utf8::unchecked::utf8to16(text_view.begin(), text_view.end(), back_inserter(wideText));
 
         for (auto strit = wideText.begin(); strit < wideText.end(); ++strit)
         {
@@ -523,7 +523,7 @@ namespace BitmapFont
                 }
                 else
                 {
-                    pValues = &cjkFont->GetValue(unicode)->EU4Values;
+                    pValues = &cjkFont->GetValue(unicode)->Value;
                 }
 
                 if (pValues == nullptr)
@@ -582,7 +582,7 @@ namespace BitmapFont
             std::string_view source_view{ OriginalText->c_str() };
 
             std::vector<wchar_t> wideText;
-            utf8::utf8to16(source_view.begin(), source_view.end(), std::back_inserter(wideText));
+            utf8::unchecked::utf8to16(source_view.begin(), source_view.end(), std::back_inserter(wideText));
 
             for (auto strit = wideText.begin(); strit < wideText.end() && nLines != 52; ++strit)
             {
@@ -641,7 +641,7 @@ namespace BitmapFont
                     }
                     else
                     {
-                        pValues = &cjkFont->GetValue(unicode)->EU4Values;
+                        pValues = &cjkFont->GetValue(unicode)->Value;
                     }
 
                     if (pValues)
@@ -741,7 +741,7 @@ namespace BitmapFont
         std::string Result{ OriginalText->c_str() };
 
         std::vector<wchar_t> wideText;
-        utf8::utf8to16(Result.begin(), Result.end(), std::back_inserter(wideText));
+        utf8::unchecked::utf8to16(Result.begin(), Result.end(), std::back_inserter(wideText));
 
         int nDefaultLineHeight = pFont->get_field<int, 0x4D4>() * pSet->GetScale();
         int nCurrentLineHeight = nDefaultLineHeight;
@@ -822,7 +822,7 @@ namespace BitmapFont
                 }
                 else
                 {
-                    pValues = &cjkFont->GetValue(unicode)->EU4Values;
+                    pValues = &cjkFont->GetValue(unicode)->Value;
                 }
 
                 if (pValues)
@@ -842,7 +842,7 @@ namespace BitmapFont
                             if (strit - wideText.begin() > 3)
                             {
                                 Result.clear();
-                                utf8::utf16to8(wideText.begin(), strit - 4, back_inserter(Result));
+                                utf8::unchecked::utf16to8(wideText.begin(), strit - 4, back_inserter(Result));
                                 Result += " ...";
                             }
                             else
@@ -876,13 +876,13 @@ namespace BitmapFont
                             if ((strit - wideText.begin()) > 4)
                             {
                                 Result.clear();
-                                utf8::utf16to8(wideText.begin(), strit - 4, back_inserter(Result));
+                                utf8::unchecked::utf16to8(wideText.begin(), strit - 4, back_inserter(Result));
                                 Result += " ...";
                             }
                             else
                             {
                                 Result.clear();
-                                utf8::utf16to8(wideText.begin(), strit, back_inserter(Result));
+                                utf8::unchecked::utf16to8(wideText.begin(), strit, back_inserter(Result));
                             }
 
                             NewText->assign(Result.c_str());
@@ -931,7 +931,7 @@ namespace BitmapFont
 
         std::vector<wchar_t> wideText;
         std::string_view source_view{ Text->c_str() };
-        utf8::utf8to16(source_view.begin(), source_view.end(), std::back_inserter(wideText));
+        utf8::unchecked::utf8to16(source_view.begin(), source_view.end(), std::back_inserter(wideText));
 
         std::vector<wchar_t>::iterator nLastIndexOfWholeWord = wideText.begin();
         std::vector<wchar_t>::iterator nCurrentLineStartIndex = wideText.begin();
@@ -1004,7 +1004,7 @@ namespace BitmapFont
                     }
                     else
                     {
-                        pValues = &cjkFont->GetValue(unicode)->EU4Values;
+                        pValues = &cjkFont->GetValue(unicode)->Value;
                     }
 
                     if (pValues)
@@ -1023,13 +1023,13 @@ namespace BitmapFont
                             {
                                 if (nLastIndexOfWholeWord > nCurrentLineStartIndex)
                                 {
-                                    utf8::utf16to8(nCurrentLineStartIndex, nLastIndexOfWholeWord, back_inserter(Result));
+                                    utf8::unchecked::utf16to8(nCurrentLineStartIndex, nLastIndexOfWholeWord, back_inserter(Result));
                                     Result += '\n';
                                     nCurrentLineStartIndex = nLastIndexOfWholeWord + 1;
                                 }
                                 else
                                 {
-                                    utf8::utf16to8(nCurrentLineStartIndex, strit, back_inserter(Result));
+                                    utf8::unchecked::utf16to8(nCurrentLineStartIndex, strit, back_inserter(Result));
                                     Result += '\n';
                                     nLastIndexOfWholeWord = strit;
                                     nCurrentLineStartIndex = strit;
@@ -1043,17 +1043,17 @@ namespace BitmapFont
                                 {
                                     if (bWholeWordOnly)
                                     {
-                                        utf8::utf16to8(wideText.begin(), nLastIndexOfWholeWord, back_inserter(Result));
+                                        utf8::unchecked::utf16to8(wideText.begin(), nLastIndexOfWholeWord, back_inserter(Result));
                                     }
                                     else
                                     {
                                         if (strit - wideText.begin() > 4)
                                         {
-                                            utf8::utf16to8(wideText.begin(), strit, back_inserter(Result));
+                                            utf8::unchecked::utf16to8(wideText.begin(), strit, back_inserter(Result));
                                         }
                                         else
                                         {
-                                            utf8::utf16to8(wideText.begin(), strit - 4, back_inserter(Result));
+                                            utf8::unchecked::utf16to8(wideText.begin(), strit - 4, back_inserter(Result));
                                             Result += " ...";
                                         }
                                     }
@@ -1080,7 +1080,7 @@ namespace BitmapFont
 
                             if (bAddBreaksToNewText)
                             {
-                                utf8::utf16to8(nCurrentLineStartIndex, strit, back_inserter(Result));
+                                utf8::unchecked::utf16to8(nCurrentLineStartIndex, strit, back_inserter(Result));
                                 Result += '\n';
 
                                 nCurrentLineStartIndex = strit + 1;
@@ -1092,12 +1092,12 @@ namespace BitmapFont
                                 {
                                     if (!bWholeWordOnly && (strit - wideText.begin()) > 4)
                                     {
-                                        utf8::utf16to8(wideText.begin(), strit - 4, std::back_inserter(Result));
+                                        utf8::unchecked::utf16to8(wideText.begin(), strit - 4, std::back_inserter(Result));
                                         Result += " ...";
                                     }
                                     else
                                     {
-                                        utf8::utf16to8(wideText.begin(), strit, std::back_inserter(Result));
+                                        utf8::unchecked::utf16to8(wideText.begin(), strit, std::back_inserter(Result));
                                     }
                                 }
 
@@ -1112,7 +1112,7 @@ namespace BitmapFont
 
         if (bAddBreaksToNewText)
         {
-            utf8::utf16to8(nCurrentLineStartIndex, wideText.end(), std::back_inserter(Result));
+            utf8::unchecked::utf16to8(nCurrentLineStartIndex, wideText.end(), std::back_inserter(Result));
             NewText->assign(Result.c_str());
         }
         else

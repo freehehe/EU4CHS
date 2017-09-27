@@ -99,7 +99,7 @@ struct RemoveTextureHook
 
         g_Fonts.GetFont(pFont->GetFontPath())->UnloadTexturesDX9();
 
-        injector::thiscall<int(uint32_t, int, void *, int)>::call(g_game.pfCTextureHandler_AddTexture, regs->esi, *(uint32_t *)(regs->ebp - 0x10), nullptr, 0);
+        injector::thiscall<int(uint32_t, int, void *, int)>::call(g_game.pfCTextureHandler_RemoveTextureInternal, regs->esi, *(uint32_t *)(regs->ebp - 0x10), nullptr, 0);
     }
 };
 

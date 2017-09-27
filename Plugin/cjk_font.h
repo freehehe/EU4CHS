@@ -7,11 +7,11 @@ class CJKFont
 public:
     struct CharacterValues
     {
-        EU4CharacterValues EU4Values;
-        std::uint16_t PageIndex;
+        EU4CharacterValues Value;
+        std::uint16_t TextureIndex;
     };
 
-    static const std::uint32_t invalid_replacement = L'？';
+    static const std::uint32_t _InvalidCharacter = L'？';
 
     CJKFont(const std::experimental::filesystem::path &fntname);
 
@@ -27,17 +27,19 @@ public:
     void DrawAllDX9();
 
 protected:
-    bool _initialized;
-    std::experimental::filesystem::path _workingdir;
-    std::uint16_t _scaleW;
-    std::uint16_t _scaleH;
-    std::uint16_t _pages;
+    bool _Initialized;
+    std::experimental::filesystem::path _WorkingDir;
+    std::uint16_t _TextureWidth;
+    std::uint16_t _TextureHeight;
+    std::uint16_t _PageCount;
 
-    std::array<std::unique_ptr<CharacterValues>, 0x10000> _values;
+    std::array<std::unique_ptr<CharacterValues>, 0x10000> _Values;
 
-    std::vector<LPDIRECT3DTEXTURE9> _textures;
-    std::vector<std::string> _texturenames;
-    std::vector<std::vector<STextVertex>> _vertices;
+    std::map<uint32_t, std::vector<STextVertex>> _ScreenVertices; //hash, vertices
+
+    std::vector<LPDIRECT3DTEXTURE9> _Textures;
+    std::vector<std::string> _TextureFileNames;
+    std::vector<std::vector<STextVertex>> _Vertices;
 
     void ReadInfoBlock(FILE *file);
     void ReadCommonBlock(FILE *file);

@@ -11,8 +11,8 @@ CJKMapFont::CJKMapFont(const filesystem::path & fntname)
 
 void CJKMapFont::AddVerticesDX9(CBitmapFont *pFont, std::uint32_t unicode, SProvinceTextVertex * pVertices)
 {
-    float width_ratio = (float)pFont->get_field<int, 0x4E8>() / _scaleW;
-    float height_ratio = (float)pFont->get_field<int, 0x4EC>() / _scaleH;
+    float width_ratio = (float)pFont->get_field<int, 0x4E8>() / _TextureWidth;
+    float height_ratio = (float)pFont->get_field<int, 0x4EC>() / _TextureHeight;
 
     pVertices[0].UV.x *= width_ratio;
     pVertices[0].UV.y *= height_ratio;
@@ -27,25 +27,25 @@ void CJKMapFont::AddVerticesDX9(CBitmapFont *pFont, std::uint32_t unicode, SProv
     pVertices[5].UV.x *= width_ratio;
     pVertices[5].UV.y *= height_ratio;
 
-    copy_n(pVertices, 6, back_inserter(_vertices[GetValue(unicode)->PageIndex]));
+    copy_n(pVertices, 6, back_inserter(_Vertices[GetValue(unicode)->TextureIndex]));
 }
 
 void CJKMapFont::DrawAllDX9()
 {
-    for (size_t index = 0; index < _pages; ++index)
+    for (size_t index = 0; index < _PageCount; ++index)
     {
-        if (!_vertices[index].empty())
+        if (!_Vertices[index].empty())
         {
-            g_game.pDX9Device->SetTexture(0, _textures[index]);
+            g_game.pDX9Device->SetTexture(0, _Textures[index]);
 
             g_game.pDX9Device->DrawIndexedPrimitiveUP(
                 D3DPT_TRIANGLELIST,
                 0, 
-                _vertices[index].size(),
-                _vertices[index].size() / 3, 
+                _Vertices[index].size(),
+                _Vertices[index].size() / 3, 
                 _indices[index].data(), 
                 D3DFORMAT::D3DFMT_INDEX32,
-                _vertices[index].data(),
+                _Vertices[index].data(),
                 sizeof(SProvinceTextVertex));
         }
     }
