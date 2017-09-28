@@ -1,10 +1,20 @@
 ﻿£¤§
 
-CBitmapFont内有40个顶点缓存，hash一样则直接渲染
+CBitmapFont内有40个RenderToScreen用顶点缓存，每个1200个顶点，hash一样则直接渲染
+才有缓存机制 超过1200个顶点就不缓存了，满了则覆盖索引39的缓存
+有特殊字符的不缓存
+
+field_2598 uint [40] hash
+field_2778 VertexBufferGFX *[40] hash对应的顶点缓存
+
+看看取消缓存造成的性能损失
+检查间断判定是咋回事
+有些裸函数换成MakeInline
+dynamic_cast
+
+4E8 4EC
 
 3D Ripper DX
-
-CJKFont放到Charset的index 0
 
 CEU3GraphicalMap
 1.21.1 0x33C
@@ -22,7 +32,7 @@ credits.txt 中A7为加大字号用
 
 看看CTextBuffer::Write的过滤关键字
 
-noto sans regular字号 + 6=新宋体大小
+noto sans regular字号 + 6= 新宋体大小
 
 vic_22_bl 28
 
@@ -55,19 +65,17 @@ tahoma_20_bold 26
 
 Mapfont // Mapfont_100 106 padding 8 spacing 1
 
-字体纹理随Latin1字体纹理
-
-Rest: //Render3d
-FillVertexBuffer
-
 CEU3GraphicalMap::ctor里面定义地图字体tahoma_60
-CCountryNameCollection::RenderNames
-CCountryNameCollection::AddNudgedNames
-CGenerateNamesWork::AddNameArea
-CEU3GraphicalMap::GenerateProvinceNames
+
+SNameStruct
+SMapNameVertexBuffer
+CCountryNameCollection
+CEU3GraphicalMap
+CGenerateNameWork
+ValidateLine
+CurveText
 
 不搞定地图字体造成utf8cpp接受到莫名字节
-FontManager绘制时只绘制当前字体！！
 
 languages.yml增加l_schinese
 pdx_launcher/game/interface/launcher.gui 语言按钮排版

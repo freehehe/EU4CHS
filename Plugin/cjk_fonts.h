@@ -1,12 +1,10 @@
-#pragma once
+﻿#pragma once
 #include "stdinc.h"
-#include "cjk_font.h"
-#include "cjk_mapfont.h"
+#include "cjk_normal.h"
 
 class CJKFontManager
 {
-    std::unordered_map<std::string, CJKFont> _NormalFonts;
-    std::unique_ptr<CJKMapFont> _MapFont;
+    std::unordered_map<std::string, std::unique_ptr<CJKFontBase>> _Fonts;
 
     void LoadFontsData();
 
@@ -15,10 +13,7 @@ public:
 
     static int __fastcall AddTextureHook(void *pTextureHandler, int edx, const CString *TextureFileName, void *Settings, bool bLoadTexture, bool bSaveAlpha);
 
-    static void DrawNormalFontsDX9(void *, int, int);
-    static void DrawMapFontDX9();
-
-    CJKFont *GetFont(const CString *fontname);
+    CJKFontBase *GetFont(const CString *fontname);
 
     void InitAndPatch();
 };

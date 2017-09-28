@@ -112,7 +112,7 @@ public:
     template <typename T>
     operator T*() const
     {
-        return this->pointer<T>();
+        return this->raw<T>();
     }
 };
 

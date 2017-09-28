@@ -74,7 +74,7 @@ namespace eu4utf8
         if (!eu4utf8::internal::is_code_point_valid(cp))
             throw invalid_code_point(cp);
 
-        if (cp < 0x80 || cp == 0xA3 || cp == 0xA4 || cp == 0xA7)    // one octet
+        if (cp < 0x80)    // one octet
             *(result++) = static_cast<uint8_t>(cp);
         else if (cp < 0x800) {                                      // two octets
             *(result++) = static_cast<uint8_t>((cp >> 6)            | 0xc0);

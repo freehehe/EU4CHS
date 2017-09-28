@@ -4,32 +4,21 @@
 using namespace std;
 using namespace std::experimental;
 
-union UnicodeCharPair
+CJKFontBase::CJKFontBase(const filesystem::path & fntname)
 {
-    struct
-    {
-        uint32_t _first;
-        uint32_t _second;
-    };
-
-    uint64_t _packed;
-};
-
-CJKFont::CJKFont(const filesystem::path & fntname)
-{
-    _Initialized = false;
-
     InitWithFile(fntname);
+    
+    _Values.reserve(45000);
 }
 
-void CJKFont::ReadInfoBlock(FILE * file)
+void CJKFontBase::ReadInfoBlock(FILE * file)
 {
     uint32_t block_size;
     fread(&block_size, 4, 1, file);
     fseek(file, block_size, SEEK_CUR);
 }
 
-void CJKFont::ReadCommonBlock(FILE * file)
+void CJKFontBase::ReadCommonBlock(FILE * file)
 {
 #pragma pack(push,1)
     struct CommonBlock
@@ -64,27 +53,17 @@ void CJKFont::ReadCommonBlock(FILE * file)
     _PageCount = common_block.pages;
 }
 
-void CJKFont::ReadPagesBlock(FILE *file)
+void CJKFontBase::ReadPagesBlock(FILE *file)
 {
     uint32_t block_size;
     fread(&block_size, 4, 1, file);
 
-    char *buffer = new char[block_size];
+    _PagesBlock.resize(block_size);
 
-    fread(buffer, block_size, 1, file);
-
-    char *p = buffer;
-
-    for (uint16_t count = 0; count < _PageCount; ++count)
-    {
-        _TextureFileNames.emplace_back(p);
-        p += (strlen(p) + 1);
-    }
-
-    delete[]buffer;
+    fread(_PagesBlock.data(), block_size, 1, file);
 }
 
-void CJKFont::ReadCharsBlock(FILE * file)
+void CJKFontBase::ReadCharsBlock(FILE * file)
 {
     struct BinaryCharValues
     {
@@ -109,9 +88,9 @@ void CJKFont::ReadCharsBlock(FILE * file)
 
     for (auto &binary : chars_block)
     {
-        CharacterValues values;
+        CJKCharInfo values;
 
-        values.TextureIndex = binary.page;
+        values.Page = binary.page;
         values.Value.x = binary.x;
         values.Value.y = binary.y;
         values.Value.w = binary.width;
@@ -123,28 +102,20 @@ void CJKFont::ReadCharsBlock(FILE * file)
 
         uint32_t unicode = binary.code;
 
-        if (unicode < 0x10000)
-        {
-            _Values[unicode] = make_unique<CharacterValues>(values);
-        }
+        _Values[unicode] = values;
     }
 }
 
-void CJKFont::ReadKerningsBlock(FILE * file)
+void CJKFontBase::ReadKerningsBlock(FILE * file)
 {
     uint32_t block_size;
     fread(&block_size, 4, 1, file);
     fseek(file, block_size, SEEK_CUR);
 }
 
-void CJKFont::InitWithFile(const filesystem::path &fntname)
+void CJKFontBase::InitWithFile(const filesystem::path &fntname)
 {
     unsigned char block_type;
-
-    if (_Initialized)
-    {
-        return;
-    }
 
     _WorkingDir = fntname.parent_path();
 
@@ -183,77 +154,49 @@ void CJKFont::InitWithFile(const filesystem::path &fntname)
 
     fclose(iFile);
 
-    _Vertices.clear();
-    _Vertices.resize(_PageCount);
-    
-    _Initialized = true;
-}
+    _BaseBuffer.resize(_PageCount);
 
-void CJKFont::LoadTexturesDX9()
-{
-    for (auto &name : _TextureFileNames)
+    _Textures.resize(_PageCount);
+    char *pName = _PagesBlock.data();
+
+    for (size_t index = 0; index < _PageCount; ++index)
     {
-        LPDIRECT3DTEXTURE9 gfx;
-
-        D3DXCreateTextureFromFileW(g_game.pDX9Device, (_WorkingDir / name).replace_extension(".dds").c_str(), &gfx);
-
-        _Textures.emplace_back(gfx);
+        _Textures[index].first = pName;
+        pName += (strlen(pName) + 1);
     }
 }
 
-void CJKFont::UnloadTexturesDX9()
+void CJKFontBase::LoadTexturesDX9()
 {
-    for (auto &texture : _Textures)
+    for (auto &info : _Textures)
     {
-        texture->Release();
+        D3DXCreateTextureFromFileW(g_game.pDX9Device, (_WorkingDir / info.first).replace_extension(".dds").c_str(), &info.second);
     }
-
-    _Textures.clear();
 }
 
-const CJKFont::CharacterValues *CJKFont::GetValue(uint32_t unicode)
+void CJKFontBase::UnloadTexturesDX9()
 {
-    if (unicode < 0x10000 && _Values[unicode])
+    for (auto &info : _Textures)
     {
-        return _Values[unicode].get();
+        info.second->Release();
+    }
+}
+
+const CJKFontBase::CJKCharInfo &CJKFontBase::GetValue(uint32_t unicode)
+{
+    auto it = _Values.find(unicode);
+
+    if (it != _Values.end())
+    {
+        return it->second;
     }
     else
     {
-        return _Values[_InvalidCharacter].get();
+        return _Values[INVALID_REPLACEMENT];
     }
 }
 
-void CJKFont::AddVerticesDX9(CBitmapFont *pFont, std::uint32_t unicode, STextVertex * pVertices)
+const EU4CharInfo * CJKFontBase::GetEU4Value(uint32_t unicode)
 {
-    float width_ratio = (float)pFont->get_field<int, 0x4E8>() / _TextureWidth;
-    float height_ratio = (float)pFont->get_field<int, 0x4EC>() / _TextureHeight;
-
-    pVertices[0].UV.x *= width_ratio;
-    pVertices[0].UV.y *= height_ratio;
-    pVertices[1].UV.x *= width_ratio;
-    pVertices[1].UV.y *= height_ratio;
-    pVertices[2].UV.x *= width_ratio;
-    pVertices[2].UV.y *= height_ratio;
-    pVertices[3].UV.x *= width_ratio;
-    pVertices[3].UV.y *= height_ratio;
-    pVertices[4].UV.x *= width_ratio;
-    pVertices[4].UV.y *= height_ratio;
-    pVertices[5].UV.x *= width_ratio;
-    pVertices[5].UV.y *= height_ratio;
-
-    copy_n(pVertices, 6, back_inserter(_Vertices[GetValue(unicode)->TextureIndex]));
-}
-
-void CJKFont::DrawAllDX9()
-{
-    for (size_t index = 0; index < _PageCount; ++index)
-    {
-        if (!_Vertices[index].empty())
-        {
-            g_game.pDX9Device->SetTexture(0, _Textures[index]);
-            g_game.pDX9Device->DrawPrimitiveUP(D3DPT_TRIANGLELIST, _Vertices[index].size() / 3, _Vertices[index].data(), sizeof(STextVertex));
-
-            _Vertices[index].clear();
-        }
-    }
+    return &GetValue(unicode).Value;
 }

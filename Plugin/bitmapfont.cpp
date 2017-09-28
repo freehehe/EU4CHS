@@ -1,30 +1,10 @@
-﻿#include "plugin.h"
-#include "bitmapfont.h"
+﻿#include "eu4.h"
 #include "functions.h"
-#include "eu4.h"
 #include "cjk_fonts.h"
+#include "bitmapfont.h"
 
 namespace BitmapFont
 {
-    static struct
-    {
-        CBitmapFont *pFont;
-        CBitmapCharacterSet *pSet;
-
-        CJKFont *cjkFont;
-
-        uint32_t textLength;
-
-        uint32_t unicode;
-        ptrdiff_t unicodeLength;
-        
-        uint32_t nextUnicode;
-
-        bool useSpecialChars;
-
-        void *ret_addr;
-    } g_context;
-
     struct CBitmapFont_RenderToScreen_GetChar_13 //1098CA0
     {
         void operator()(injector::reg_pack *regs) const
@@ -50,7 +30,7 @@ namespace BitmapFont
                 g_context.useSpecialChars);
 
             regs->eax = g_context.unicode;
-            utf8::unchecked::append(g_context.unicode, g_game.pWord + regs->esi);
+            eu4utf8::append(g_context.unicode, g_game.pWord + regs->esi);
 
             regs->edi += (g_context.unicodeLength - 1);
             regs->esi += g_context.unicodeLength;
@@ -77,10 +57,60 @@ namespace BitmapFont
             }
             else
             {
-                regs->ecx = (uint32_t)(&g_context.cjkFont->GetValue(g_context.unicode)->Value);
+                regs->ecx = (uint32_t)(g_context.cjkFont->GetEU4Value(g_context.unicode));
             }
         }
     };
+
+    __declspec(naked) void CBitmapFont_GetKerning()
+    {
+        __asm
+        {
+            pop g_context.ret_addr;
+
+            cmp g_context.nextUnicode, 0xFF;
+            jg skip;
+
+            mov eax, g_context.nextUnicode;
+            mov ecx, 0xA3;
+            cmp eax, 0x3;
+            cmovz eax, ecx;
+
+            mov ecx, 0xA4;
+            cmp eax, 0x4;
+            cmovz eax, ecx;
+
+            mov ecx, 0xA7;
+            cmp eax, 0x7;
+            cmovz eax, ecx;
+
+            push eax;
+
+            mov eax, g_context.unicode;
+            mov ecx, 0xA3;
+            cmp eax, 0x3;
+            cmovz eax, ecx;
+
+            mov ecx, 0xA4;
+            cmp eax, 0x4;
+            cmovz eax, ecx;
+
+            mov ecx, 0xA7;
+            cmp eax, 0x7;
+            cmovz eax, ecx;
+
+            push eax;
+
+            mov ecx, g_context.pSet;
+            call g_game.pfCBitmapCharacterSet_GetKerning;
+
+        skip:
+            xorps xmm0, xmm0;
+
+        end:
+            jmp g_context.ret_addr;
+        }
+    }
 
     __declspec(naked) void CBitmapFont_RenderToScreen_Delim() //1098F0A
     {
@@ -92,7 +122,7 @@ namespace BitmapFont
             xor al, al;
 
             //高度不为0 && 前字节<=255 && 后字节<=255
-            cmp [ecx]EU4CharacterValues.h, 0; //高度为0
+            cmp [ecx]EU4CharInfo.h, 0; //高度为0
             setnz al;
             mov dl, al;
 
@@ -140,7 +170,7 @@ namespace BitmapFont
             }
             else
             {
-                regs->esi = (uint32_t)(&g_context.cjkFont->GetValue(g_context.unicode)->Value);
+                regs->esi = (uint32_t)(g_context.cjkFont->GetEU4Value(g_context.unicode));
             }
 
             regs->edx = (uint32_t)g_context.pSet;
@@ -168,7 +198,7 @@ namespace BitmapFont
             push g_context.unicode;
             push g_context.pFont;
             mov ecx, g_context.cjkFont;
-            call CJKFont::AddVerticesDX9;
+            call CJKNormalFont::AddScreenVerticesDX9;
 
         latin:
             mov ecx, [ebp - 0x40];
@@ -212,7 +242,7 @@ namespace BitmapFont
             }
             else
             {
-                regs->eax = (uint32_t)g_context.cjkFont->GetValue(g_context.unicode);
+                regs->eax = (uint32_t)g_context.cjkFont->GetEU4Value(g_context.unicode);
             }
         }
     };
@@ -225,7 +255,7 @@ namespace BitmapFont
             pop g_context.ret_addr;
 
             //高度不为0 && 前字节<=255 && 后字节<=255
-            cmp [eax]EU4CharacterValues.h, 0; //高度为0
+            cmp [eax]EU4CharInfo.h, 0; //高度为0
             setnz al;
             mov dl, al;
 
@@ -266,7 +296,7 @@ namespace BitmapFont
             }
             else
             {
-                regs->eax = (uint32_t)g_context.cjkFont->GetValue(g_context.unicode);
+                regs->eax = (uint32_t)g_context.cjkFont->GetEU4Value(g_context.unicode);
             }
         }
     };
@@ -290,8 +320,9 @@ namespace BitmapFont
             push g_context.unicode;
             push g_context.pFont;
             mov ecx, g_context.cjkFont;
-            call CJKFont::AddVerticesDX9;
+            call CJKNormalFont::AddScreenVerticesDX9;
 
+#error ???
         end:
             mov ecx, [ebp - 0x9C];
             mov edx, [ebp + 0x24];
@@ -330,7 +361,7 @@ namespace BitmapFont
         int nWidth = 0; //最大行宽度
 
         CBitmapCharacterSet *pSet = pFont->GetLatin1CharacterSet();
-        CJKFont *cjkFont = g_Fonts.GetFont(pFont->GetFontPath());
+        CJKFontBase *cjkFont = g_Fonts.GetFont(pFont->GetFontPath());
 
         int nRealSize = nLength;
 
@@ -340,7 +371,7 @@ namespace BitmapFont
         }
 
         std::vector<wchar_t> wideText;
-        utf8::unchecked::utf8to16(Text, Text + nRealSize, back_inserter(wideText));
+        eu4utf8::utf8to16(Text, Text + nRealSize, back_inserter(wideText));
 
         for (auto strit = wideText.begin(); strit < wideText.end(); ++strit)
         {
@@ -386,7 +417,7 @@ namespace BitmapFont
             }
             else
             {
-                const EU4CharacterValues *pValues;
+                const EU4CharInfo *pValues;
 
                 if (Functions::IsLatin1Char(unicode))
                 {
@@ -394,7 +425,7 @@ namespace BitmapFont
                 }
                 else
                 {
-                    pValues = &cjkFont->GetValue(unicode)->Value;
+                    pValues = cjkFont->GetEU4Value(unicode);
                 }
 
                 if (pValues == nullptr)
@@ -439,7 +470,7 @@ namespace BitmapFont
         float vHeight = vCharacterHeight;
         float vCurrentLineHeight = vCharacterHeight;
         CBitmapCharacterSet *pSet = pFont->GetLatin1CharacterSet();
-        CJKFont *cjkFont = g_Fonts.GetFont(pFont->GetFontPath());
+        CJKFontBase *cjkFont = g_Fonts.GetFont(pFont->GetFontPath());
 
         if (nMaxWidth == 0)
         {
@@ -456,7 +487,7 @@ namespace BitmapFont
         }
 
         std::vector<wchar_t> wideText;
-        utf8::unchecked::utf8to16(text_view.begin(), text_view.end(), back_inserter(wideText));
+        eu4utf8::utf8to16(text_view.begin(), text_view.end(), back_inserter(wideText));
 
         for (auto strit = wideText.begin(); strit < wideText.end(); ++strit)
         {
@@ -510,7 +541,7 @@ namespace BitmapFont
             }
             else
             {
-                const EU4CharacterValues *pValues;
+                const EU4CharInfo *pValues;
 
                 if (unicode == ' ' || !Functions::IsLatin1Char(unicode))
                 {
@@ -523,7 +554,7 @@ namespace BitmapFont
                 }
                 else
                 {
-                    pValues = &cjkFont->GetValue(unicode)->Value;
+                    pValues = cjkFont->GetEU4Value(unicode);
                 }
 
                 if (pValues == nullptr)
@@ -561,7 +592,7 @@ namespace BitmapFont
         static const float fIconWidth = 8.0f;
 
         CBitmapCharacterSet *pSet = pFont->GetLatin1CharacterSet();
-        CJKFont *cjkFont = g_Fonts.GetFont(pFont->GetFontPath());
+        CJKFontBase *cjkFont = g_Fonts.GetFont(pFont->GetFontPath());
 
         char Tag[128];
         int nLinesHeight[110] = { 0 };
@@ -582,7 +613,7 @@ namespace BitmapFont
             std::string_view source_view{ OriginalText->c_str() };
 
             std::vector<wchar_t> wideText;
-            utf8::unchecked::utf8to16(source_view.begin(), source_view.end(), std::back_inserter(wideText));
+            eu4utf8::utf8to16(source_view.begin(), source_view.end(), std::back_inserter(wideText));
 
             for (auto strit = wideText.begin(); strit < wideText.end() && nLines != 52; ++strit)
             {
@@ -633,7 +664,7 @@ namespace BitmapFont
                 }
                 else
                 {
-                    const EU4CharacterValues *pValues;
+                    const EU4CharInfo *pValues;
 
                     if (Functions::IsLatin1Char(unicode))
                     {
@@ -641,7 +672,7 @@ namespace BitmapFont
                     }
                     else
                     {
-                        pValues = &cjkFont->GetValue(unicode)->Value;
+                        pValues = cjkFont->GetEU4Value(unicode);
                     }
 
                     if (pValues)
@@ -736,12 +767,12 @@ namespace BitmapFont
         float vTempWidth = 0.0f;
 
         CBitmapCharacterSet *pSet = pFont->GetLatin1CharacterSet();
-        CJKFont *cjkFont = g_Fonts.GetFont(pFont->GetFontPath());
+        CJKFontBase *cjkFont = g_Fonts.GetFont(pFont->GetFontPath());
 
         std::string Result{ OriginalText->c_str() };
 
         std::vector<wchar_t> wideText;
-        utf8::unchecked::utf8to16(Result.begin(), Result.end(), std::back_inserter(wideText));
+        eu4utf8::utf8to16(Result.begin(), Result.end(), std::back_inserter(wideText));
 
         int nDefaultLineHeight = pFont->get_field<int, 0x4D4>() * pSet->GetScale();
         int nCurrentLineHeight = nDefaultLineHeight;
@@ -814,7 +845,7 @@ namespace BitmapFont
             }
             else
             {
-                const EU4CharacterValues *pValues;
+                const EU4CharInfo *pValues;
 
                 if (Functions::IsLatin1Char(unicode))
                 {
@@ -822,7 +853,7 @@ namespace BitmapFont
                 }
                 else
                 {
-                    pValues = &cjkFont->GetValue(unicode)->Value;
+                    pValues = cjkFont->GetEU4Value(unicode);
                 }
 
                 if (pValues)
@@ -842,7 +873,7 @@ namespace BitmapFont
                             if (strit - wideText.begin() > 3)
                             {
                                 Result.clear();
-                                utf8::unchecked::utf16to8(wideText.begin(), strit - 4, back_inserter(Result));
+                                eu4utf8::utf16to8(wideText.begin(), strit - 4, back_inserter(Result));
                                 Result += " ...";
                             }
                             else
@@ -876,13 +907,13 @@ namespace BitmapFont
                             if ((strit - wideText.begin()) > 4)
                             {
                                 Result.clear();
-                                utf8::unchecked::utf16to8(wideText.begin(), strit - 4, back_inserter(Result));
+                                eu4utf8::utf16to8(wideText.begin(), strit - 4, back_inserter(Result));
                                 Result += " ...";
                             }
                             else
                             {
                                 Result.clear();
-                                utf8::unchecked::utf16to8(wideText.begin(), strit, back_inserter(Result));
+                                eu4utf8::utf16to8(wideText.begin(), strit, back_inserter(Result));
                             }
 
                             NewText->assign(Result.c_str());
@@ -909,7 +940,7 @@ namespace BitmapFont
         char Tag[128];
 
         CBitmapCharacterSet *pSet = pFont->GetLatin1CharacterSet();
-        CJKFont *cjkFont = g_Fonts.GetFont(pFont->GetFontPath());
+        CJKFontBase *cjkFont = g_Fonts.GetFont(pFont->GetFontPath());
 
         int nDefaultLineHeight = pFont->get_field<int, 0x4D4>() * pSet->GetScale();
         int nCurrentLineHeight = nDefaultLineHeight;
@@ -931,7 +962,7 @@ namespace BitmapFont
 
         std::vector<wchar_t> wideText;
         std::string_view source_view{ Text->c_str() };
-        utf8::unchecked::utf8to16(source_view.begin(), source_view.end(), std::back_inserter(wideText));
+        eu4utf8::utf8to16(source_view.begin(), source_view.end(), std::back_inserter(wideText));
 
         std::vector<wchar_t>::iterator nLastIndexOfWholeWord = wideText.begin();
         std::vector<wchar_t>::iterator nCurrentLineStartIndex = wideText.begin();
@@ -996,7 +1027,7 @@ namespace BitmapFont
                         nLastIndexOfWholeWord = strit;
                     }
 
-                    const EU4CharacterValues *pValues;
+                    const EU4CharInfo *pValues;
 
                     if (Functions::IsLatin1Char(unicode))
                     {
@@ -1004,7 +1035,7 @@ namespace BitmapFont
                     }
                     else
                     {
-                        pValues = &cjkFont->GetValue(unicode)->Value;
+                        pValues = cjkFont->GetEU4Value(unicode);
                     }
 
                     if (pValues)
@@ -1023,13 +1054,13 @@ namespace BitmapFont
                             {
                                 if (nLastIndexOfWholeWord > nCurrentLineStartIndex)
                                 {
-                                    utf8::unchecked::utf16to8(nCurrentLineStartIndex, nLastIndexOfWholeWord, back_inserter(Result));
+                                    eu4utf8::utf16to8(nCurrentLineStartIndex, nLastIndexOfWholeWord, back_inserter(Result));
                                     Result += '\n';
                                     nCurrentLineStartIndex = nLastIndexOfWholeWord + 1;
                                 }
                                 else
                                 {
-                                    utf8::unchecked::utf16to8(nCurrentLineStartIndex, strit, back_inserter(Result));
+                                    eu4utf8::utf16to8(nCurrentLineStartIndex, strit, back_inserter(Result));
                                     Result += '\n';
                                     nLastIndexOfWholeWord = strit;
                                     nCurrentLineStartIndex = strit;
@@ -1043,17 +1074,17 @@ namespace BitmapFont
                                 {
                                     if (bWholeWordOnly)
                                     {
-                                        utf8::unchecked::utf16to8(wideText.begin(), nLastIndexOfWholeWord, back_inserter(Result));
+                                        eu4utf8::utf16to8(wideText.begin(), nLastIndexOfWholeWord, back_inserter(Result));
                                     }
                                     else
                                     {
                                         if (strit - wideText.begin() > 4)
                                         {
-                                            utf8::unchecked::utf16to8(wideText.begin(), strit, back_inserter(Result));
+                                            eu4utf8::utf16to8(wideText.begin(), strit, back_inserter(Result));
                                         }
                                         else
                                         {
-                                            utf8::unchecked::utf16to8(wideText.begin(), strit - 4, back_inserter(Result));
+                                            eu4utf8::utf16to8(wideText.begin(), strit - 4, back_inserter(Result));
                                             Result += " ...";
                                         }
                                     }
@@ -1080,7 +1111,7 @@ namespace BitmapFont
 
                             if (bAddBreaksToNewText)
                             {
-                                utf8::unchecked::utf16to8(nCurrentLineStartIndex, strit, back_inserter(Result));
+                                eu4utf8::utf16to8(nCurrentLineStartIndex, strit, back_inserter(Result));
                                 Result += '\n';
 
                                 nCurrentLineStartIndex = strit + 1;
@@ -1092,12 +1123,12 @@ namespace BitmapFont
                                 {
                                     if (!bWholeWordOnly && (strit - wideText.begin()) > 4)
                                     {
-                                        utf8::unchecked::utf16to8(wideText.begin(), strit - 4, std::back_inserter(Result));
+                                        eu4utf8::utf16to8(wideText.begin(), strit - 4, std::back_inserter(Result));
                                         Result += " ...";
                                     }
                                     else
                                     {
-                                        utf8::unchecked::utf16to8(wideText.begin(), strit, std::back_inserter(Result));
+                                        eu4utf8::utf16to8(wideText.begin(), strit, std::back_inserter(Result));
                                     }
                                 }
 
@@ -1112,7 +1143,7 @@ namespace BitmapFont
 
         if (bAddBreaksToNewText)
         {
-            utf8::unchecked::utf16to8(nCurrentLineStartIndex, wideText.end(), std::back_inserter(Result));
+            eu4utf8::utf16to8(nCurrentLineStartIndex, wideText.end(), std::back_inserter(Result));
             NewText->assign(Result.c_str());
         }
         else
