@@ -107,7 +107,7 @@ namespace Functions
         if (index < text_length)
         {
             first_length = utf8::internal::sequence_length(pText + index);
-            first = utf8::peek_next(pText + index);
+            first = utf8::unchecked::peek_next(pText + index);
             index += first_length;
         }
 

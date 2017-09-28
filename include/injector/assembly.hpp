@@ -38,45 +38,86 @@
 
 namespace injector
 {
+    //helpers
+    union _general_register
+    {
+        uint32_t i;
+        void *p;
+
+        _general_register &operator=(uint32_t value)
+        {
+            i = value;
+
+            return *this;
+        }
+
+        template <typename T>
+        _general_register &operator=(T *pointer)
+        {
+            p = pointer;
+
+            return *this;
+        }
+
+        template <typename T>
+        operator T*() const
+        {
+            return (T *)p;
+        }
+    };
+
+    struct _flags_register
+    {
+        bool carry_flag : 1;
+        bool flag1 : 1;
+        bool parity_flag : 1;
+        bool flag3 : 1;
+        bool adjust_flag : 1;
+        bool flag5 : 1;
+        bool zero_flag : 1;
+        bool sign_flag : 1;
+        bool flag8 : 1;
+        bool flag9 : 1;
+        bool direction_flag : 1;
+        bool overflow_flag : 1;
+        bool flag12 : 1;
+        bool flag13 : 1;
+        bool flag14 : 1;
+        bool flag15 : 1;
+        bool flag16 : 1;
+        bool flag17 : 1;
+        bool flag18 : 1;
+        bool flag19 : 1;
+        bool flag20 : 1;
+        bool flag21 : 1;
+        bool flag22 : 1;
+        bool flag23 : 1;
+        bool flag24 : 1;
+        bool flag25 : 1;
+        bool flag26 : 1;
+        bool flag27 : 1;
+        bool flag28 : 1;
+        bool flag29 : 1;
+        bool flag30 : 1;
+        bool flag31 : 1;
+    };
+    static_assert(sizeof(_general_register) == 4);
+    static_assert(sizeof(_flags_register) == 4);
+
     struct reg_pack
     {
         // The ordering is very important, don't change
         // The first field is the last to be pushed and first to be poped
 
         // PUSHFD / POPFD
-        uint32_t ef;
+        _flags_register ef;
 
         // PUSHAD/POPAD -- must be the lastest fields (because of esp)
         union
         {
-            uint32_t arr[8];
-            struct { uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax; };
+            _general_register arr[8];
+            struct { _general_register edi, esi, ebp, esp, ebx, edx, ecx, eax; };
         };
-        
-        enum reg_name {
-            reg_edi, reg_esi, reg_ebp, reg_esp, reg_ebx, reg_edx, reg_ecx, reg_eax 
-        };
-        
-        enum ef_flag {
-            carry_flag = 0, parity_flag = 2, adjust_flag = 4, zero_flag = 6, sign_flag = 7,
-            direction_flag = 10, overflow_flag = 11
-        };
-
-        uint32_t& operator[](size_t i)
-        { return this->arr[i]; }
-        const uint32_t& operator[](size_t i) const
-        { return this->arr[i]; }
-
-        template<uint32_t bit>   // bit starts from 0, use ef_flag enum
-        bool flag()
-        {
-            return (this->ef & (1 << bit)) != 0;
-        }
-
-        bool jnb()
-        {
-            return flag<carry_flag>() == false;
-        }
     };
 
     // Lowest level stuff (actual assembly) goes on the following namespace

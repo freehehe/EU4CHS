@@ -1134,6 +1134,7 @@ namespace BitmapFont
         injector::MakeJMP(g_pattern.find_first("81 EC 04 01 00 00 53 8B 5D 0C 56").integer(-0x18), GetActualRealRequiredSizeActually);
 
         //RenderToScreen
+/*
         g_pattern.find_pattern("8A 87 ? ? ? ? 88 86 ? ? ? ? 46");
         injector::MakeInline<CBitmapFont_RenderToScreen_GetChar_13>(g_pattern.get(0).integer(), g_pattern.get(0).integer(13));
 
@@ -1149,9 +1150,10 @@ namespace BitmapFont
 
         g_pattern.find_pattern("89 04 95 ? ? ? ? B8 AB AA AA 2A");
         injector::MakeNOP(g_pattern.get(0).integer(7), 19);
-        injector::MakeCALL(g_pattern.get(0).integer(7), CBitmapFont_RenderToScreen_GenVertices_19);
+        injector::MakeCALL(g_pattern.get(0).integer(7), CBitmapFont_RenderToScreen_GenVertices_19);*/
 
         //RenderToTexture
+
         g_pattern.find_pattern("8A 04 30 0F B6 C0 8B 84 87 B4 00 00 00");
         injector::MakeInline<CBitmapFont_RenderToTexture_GetCharInfo_13>(g_pattern.get(0).integer(), g_pattern.get(0).integer(13));
 
@@ -1252,5 +1254,9 @@ namespace BitmapFont
 
         //CBitmapFont__RemoveSpecialChars
         injector::WriteMemory(g_pattern.find_first("83 EC 34 6A 05 68").integer(6), "@{", true);
+
+        //取消缓存
+        injector::MakeNOP(g_pattern.find_first("0F 84 B8 1B 00 00").raw(), 6);
+        injector::WriteMemory<char>(g_pattern.find_first("C6 45 3B 01").raw(3), 0, true);
     }
 }
