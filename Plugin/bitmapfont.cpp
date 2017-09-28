@@ -162,18 +162,18 @@ namespace BitmapFont
 
             regs->eax = g_context.unicode;
             regs->ecx = g_context.unicode;
-            regs->edi += (g_context.unicodeLength - 1);
+            regs->edi.i += (g_context.unicodeLength - 1);
 
             if (Functions::IsLatin1Char(g_context.unicode))
             {
-                regs->esi = (uint32_t)(g_context.pSet->GetLatin1Value(g_context.unicode));
+                regs->esi = g_context.pSet->GetLatin1Value(g_context.unicode);
             }
             else
             {
-                regs->esi = (uint32_t)(g_context.cjkFont->GetEU4Value(g_context.unicode));
+                regs->esi = g_context.cjkFont->GetEU4Value(g_context.unicode);
             }
 
-            regs->edx = (uint32_t)g_context.pSet;
+            regs->edx = g_context.pSet;
         }
     };
 
