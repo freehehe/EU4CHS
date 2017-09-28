@@ -70,10 +70,6 @@ BOOL WINAPI DllMain(HMODULE module, DWORD reason, LPVOID reserved)
     {
         Initialize(module);
     }
-    else if (reason == DLL_PROCESS_DETACH)
-    {
-        FreeLibrary(d3d9meta.dll);
-    }
 
     return TRUE;
 }

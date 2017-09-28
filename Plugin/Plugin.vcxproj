@@ -89,22 +89,28 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="bitmapfont.cpp" />
-    <ClCompile Include="cjk_mapfont.cpp" />
+    <ClCompile Include="byte_pattern.cpp" />
+    <ClCompile Include="cjk_map.cpp" />
+    <ClCompile Include="cjk_normal.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="eu4.cpp" />
     <ClCompile Include="functions.cpp" />
     <ClCompile Include="cjk_fonts.cpp" />
     <ClCompile Include="cjk_font.cpp" />
     <ClCompile Include="plugin.cpp" />
+    <ClCompile Include="province.cpp" />
     <ClCompile Include="textbuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bitmapfont.h" />
-    <ClInclude Include="cjk_mapfont.h" />
+    <ClInclude Include="byte_pattern.h" />
+    <ClInclude Include="cjk_map.h" />
+    <ClInclude Include="cjk_normal.h" />
     <ClInclude Include="eu4.h" />
     <ClInclude Include="functions.h" />
     <ClInclude Include="cjk_fonts.h" />
     <ClInclude Include="cjk_font.h" />
+    <ClInclude Include="province.h" />
     <ClInclude Include="stdinc.h" />
     <ClInclude Include="plugin.h" />
     <ClInclude Include="textbuffer.h" />

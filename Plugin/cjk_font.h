@@ -2,48 +2,45 @@
 #include "stdinc.h"
 #include "eu4.h"
 
-class CJKFont
+class CJKFontBase
 {
 public:
-    struct CharacterValues
+    struct CJKCharInfo
     {
-        EU4CharacterValues Value;
-        std::uint16_t TextureIndex;
+        EU4CharInfo Value;
+        uint16_t Page;
     };
 
-    static const std::uint32_t _InvalidCharacter = L'？';
+    static const uint32_t INVALID_REPLACEMENT = L'？';
 
-    CJKFont(const std::experimental::filesystem::path &fntname);
-
-    void InitWithFile(const std::experimental::filesystem::path &fntname);
+    const CJKCharInfo &GetValue(uint32_t unicode);
+    const EU4CharInfo *GetEU4Value(uint32_t unicode);
 
     void LoadTexturesDX9();
     void UnloadTexturesDX9();
 
-    const CharacterValues *GetValue(std::uint32_t unicode);
-
-    void AddVerticesDX9(CBitmapFont *pFont, std::uint32_t unicode, STextVertex *pVertices);
-
-    void DrawAllDX9();
+    virtual ~CJKFontBase() = default;
 
 protected:
-    bool _Initialized;
-    std::experimental::filesystem::path _WorkingDir;
+    CJKFontBase(const std::experimental::filesystem::path &fntname);
+
     std::uint16_t _TextureWidth;
     std::uint16_t _TextureHeight;
     std::uint16_t _PageCount;
 
-    std::array<std::unique_ptr<CharacterValues>, 0x10000> _Values;
+    std::vector<std::pair<std::string, LPDIRECT3DTEXTURE9>> _Textures;
 
-    std::map<uint32_t, std::vector<STextVertex>> _ScreenVertices; //hash, vertices
-
-    std::vector<LPDIRECT3DTEXTURE9> _Textures;
-    std::vector<std::string> _TextureFileNames;
-    std::vector<std::vector<STextVertex>> _Vertices;
+private:
+    void InitWithFile(const std::experimental::filesystem::path &fntname);
 
     void ReadInfoBlock(FILE *file);
     void ReadCommonBlock(FILE *file);
     void ReadPagesBlock(FILE *file);
     void ReadCharsBlock(FILE *file);
     void ReadKerningsBlock(FILE *file);
+
+    std::unordered_map<uint32_t, CJKCharInfo> _Values;
+
+    std::experimental::filesystem::path _WorkingDir;
+    std::vector<char> _PagesBlock;
 };

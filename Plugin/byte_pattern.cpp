@@ -14,7 +14,7 @@ memory_pointer byte_pattern::get(size_t index) const
 
         MessageBoxA(NULL, sstr.str().c_str(), "byte_pattern: too few results.", MB_OK);
 
-        return memory_pointer{};
+        ExitProcess(0);
     }
 
     return this->_results[index];

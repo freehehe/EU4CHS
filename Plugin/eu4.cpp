@@ -2,8 +2,6 @@
 
 EU4Meta::EU4Meta()
 {
-    g_pattern.set_module();
-
     g_pattern.find_pattern("81 EC 1C 06 00 00 56");
     this->pOriginalText = *g_pattern.get(0).raw<char *>(0xD1 - 0x18);
     this->pText = *g_pattern.get(0).raw<char *>(0xFB - 0x18);
@@ -22,3 +20,4 @@ EU4Meta::EU4Meta()
 }
 
 EU4Meta g_game;
+HookContext g_context;

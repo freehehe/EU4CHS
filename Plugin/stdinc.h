@@ -28,11 +28,8 @@
 #include <d3dx9.h>
 #include <sstream>
 #include "utf8cpp/utf8.h"
-//#include "utf8pp/encoding_cast.hxx"
-//#include "utf8pp/string.hxx"
-//#include "utf8pp/iterator.hxx"
-//#include "eu4utf8cpp/eu4utf8.h"
-#include "byte_pattern/byte_pattern.h"
+#include "eu4utf8/eu4utf8.h"
+#include "byte_pattern.h"
 #include "injector/hooking.hpp"
 #include "injector/calling.hpp"
 #include "injector/assembly.hpp"

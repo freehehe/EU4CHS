@@ -39,7 +39,16 @@
     <ClCompile Include="textbuffer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="cjk_mapfont.cpp">
+    <ClCompile Include="cjk_normal.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="cjk_map.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="province.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="byte_pattern.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -68,7 +77,16 @@
     <ClInclude Include="textbuffer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="cjk_mapfont.h">
+    <ClInclude Include="cjk_normal.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="cjk_map.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="province.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="byte_pattern.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

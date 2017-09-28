@@ -107,7 +107,7 @@ namespace Functions
         if (index < text_length)
         {
             first_length = utf8::internal::sequence_length(pText + index);
-            first = utf8::unchecked::peek_next(pText + index);
+            first = utf8::peek_next(pText + index, pText + text_length);
             index += first_length;
         }
 
@@ -115,7 +115,7 @@ namespace Functions
         if (index < text_length)
         {
             ptrdiff_t second_length = utf8::internal::sequence_length(pText + index);
-            uint32_t temp_second = utf8::unchecked::peek_next(pText + index);
+            uint32_t temp_second = utf8::peek_next(pText + index, pText + text_length);
 
             if (bUseSpecialChars)
             {
@@ -128,7 +128,7 @@ namespace Functions
                         return;
                     }
 
-                    temp_second = utf8::unchecked::peek_next(pText + index);
+                    temp_second = utf8::peek_next(pText + index, pText + text_length);
                 }
             }
 

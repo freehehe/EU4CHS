@@ -86,7 +86,7 @@ struct SProvinceTextVertex
 };
 VALIDATE_SIZE(SProvinceTextVertex, 0x14)
 
-struct EU4CharacterValues
+struct EU4CharInfo
 {
     int16_t x;
     int16_t y;
@@ -97,7 +97,7 @@ struct EU4CharacterValues
     int16_t xadvance;
     bool kerning;
 };
-VALIDATE_SIZE(EU4CharacterValues, 0x10)
+VALIDATE_SIZE(EU4CharInfo, 0x10)
 
 struct CInputEvent
 {
@@ -118,9 +118,12 @@ struct EU4Meta
 {
     LPDIRECT3DDEVICE9 pDX9Device;
 
+
     std::uintptr_t pfGfxInitDX9;
     std::uintptr_t pfGfxShutdownDX9;
     std::uintptr_t pfGfxDrawDX9;
+
+    std::uintptr_t pfCBitmapCharacterSet_GetKerning;
 
     std::uintptr_t pfCTextureHandler_AddTexture;
     std::uintptr_t pfCTextureHandler_RemoveTextureInternal;
@@ -175,14 +178,14 @@ VALIDATE_SIZE(CString, 0x18)
 
 struct CBitmapCharacterSet :IncompleteClass
 {
-    const EU4CharacterValues *GetLatin1Value(uint32_t cp)
+    const EU4CharInfo *GetLatin1Value(uint32_t cp)
     {
         if (cp == 0x3 || cp == 0x4 || cp == 0x7)
         {
             cp += 0xA0;
         }
 
-        return field<EU4CharacterValues *, 0>()[cp];
+        return field<EU4CharInfo *, 0>()[cp];
     }
 
     float GetScale()
@@ -204,8 +207,37 @@ struct CBitmapFont :IncompleteClass
         return field<const CString, 0x9C>();
     }
 
-    const EU4CharacterValues *GetLatin1Value(uint32_t cp)
+    const EU4CharInfo *GetLatin1Value(uint32_t cp)
     {
         return GetLatin1CharacterSet()->GetLatin1Value(cp);
     }
+
+    int GetTextureWidth()
+    {
+        return get_field<int, 0x4E8>();
+    }
+
+    int GetTextureHeight()
+    {
+        return get_field<int, 0x4EC>();
+    }
 };
+
+extern struct HookContext
+{
+    CBitmapFont *pFont;
+    CBitmapCharacterSet *pSet;
+
+    CJKFontBase *cjkFont;
+
+    uint32_t textLength;
+
+    uint32_t unicode;
+    ptrdiff_t unicodeLength;
+
+    uint32_t nextUnicode;
+
+    bool useSpecialChars;
+
+    void *ret_addr;
+} g_context;
