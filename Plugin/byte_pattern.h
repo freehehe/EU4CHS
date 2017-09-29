@@ -47,7 +47,7 @@ public:
     }
 
     template<typename T = void>
-    T *raw(std::ptrdiff_t offset = 0) const
+    T *pointer(std::ptrdiff_t offset = 0) const
     {
         return reinterpret_cast<T *>(this->integer(offset));
     }

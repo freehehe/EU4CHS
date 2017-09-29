@@ -10,7 +10,7 @@ field_2778 VertexBufferGFX *[40] hash对应的顶点缓存
 看看取消缓存造成的性能损失
 检查间断判定是咋回事
 有些裸函数换成MakeInline
-dynamic_cast
+把CJKFont放到CBitmapCharacterSet::field_0[0]
 
 4E8 4EC
 

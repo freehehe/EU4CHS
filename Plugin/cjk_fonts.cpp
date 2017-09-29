@@ -1,7 +1,6 @@
 ﻿#include "cjk_fonts.h"
-#include "cjk_normal.h"
-#include "cjk_map.h"
 #include "plugin.h"
+#include "bitmapfont.h"
 
 CJKFontManager g_Fonts;
 
@@ -20,15 +19,7 @@ void CJKFontManager::LoadFontsData()
         {
             auto filestem = _path.stem();
 
-            if (filestem == "Mapfont")
-            {
-                _Fonts.emplace(filestem.string(), make_unique<CJKMapFont>(_path));
-            }
-            else
-            {
-                _Fonts.emplace(filestem.string(), make_unique<CJKNormalFont>(_path));
-            }
-
+            _Fonts.emplace(filestem.string(), _path);
         }
 
         ++dirit;
@@ -44,23 +35,23 @@ void *CJKFontManager::OnDX9Init(void *pInfo, void *pBool)
     return pMasterContext;
 }
 
-CJKFontBase * CJKFontManager::GetFont(const CString * fontname)
+CJKFont * CJKFontManager::GetFont(const CString * fontname)
 {
     auto it = _Fonts.find(filesystem::path{ fontname->c_str() }.stem().string());
 
     if (it != _Fonts.end())
     {
-        return it->second.get();
+        return &it->second;
     }
     else 
     {
-        return _Fonts.find("vic_18")->second.get();
+        return &_Fonts.find("vic_18")->second;
     }
 }
 
 int __fastcall CJKFontManager::AddTextureHook(void *pTextureHandler, int edx, const CString *TextureFileName, void *Settings, bool bLoadTexture, bool bSaveAlpha)
 {
-    CJKFontBase *pFont = g_Fonts.GetFont(TextureFileName);
+    CJKFont *pFont = g_Fonts.GetFont(TextureFileName);
 
     pFont->LoadTexturesDX9();
 
@@ -75,7 +66,7 @@ struct RemoveTextureHook
 
         g_Fonts.GetFont(pFont->GetFontPath())->UnloadTexturesDX9();
 
-        injector::thiscall<int(uint32_t, int, void *, int)>::call(g_game.pfCTextureHandler_RemoveTextureInternal, regs->esi, *(uint32_t *)(regs->ebp - 0x10), nullptr, 0);
+        injector::thiscall<int(void *, int, void *, int)>::call(g_game.pfCTextureHandler_RemoveTextureInternal, regs->esi.p, *(uint32_t *)(regs->ebp.i - 0x10), nullptr, 0);
     }
 };
 
@@ -87,10 +78,12 @@ void CJKFontManager::InitAndPatch()
     g_pattern.find_pattern("83 F9 02 0F 85 35 03 00 00");
 
     //injector::WriteMemory(g_pattern.get(0).address(0x344), OnDX9Init, true);
-    injector::WriteMemory(*g_pattern.get(0).raw<std::uintptr_t>(0x340), OnDX9Init, true);
+    injector::WriteMemory(*g_pattern.get(0).pointer<std::uintptr_t>(0x340), OnDX9Init, true);
 
     g_pattern.find_pattern("6A 00 6A 00 FF 75 F0 8B CE E8"); //10959CF
-    injector::MakeInline<RemoveTextureHook>(g_pattern.get(0).raw(), g_pattern.get(0).raw(14));
+    injector::MakeInline<RemoveTextureHook>(g_pattern.get(0).pointer(), g_pattern.get(0).pointer(14));
 
-    injector::MakeCALL(g_pattern.find_first("E8 ? ? ? ? 8B 4F 30 89 87 E0 04 00 00").raw(), AddTextureHook); //10963EE
+    injector::MakeCALL(g_pattern.find_first("E8 ? ? ? ? 8B 4F 30 89 87 E0 04 00 00").pointer(), AddTextureHook); //10963EE
+
+
 }

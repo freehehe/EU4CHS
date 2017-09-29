@@ -1,31 +1,21 @@
-﻿#include <iostream>
-#include <cstdint>
-#include <cstdio>
-#include <string_view>
-#include <string>
-#include <iterator>
-#include <vector>
+﻿#include "cjk_font.h"
+#include <iostream>
 
 //£¤§
 using namespace std;
+// 0 - 10FFFF
 
 int main()
 {
-    int val, count = 0;
+    CJKFontBase font{ "C:\\test.fnt" };
 
-    cin >> val;
+    CJKFontBase::CJKCharInfo *p;
 
-    while (val != 0)
-    {
-        if ((val & 1) == 1)
-        {
-            ++count;
-        }
+    p = font.GetValueHash(L'草');
+    p = font.GetValueMap(L'泥');
+    p = font.GetValueVec(L'马');
 
-        *(unsigned int *)&val >>= 1;
-    }
-
-    cout << count << endl;
+    cout << p << endl;
 
     return 0;
 }

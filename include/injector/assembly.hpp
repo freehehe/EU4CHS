@@ -64,29 +64,6 @@ namespace injector
         {
             return (T *)p;
         }
-
-        operator uint32_t() const
-        {
-            return i;
-        }
-
-        _general_register operator+(uint32_t offset) const
-        {
-            _general_register result{ *this };
-
-            result.i += offset;
-
-            return result;
-        }
-
-        _general_register operator-(uint32_t offset) const
-        {
-            _general_register result{ *this };
-
-            result.i -= offset;
-
-            return result;
-        }
     };
 
     struct _flags_register

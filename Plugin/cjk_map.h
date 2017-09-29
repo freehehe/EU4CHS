@@ -1,7 +1,7 @@
 #pragma once
 #include "cjk_font.h"
 
-class CJKMapFont :public CJKFontBase
+class CJKMapFont :public CJKFont
 {
 public:
     CJKMapFont(const std::experimental::filesystem::path &fntname);

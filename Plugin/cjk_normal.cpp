@@ -1,7 +1,7 @@
 #include "cjk_normal.h"
 
 CJKNormalFont::CJKNormalFont(const std::experimental::filesystem::path &fntname)
-    :CJKFontBase(fntname)
+    :CJKFont(fntname)
 {
 
 }
@@ -22,18 +22,27 @@ void CJKNormalFont::AddVerticesDX9(CBitmapFont *pFont, uint32_t unicode, STextVe
     pVertex[4].UV.x *= fWidthRatio;
     pVertex[4].UV.y *= fHeightRatio;
 
-    copy_n(pVertex, 6, back_inserter(_BaseBuffer[GetValue(unicode)->Page]));
+    copy_n(pVertex, 6, back_inserter(_BaseBuffer[GetValue(unicode).Page]));
 }
 
 void CJKNormalFont::DrawUnbufferedDX9()
 {
+    LPDIRECT3DBASETEXTURE9 OriginalTexture;
+
+    g_game.pDX9Device->GetTexture(0, &OriginalTexture);
+
     for (size_t index = 0; index < _BaseBuffer.size(); ++index)
     {
-        g_game.pDX9Device->SetTexture(0, _Textures[index].second);
-        g_game.pDX9Device->DrawPrimitiveUP(D3DPT_TRIANGLELIST, _BaseBuffer[index].size() / 3, _BaseBuffer[index].data(), sizeof(STextVertex));
+        if (!_BaseBuffer[index].empty())
+        {
+            g_game.pDX9Device->SetTexture(0, _Textures[index].second);
+            g_game.pDX9Device->DrawPrimitiveUP(D3DPT_TRIANGLELIST, _BaseBuffer[index].size() / 3, _BaseBuffer[index].data(), sizeof(STextVertex));
 
-        _BaseBuffer[index].clear();
+            _BaseBuffer[index].clear();
+        }
     }
+
+    g_game.pDX9Device->SetTexture(0, OriginalTexture);
 }
 
 void CJKNormalFont::DrawBufferedDX9(uint32_t hash)
@@ -44,8 +53,11 @@ void CJKNormalFont::DrawBufferedDX9(uint32_t hash)
     {
         for (size_t index = 0; index < it->second.size(); ++index)
         {
-            g_game.pDX9Device->SetTexture(0, _Textures[index].second);
-            g_game.pDX9Device->DrawPrimitiveUP(D3DPT_TRIANGLELIST, it->second[index].size() / 3, it->second[index].data(), sizeof(STextVertex));
+            if (!it->second[index].empty())
+            {
+                g_game.pDX9Device->SetTexture(0, _Textures[index].second);
+                g_game.pDX9Device->DrawPrimitiveUP(D3DPT_TRIANGLELIST, it->second[index].size() / 3, it->second[index].data(), sizeof(STextVertex));
+            }
         }
     }
 }

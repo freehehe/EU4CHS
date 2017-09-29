@@ -207,8 +207,8 @@ void byte_pattern::get_module_ranges(memory_pointer module)
     _ranges.clear();
     std::pair<std::uintptr_t, std::uintptr_t> range;
 
-    PIMAGE_DOS_HEADER dosHeader = module.raw<IMAGE_DOS_HEADER>();
-    PIMAGE_NT_HEADERS ntHeader = module.raw<IMAGE_NT_HEADERS>(dosHeader->e_lfanew);
+    PIMAGE_DOS_HEADER dosHeader = module.pointer<IMAGE_DOS_HEADER>();
+    PIMAGE_NT_HEADERS ntHeader = module.pointer<IMAGE_NT_HEADERS>(dosHeader->e_lfanew);
 
     for (int i = 0; i < ntHeader->FileHeader.NumberOfSections; i++)
     {

@@ -176,7 +176,7 @@ namespace Functions
         void operator()(injector::reg_pack *regs) const
         {
             CInputEvent temp;
-            char *pText = (char *)(regs->ebp - 0x48);
+            char *pText = (char *)(regs->ebp.i - 0x48);
 
             string_view text_view(pText);
 
@@ -184,7 +184,7 @@ namespace Functions
             {
                 temp.Init(c);
 
-                injector::thiscall<void(uint32_t, const CInputEvent *)>::vtbl<3>(regs->ebx, &temp);
+                injector::thiscall<void(void *, const CInputEvent *)>::vtbl<3>(regs->ebx, &temp);
             }
 
             memset(pText, 0, 32);
