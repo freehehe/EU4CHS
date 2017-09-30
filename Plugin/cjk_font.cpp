@@ -162,6 +162,8 @@ void CJKFont::InitWithFile(const filesystem::path &fntname)
         _Textures[index].first = pName;
         pName += (strlen(pName) + 1);
     }
+
+    _BaseBuffer.resize(_PageCount);
 }
 
 void CJKFont::LoadTexturesDX9()
@@ -214,6 +216,8 @@ void CJKFont::AddVerticesDX9(CBitmapFont *pFont, uint32_t unicode, STextVertex *
     pVertex[3].UV.y *= fHeightRatio;
     pVertex[4].UV.x *= fWidthRatio;
     pVertex[4].UV.y *= fHeightRatio;
+    pVertex[5].UV.x *= fWidthRatio;
+    pVertex[5].UV.y *= fHeightRatio;
 
     copy_n(pVertex, 6, back_inserter(_BaseBuffer[GetValue(unicode)->Page]));
 }

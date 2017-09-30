@@ -138,13 +138,13 @@ namespace BitmapFont
         {
             int *nVertexCount = (int *)(regs->ebp.i - 0x40);
 
-            STextVertex *pVertices = g_game.pBitmapVertices + regs->edx.i / 7;
-            
-            g_context.cjkFont->AddVerticesDX9(g_context.pFont, g_context.unicode, pVertices);
-
             if (!Functions::IsLatin1Char(g_context.unicode))
             {
                 *nVertexCount -= 6;
+
+                STextVertex *pVertices = g_game.pBitmapVertices + *nVertexCount;
+
+                g_context.cjkFont->AddVerticesDX9(g_context.pFont, g_context.unicode, pVertices);
             }
 
             regs->eax.i = *nVertexCount / 6;
