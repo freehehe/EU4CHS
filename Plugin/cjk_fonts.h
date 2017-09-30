@@ -1,7 +1,8 @@
 ﻿#pragma once
 #include "stdinc.h"
 #include "cjk_font.h"
-#include "std_string.h"
+
+class CString;
 
 class CJKFontManager
 {

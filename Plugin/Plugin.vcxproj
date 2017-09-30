@@ -97,6 +97,7 @@
     <ClCompile Include="cjk_fonts.cpp" />
     <ClCompile Include="cjk_font.cpp" />
     <ClCompile Include="plugin.cpp" />
+    <ClCompile Include="std_string.cpp" />
     <ClCompile Include="textbuffer.cpp" />
   </ItemGroup>
   <ItemGroup>

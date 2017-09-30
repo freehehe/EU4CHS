@@ -1,62 +1,43 @@
 ﻿#pragma once
+#include "stdinc.h"
 #include "eu4.h"
-#include "std_string.h"
 
+class CString;
 class CJKFont;
+
+struct EU4CharInfo
+{
+    int16_t x;
+    int16_t y;
+    int16_t w;
+    int16_t h;
+    int16_t xoff;
+    int16_t yoff;
+    int16_t xadvance;
+    bool kerning;
+};
+VALIDATE_SIZE(EU4CharInfo, 0x10)
 
 struct CBitmapCharacterSet :IncompleteClass
 {
-    EU4CharInfo *GetLatin1Value(uint32_t cp)
-    {
-        if (cp == 0x3 || cp == 0x4 || cp == 0x7)
-        {
-            cp += 0xA0;
-        }
-
-        return field<EU4CharInfo *, 0>()[cp];
-    }
-
-    CJKFont *GetCJKFont()
-    {
-        return reinterpret_cast<CJKFont *>(GetLatin1Value(0));
-    }
-
-    float GetScale()
-    {
-        return get_field<float, 0x428>();
-    }
+    EU4CharInfo *GetLatin1Value(uint32_t cp);
+    float GetScaleX();
 };
 
-#define CHARSET_OFF 0xB4
 struct CBitmapFont :IncompleteClass
 {
-    CBitmapCharacterSet *GetLatin1CharacterSet()
-    {
-        return field<CBitmapCharacterSet, CHARSET_OFF>();
-    }
+    CBitmapCharacterSet *GetLatin1CharacterSet();
+    CJKFont *GetCJKFont();
+    const CString *GetFontPath();
+    EU4CharInfo *GetCharacterValue(uint32_t cp);
+    int GetTextureWidth();
+    int GetTextureHeight();
 
-    const CString *GetFontPath()
-    {
-        return field<const CString, 0x9C>();
-    }
+    static int __fastcall GetWidthOfString(CBitmapFont * pFont, int, const char * Text, const int nLength, bool bUseSpecialChars);
+    static int __fastcall GetHeightOfString(CBitmapFont * pFont, int, const CString *text, int nMaxWidth, int nMaxHeight, const CVector2<int> *BorderSize, bool bUseSpecialChars);
+    static int __fastcall GetActualRequiredSize(CBitmapFont *pFont, int, const CString *OriginalText, int nMaxWidth, int nMaxHeight, CVector2<int> *BorderSize, CVector2<short> *NeededSize, bool bUseSpecialChars);
+    static void __fastcall GetRequiredSize(CBitmapFont *pFont, int, const CString *OriginalText, CString *NewText, int nMaxWidth, int nMaxHeight, CVector2<int> *BorderSize, bool bUseSpecialChars);
+    static void __fastcall GetActualRealRequiredSizeActually(CBitmapFont *pFont, int, const CString *Text, CString *NewText, int nMaxWidth, int nMaxHeight, CVector2<int> *BorderSize, bool bWholeWordOnly, bool bAddBreaksToNewText, bool bUseSpecialChars);
 
-    const EU4CharInfo *GetLatin1Value(uint32_t cp)
-    {
-        return GetLatin1CharacterSet()->GetLatin1Value(cp);
-    }
-
-    int GetTextureWidth()
-    {
-        return get_field<int, 0x4E8>();
-    }
-
-    int GetTextureHeight()
-    {
-        return get_field<int, 0x4EC>();
-    }
+    static void InitAndPatch();
 };
-
-namespace BitmapFont
-{
-    void InitAndPatch();
-}

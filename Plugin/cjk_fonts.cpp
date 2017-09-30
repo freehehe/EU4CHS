@@ -1,6 +1,7 @@
 ﻿#include "cjk_fonts.h"
 #include "plugin.h"
 #include "bitmapfont.h"
+#include "std_string.h"
 
 CJKFontManager g_Fonts;
 
@@ -60,13 +61,13 @@ int __fastcall CJKFontManager::AddTextureHook(void *pTextureHandler, int edx, co
 
 struct RemoveTextureHook
 {
-    void operator()(injector::reg_pack *regs) const
+    void operator()(injector::reg_pack &regs) const
     {
-        CBitmapFont *pFont = (CBitmapFont *)regs->edi;
+        CBitmapFont *pFont = (CBitmapFont *)regs.edi;
 
         g_Fonts.GetFont(pFont->GetFontPath())->UnloadTexturesDX9();
 
-        injector::thiscall<int(void *, int, void *, int)>::call(g_game.pfCTextureHandler_RemoveTextureInternal, regs->esi.p, *(uint32_t *)(regs->ebp.i - 0x10), nullptr, 0);
+        injector::thiscall<int(void *, int, void *, int)>::call(g_game.pfCTextureHandler_RemoveTextureInternal, regs.esi.p, *(uint32_t *)(regs.ebp.i - 0x10), nullptr, 0);
     }
 };
 
@@ -84,6 +85,4 @@ void CJKFontManager::InitAndPatch()
     injector::MakeInline<RemoveTextureHook>(g_pattern.get(0).pointer(), g_pattern.get(0).pointer(14));
 
     injector::MakeCALL(g_pattern.find_first("E8 ? ? ? ? 8B 4F 30 89 87 E0 04 00 00").pointer(), AddTextureHook); //10963EE
-
-
 }
