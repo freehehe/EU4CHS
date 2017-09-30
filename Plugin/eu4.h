@@ -84,19 +84,6 @@ struct CInputEvent
 };
 VALIDATE_SIZE(CInputEvent,0x58)
 
-struct EU4CharInfo
-{
-    int16_t x;
-    int16_t y;
-    int16_t w;
-    int16_t h;
-    int16_t xoff;
-    int16_t yoff;
-    int16_t xadvance;
-    bool kerning;
-};
-VALIDATE_SIZE(EU4CharInfo, 0x10)
-
 struct EU4Meta
 {
     LPDIRECT3DDEVICE9 pDX9Device;

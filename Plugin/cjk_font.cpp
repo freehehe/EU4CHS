@@ -7,8 +7,6 @@ using namespace std::experimental;
 CJKFont::CJKFont(const filesystem::path & fntname)
 {
     InitWithFile(fntname);
-    
-    _Values.reserve(45000);
 }
 
 void CJKFont::ReadInfoBlock(FILE * file)
@@ -102,7 +100,7 @@ void CJKFont::ReadCharsBlock(FILE * file)
 
         uint32_t unicode = binary.code;
 
-        _Values[unicode] = values;
+        _Values[unicode] = make_unique<CJKCharInfo>(values);
     }
 }
 
@@ -154,6 +152,9 @@ void CJKFont::InitWithFile(const filesystem::path &fntname)
 
     fclose(iFile);
 
+    _BaseBuffer.resize(_PageCount);
+    _ProvinceBuffer.resize(_PageCount);
+
     _Textures.resize(_PageCount);
     char *pName = _PagesBlock.data();
 
@@ -184,15 +185,15 @@ void CJKFont::UnloadTexturesDX9()
 
 CJKFont::CJKCharInfo *CJKFont::GetValue(uint32_t unicode)
 {
-    auto it = _Values.find(unicode);
+    auto &p = _Values[unicode];
 
-    if (it != _Values.end())
+    if (p)
     {
-        return &it->second;
+        return p.get();
     }
     else
     {
-        return &_Values[INVALID_REPLACEMENT];
+        return _Values[INVALID_REPLACEMENT].get();
     }
 }
 

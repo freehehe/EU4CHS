@@ -130,7 +130,7 @@ namespace injector
         {
             static void call(reg_pack* regs)
             {
-                T fun; fun(regs);
+                T fun; fun(*regs);
             }
         };
 
@@ -199,8 +199,8 @@ namespace injector
         // Encapsulates the call to static_func
         struct Caps
         {
-            void operator()(reg_pack& regs)
-            { (*static_func)(regs); }
+            void operator()(reg_pack* regs)
+            { (*static_func)(&regs); }
         };
 
         // Does the actual MakeInline

@@ -1,7 +1,6 @@
 ﻿#pragma once
 #include "eu4.h"
-
-class CBitmapFont;
+#include "bitmapfont.h"
 
 class CJKFont
 {
@@ -47,9 +46,11 @@ private:
     std::uint16_t _TextureHeight;
     std::uint16_t _PageCount;
 
-    std::unordered_map<uint32_t, CJKCharInfo> _Values;
+    std::array<std::unique_ptr<CJKCharInfo>, 0x10000> _Values;
     std::vector<std::pair<std::string, LPDIRECT3DTEXTURE9>> _Textures;
     std::vector<std::vector<STextVertex>> _BaseBuffer;
     std::map<uint32_t, std::vector<std::vector<STextVertex>>> _ScreenBuffer;
     std::vector<std::vector<SProvinceTextVertex>> _ProvinceBuffer;
 };
+
+constexpr auto aa = sizeof(std::optional<CJKFont::CJKCharInfo>);

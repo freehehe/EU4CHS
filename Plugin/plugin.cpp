@@ -17,7 +17,7 @@ void CPlugin::InitAndPatch(HMODULE hself)
 
     g_Fonts.InitAndPatch();
     Functions::InitAndPatch();
-    BitmapFont::InitAndPatch();
+    CBitmapFont::InitAndPatch();
 }
 
 const std::experimental::filesystem::path & CPlugin::GetGameDirectory() const

@@ -45,6 +45,9 @@
     <ClCompile Include="context.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="std_string.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="plugin.h">
