@@ -6,6 +6,8 @@ EU4Meta::EU4Meta()
     this->pText = *g_pattern.find_first("68 3C 0C 00 00 6A 00 68").pointer<char *>(8);
     this->pWord = *g_pattern.find_first("68 00 01 00 00 6A 00 68").pointer<char *>(8);
 
+    this->pfCBitmapFont_ParseFontFile = g_pattern.find_first("81 EC AC 0F 00 00").integer(-0x18);
+
     this->pfCTextureHandler_AddTexture = g_pattern.find_first("83 EC 40 53 56 8B F1 32 DB").integer(-0x18);
     this->pfCTextureHandler_RemoveTextureInternal = g_pattern.find_first("57 8B F9 8B 4D 08 85 C9").integer(-5);
 

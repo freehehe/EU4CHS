@@ -92,6 +92,7 @@ struct EU4Meta
     std::uintptr_t pfGfxShutdownDX9;
     std::uintptr_t pfGfxDrawDX9;
 
+    std::uintptr_t pfCBitmapFont_ParseFontFile;
     std::uintptr_t pfCBitmapCharacterSet_GetKerning;
 
     std::uintptr_t pfCTextureHandler_AddTexture;

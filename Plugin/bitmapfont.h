@@ -21,6 +21,7 @@ VALIDATE_SIZE(EU4CharInfo, 0x10)
 struct CBitmapCharacterSet :IncompleteClass
 {
     EU4CharInfo *GetLatin1Value(uint32_t cp);
+    CJKFont *GetCJKFont();
     float GetScaleX();
 };
 

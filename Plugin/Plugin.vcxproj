@@ -54,7 +54,6 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <Optimization>Disabled</Optimization>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <PrecompiledHeaderFile>stdinc.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>../include/;$(DXSDK_DIR)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -74,6 +73,8 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <PrecompiledHeaderFile>stdinc.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>../include/;$(DXSDK_DIR)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <Optimization>Disabled</Optimization>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -81,6 +82,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>d3d9.lib ;d3dx9.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <LinkTimeCodeGeneration />
     </Link>
     <PostBuildEvent>
       <Command>
@@ -97,6 +100,7 @@
     <ClCompile Include="cjk_fonts.cpp" />
     <ClCompile Include="cjk_font.cpp" />
     <ClCompile Include="plugin.cpp" />
+    <ClCompile Include="province.cpp" />
     <ClCompile Include="std_string.cpp" />
     <ClCompile Include="textbuffer.cpp" />
   </ItemGroup>
@@ -104,6 +108,7 @@
     <ClInclude Include="bitmapfont.h" />
     <ClInclude Include="byte_pattern.h" />
     <ClInclude Include="context.h" />
+    <ClInclude Include="province.h" />
     <ClInclude Include="std_string.h" />
     <ClInclude Include="eu4.h" />
     <ClInclude Include="functions.h" />

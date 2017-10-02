@@ -9,10 +9,10 @@ namespace Functions
     {
         string_view source_view(source);
 
-        vector<wchar_t> wideText;
-        utf8::utf8to16(source_view.begin(), source_view.end(), back_inserter(wideText));
+        vector<uint32_t> wideText;
+        utf8::utf8to32(source_view.begin(), source_view.end(), back_inserter(wideText));
 
-        for (wchar_t &cp : wideText)
+        for (uint32_t &cp : wideText)
         {
             switch (cp)
             {
@@ -86,7 +86,7 @@ namespace Functions
         }
 
         wideText.push_back(0);
-        utf8::utf16to8(wideText.begin(), wideText.end(), dest);
+        utf8::utf32to8(wideText.begin(), wideText.end(), dest);
     }
 
     bool IsLatin1Char(uint32_t cp)
@@ -136,7 +136,7 @@ namespace Functions
         }
     }
 
-    void GetTwoUnicode(std::vector<wchar_t>::iterator pText, std::vector<wchar_t>::iterator pEnd, uint32_t & first, uint32_t & second, bool bUseSpecialChars)
+    void GetTwoUnicode(std::vector<uint32_t>::iterator pText, std::vector<uint32_t>::iterator pEnd, uint32_t & first, uint32_t & second, bool bUseSpecialChars)
     {
         second = 0;
 

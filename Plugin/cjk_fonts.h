@@ -13,7 +13,7 @@ class CJKFontManager
 public:
     static void *OnDX9Init(void *, void *);
 
-    static int __fastcall AddTextureHook(void *pTextureHandler, int edx, const CString *TextureFileName, void *Settings, bool bLoadTexture, bool bSaveAlpha);
+    static void __fastcall AddTextureHook(CBitmapFont *pFont);
 
     CJKFont *GetFont(const CString *fontname);
 

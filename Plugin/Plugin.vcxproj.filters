@@ -48,6 +48,9 @@
     <ClCompile Include="std_string.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="province.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="plugin.h">
@@ -81,6 +84,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="std_string.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="province.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

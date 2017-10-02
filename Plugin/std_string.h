@@ -3,6 +3,7 @@
 
 class CString
 {
+public:
     union
     {
         char *_heap;
@@ -13,7 +14,7 @@ class CString
     size_t _length;
     size_t _capacity;
 
-public:
+
     CString() = delete;
     CString(const CString &) = delete;
     CString &operator=(const CString &) = delete;

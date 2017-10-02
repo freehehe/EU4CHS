@@ -1,26 +1,12 @@
 ﻿£¤§
 
-CBitmapFont内有40个RenderToScreen用顶点缓存，每个1200个顶点，hash一样则直接渲染
-才有缓存机制 超过1200个顶点就不缓存了，满了则覆盖索引39的缓存
-有特殊字符的不缓存
-
-field_2598 uint [40] hash
-field_2778 VertexBufferGFX *[40] hash对应的顶点缓存
-
-看看取消缓存造成的性能损失
-检查间断判定是咋回事
-有些裸函数换成MakeInline
-把CJKFont放到CBitmapCharacterSet::field_0[0]
-
-4E8 4EC
+Bring back vfs hook
 
 3D Ripper DX
 
 CEU3GraphicalMap
 1.21.1 0x33C
 1.16.3 0x398
-
-地图用0x14大小的Vertex
 
 地图字体 64 64 64 有透明
 外发光200 200 200 不透明度100 精确5像素
@@ -31,8 +17,6 @@ credits.txt 中A7为加大字号用
 特殊处理或换掉
 
 看看CTextBuffer::Write的过滤关键字
-
-noto sans regular字号 + 6= 新宋体大小
 
 vic_22_bl 28
 
@@ -63,6 +47,8 @@ flaunch_16b 22
 flaunch_18b 24
 tahoma_20_bold 26
 
+字体下方+padding? 尝试spaceing 1
+
 Mapfont // Mapfont_100 106 padding 8 spacing 1
 
 CEU3GraphicalMap::ctor里面定义地图字体tahoma_60
@@ -89,6 +75,12 @@ pdx_launcher/game/interface/launcher.gui 语言按钮排版
 					format = "UPPER_LEFT"
 
 pdx_launcher/common/interface/common_core.gfx 增加中国国旗
+
+	spriteType = {
+		name = "GFX_lang_flag_l_schinese"
+		texturefile = "pdx_launcher/common/gfx/interface/Chinese_flag.dds"
+	}
+
 pdx_launcher/common/gfx/interface/Chinese_flag.dds 国旗贴图
 
 战嚎 15

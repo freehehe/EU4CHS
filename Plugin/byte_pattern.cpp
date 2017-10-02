@@ -140,7 +140,7 @@ void byte_pattern::transform_pattern(const char *pattern_literal)
         {
             if (!temp_string[0] && !temp_string[1])
             {
-                continue;
+
             }
             else if (temp_string[0] == '?' && (temp_string[1] == '?' || temp_string[1] == 0))
             {

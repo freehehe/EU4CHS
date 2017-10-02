@@ -9,7 +9,7 @@ namespace Functions
     bool IsTextIconChar(uint32_t cp);
 
     void GetTwoUnicode(const char * pText, uint32_t index, uint32_t text_length, uint32_t &first, ptrdiff_t &first_length, uint32_t &second, bool bUseSpecialChars);
-    void GetTwoUnicode(std::vector<wchar_t>::iterator pText, std::vector<wchar_t>::iterator pEnd, uint32_t &first, uint32_t &second, bool bUseSpecialChars);
+    void GetTwoUnicode(std::vector<uint32_t>::iterator pText, std::vector<uint32_t>::iterator pEnd, uint32_t &first, uint32_t &second, bool bUseSpecialChars);
 
     void InitAndPatch();
 };

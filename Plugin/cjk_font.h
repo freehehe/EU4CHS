@@ -22,13 +22,14 @@ public:
     CJKFont(const std::experimental::filesystem::path &fntname);
 
     void AddVerticesDX9(CBitmapFont *pFont, uint32_t unicode, STextVertex *pVertex);
+    void AddProvinceVerticesDX9(CBitmapFont *pFont, uint32_t unicode, SProvinceTextVertex *pVertex);
+    void GenerateProvinceIndicesDX9();
 
     //未缓存的绘制
     //直接绘制已有缓存
     //首次绘制并缓存
-    void DrawUnbufferedDX9();
-    void DrawBufferedDX9(uint32_t hash);
-    void DrawAndBufferDX9(uint32_t hash);
+    void DrawNormalDX9();
+    void DrawProvinceDX9();
 
 private:
     void InitWithFile(const std::experimental::filesystem::path &fntname);
@@ -46,11 +47,9 @@ private:
     std::uint16_t _TextureHeight;
     std::uint16_t _PageCount;
 
-    std::array<std::unique_ptr<CJKCharInfo>, 0x10000> _Values;
+    std::unordered_map<uint32_t, CJKCharInfo> _Values;
     std::vector<std::pair<std::string, LPDIRECT3DTEXTURE9>> _Textures;
-    std::vector<std::vector<STextVertex>> _BaseBuffer;
-    std::map<uint32_t, std::vector<std::vector<STextVertex>>> _ScreenBuffer;
-    std::vector<std::vector<SProvinceTextVertex>> _ProvinceBuffer;
+    std::vector<std::vector<STextVertex>> _BaseVertices;
+    std::vector<std::vector<SProvinceTextVertex>> _ProvinceVertices;
+    std::vector<std::vector<UINT32>> _ProvinceIndices;
 };
-
-constexpr auto aa = sizeof(std::optional<CJKFont::CJKCharInfo>);

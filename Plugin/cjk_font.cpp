@@ -6,6 +6,7 @@ using namespace std::experimental;
 
 CJKFont::CJKFont(const filesystem::path & fntname)
 {
+    _Values.reserve(45000);
     InitWithFile(fntname);
 }
 
@@ -100,7 +101,7 @@ void CJKFont::ReadCharsBlock(FILE * file)
 
         uint32_t unicode = binary.code;
 
-        _Values[unicode] = make_unique<CJKCharInfo>(values);
+        _Values[unicode] = values;
     }
 }
 
@@ -152,8 +153,8 @@ void CJKFont::InitWithFile(const filesystem::path &fntname)
 
     fclose(iFile);
 
-    _BaseBuffer.resize(_PageCount);
-    _ProvinceBuffer.resize(_PageCount);
+    _BaseVertices.resize(_PageCount);
+    _ProvinceVertices.resize(_PageCount);
 
     _Textures.resize(_PageCount);
     char *pName = _PagesBlock.data();
@@ -161,17 +162,25 @@ void CJKFont::InitWithFile(const filesystem::path &fntname)
     for (size_t index = 0; index < _PageCount; ++index)
     {
         _Textures[index].first = pName;
+        _Textures[index].second = nullptr;
         pName += (strlen(pName) + 1);
     }
 
-    _BaseBuffer.resize(_PageCount);
+    _BaseVertices.resize(_PageCount);
 }
 
 void CJKFont::LoadTexturesDX9()
 {
     for (auto &info : _Textures)
     {
-        D3DXCreateTextureFromFileW(g_game.pDX9Device, (_WorkingDir / info.first).replace_extension(".dds").c_str(), &info.second);
+        if (info.second)
+        {
+            info.second->AddRef();
+        }
+        else
+        {
+            D3DXCreateTextureFromFileW(g_game.pDX9Device, (_WorkingDir / info.first).replace_extension(".dds").c_str(), &info.second);
+        }
     }
 }
 
@@ -179,21 +188,27 @@ void CJKFont::UnloadTexturesDX9()
 {
     for (auto &info : _Textures)
     {
-        info.second->Release();
+        if (info.second)
+        {
+            if (info.second->Release() == 0)
+            {
+                info.second = nullptr;
+            }
+        }
     }
 }
 
 CJKFont::CJKCharInfo *CJKFont::GetValue(uint32_t unicode)
 {
-    auto &p = _Values[unicode];
+    auto it = _Values.find(unicode);
 
-    if (p)
+    if (it != _Values.end())
     {
-        return p.get();
+        return &it->second;
     }
     else
     {
-        return _Values[INVALID_REPLACEMENT].get();
+        return &_Values[INVALID_REPLACEMENT];
     }
 }
 
@@ -220,49 +235,67 @@ void CJKFont::AddVerticesDX9(CBitmapFont *pFont, uint32_t unicode, STextVertex *
     pVertex[5].UV.x *= fWidthRatio;
     pVertex[5].UV.y *= fHeightRatio;
 
-    copy_n(pVertex, 6, back_inserter(_BaseBuffer[GetValue(unicode)->Page]));
+    copy_n(pVertex, 6, back_inserter(_BaseVertices[GetValue(unicode)->Page]));
 }
 
-void CJKFont::DrawUnbufferedDX9()
+void CJKFont::AddProvinceVerticesDX9(CBitmapFont *pFont, uint32_t unicode, SProvinceTextVertex *pVertex)
+{
+
+}
+
+void CJKFont::GenerateProvinceIndicesDX9()
+{
+    for (size_t index = 0; index < _PageCount; ++index)
+    {
+        _ProvinceIndices[index].clear();
+
+
+    }
+}
+
+void CJKFont::DrawNormalDX9()
 {
     LPDIRECT3DBASETEXTURE9 OriginalTexture;
 
     g_game.pDX9Device->GetTexture(0, &OriginalTexture);
 
-    for (size_t index = 0; index < _BaseBuffer.size(); ++index)
+    for (size_t index = 0; index < _PageCount; ++index)
     {
-        if (!_BaseBuffer[index].empty())
+        if (!_BaseVertices[index].empty())
         {
             g_game.pDX9Device->SetTexture(0, _Textures[index].second);
-            g_game.pDX9Device->DrawPrimitiveUP(D3DPT_TRIANGLELIST, _BaseBuffer[index].size() / 3, _BaseBuffer[index].data(), sizeof(STextVertex));
-
-            _BaseBuffer[index].clear();
+            g_game.pDX9Device->DrawPrimitiveUP(D3DPT_TRIANGLELIST, _BaseVertices[index].size() / 3, _BaseVertices[index].data(), sizeof(STextVertex));
+            _BaseVertices[index].clear();
         }
     }
 
     g_game.pDX9Device->SetTexture(0, OriginalTexture);
 }
 
-void CJKFont::DrawBufferedDX9(uint32_t hash)
+void CJKFont::DrawProvinceDX9()
 {
-    auto it = _ScreenBuffer.find(hash);
+    LPDIRECT3DBASETEXTURE9 OriginalTexture;
 
-    if (it != _ScreenBuffer.end())
+    g_game.pDX9Device->GetTexture(0, &OriginalTexture);
+
+    for (size_t index = 0; index < _PageCount; ++index)
     {
-        for (size_t index = 0; index < it->second.size(); ++index)
+        if (!_ProvinceVertices[index].empty())
         {
-            if (!it->second[index].empty())
-            {
-                g_game.pDX9Device->SetTexture(0, _Textures[index].second);
-                g_game.pDX9Device->DrawPrimitiveUP(D3DPT_TRIANGLELIST, it->second[index].size() / 3, it->second[index].data(), sizeof(STextVertex));
-            }
+            g_game.pDX9Device->SetTexture(0, _Textures[index].second);
+            g_game.pDX9Device->DrawIndexedPrimitiveUP(
+                D3DPT_TRIANGLELIST, 
+                0, 
+                _ProvinceVertices[index].size(),
+                _ProvinceVertices[index].size() - 2,
+                _ProvinceIndices[index].data(),
+                D3DFMT_INDEX32,
+                _ProvinceVertices[index].data(),
+                sizeof(SProvinceTextVertex));
+
+            _ProvinceVertices[index].clear();
         }
     }
-}
 
-void CJKFont::DrawAndBufferDX9(uint32_t hash)
-{
-    _ScreenBuffer[hash] = _BaseBuffer;
-    DrawUnbufferedDX9();
+    g_game.pDX9Device->SetTexture(0, OriginalTexture);
 }
-

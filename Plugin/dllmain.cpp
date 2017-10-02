@@ -13,7 +13,7 @@ void UTF8ToLatin1View()
         u32sequence.push_back(cp);
     }
 
-    utf8::utf16to8(u32sequence.begin(), u32sequence.end(), std::back_inserter(u8sequence));
+    utf8::utf32to8(u32sequence.begin(), u32sequence.end(), std::back_inserter(u8sequence));
 
     u8sequence.push_back(0);
 
