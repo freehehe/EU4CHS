@@ -72,9 +72,7 @@ byte_pattern &byte_pattern::search()
 {
     this->bm_search();
 
-#ifdef _DEBUG
     debug_output();
-#endif
 
     return *this;
 }

@@ -37,7 +37,7 @@ namespace utf8
         template <typename octet_iterator>
         octet_iterator append(uint32_t cp, octet_iterator result)
         {
-            if (cp < 0x80)                        // one octet
+            if (cp < 0x80 || cp == 0xA3 || cp == 0xA4 || cp == 0xA7)                        // one octet
                 *(result++) = static_cast<uint8_t>(cp);  
             else if (cp < 0x800) {                // two octets
                 *(result++) = static_cast<uint8_t>((cp >> 6)          | 0xc0);
@@ -92,21 +92,6 @@ namespace utf8
         uint32_t peek_next(octet_iterator it)
         {
             return utf8::unchecked::next(it);    
-        }
-
-        template <typename octet_iterator>
-        uint32_t prior(octet_iterator& it)
-        {
-            while (utf8::internal::is_trail(*(--it))) ;
-            octet_iterator temp = it;
-            return utf8::unchecked::next(temp);
-        }
-
-        // Deprecated in versions that include prior, but only for the sake of consistency (see utf8::previous)
-        template <typename octet_iterator>
-        inline uint32_t previous(octet_iterator& it)
-        {
-            return utf8::unchecked::prior(it);
         }
 
         template <typename octet_iterator, typename distance_type>

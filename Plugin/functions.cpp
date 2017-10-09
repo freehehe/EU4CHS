@@ -9,10 +9,10 @@ namespace Functions
     {
         string_view source_view(source);
 
-        vector<uint32_t> wideText;
-        utf8::utf8to32(source_view.begin(), source_view.end(), back_inserter(wideText));
+        vector<wchar_t> wideText;
+        utf8::utf8to16(source_view.begin(), source_view.end(), back_inserter(wideText));
 
-        for (uint32_t &cp : wideText)
+        for (wchar_t &cp : wideText)
         {
             switch (cp)
             {
@@ -44,12 +44,6 @@ namespace Functions
             case 0x9e:
             case 0x9f:
                 cp = '?';
-                break;
-
-            case 0xA3:
-            case 0xA4:
-            case 0xA7:
-                cp -= 0xA0;
                 break;
 
             case 0x152: cp = 0x8c; break;
@@ -86,20 +80,20 @@ namespace Functions
         }
 
         wideText.push_back(0);
-        utf8::utf32to8(wideText.begin(), wideText.end(), dest);
+        utf8::utf16to8(wideText.begin(), wideText.end(), dest);
     }
 
-    bool IsLatin1Char(uint32_t cp)
+    bool IsLatin1Char(wchar_t cp)
     {
         return cp <= 0xFF;
     }
 
-    bool IsTextIconChar(uint32_t cp)
+    bool IsTextIconChar(wchar_t cp)
     {
         return isalpha(cp) || isdigit(cp) || cp == '_' || cp == '|';
     }
     
-    void GetTwoUnicode(const char * pText, uint32_t index, uint32_t text_length, uint32_t &first, ptrdiff_t &first_length, uint32_t &second, bool bUseSpecialChars)
+    void GetTwoUnicode(const char * pText, uint32_t index, uint32_t text_length, wchar_t &first, ptrdiff_t &first_length, wchar_t &second, bool bUseSpecialChars)
     {
         second = 0;
 
@@ -115,11 +109,11 @@ namespace Functions
         if (index < text_length)
         {
             ptrdiff_t second_length = utf8::internal::sequence_length(pText + index);
-            uint32_t temp_second = utf8::peek_next(pText + index, pText + text_length);
+            wchar_t temp_second = utf8::peek_next(pText + index, pText + text_length);
 
             if (bUseSpecialChars)
             {
-                while (temp_second == 0x7)
+                while (temp_second == 0xA7)
                 {
                     index += 2;
 
@@ -136,7 +130,7 @@ namespace Functions
         }
     }
 
-    void GetTwoUnicode(std::vector<uint32_t>::iterator pText, std::vector<uint32_t>::iterator pEnd, uint32_t & first, uint32_t & second, bool bUseSpecialChars)
+    void GetTwoUnicode(std::vector<wchar_t>::iterator pText, std::vector<wchar_t>::iterator pEnd, wchar_t & first, wchar_t & second, bool bUseSpecialChars)
     {
         second = 0;
 
@@ -150,11 +144,11 @@ namespace Functions
         //Second
         if (pText < pEnd)
         {
-            uint32_t temp_second = *pText;
+            wchar_t temp_second = *pText;
 
             if (bUseSpecialChars)
             {
-                while (temp_second == 0x7)
+                while (temp_second == 0xA7)
                 {
                     pText += 2;
 

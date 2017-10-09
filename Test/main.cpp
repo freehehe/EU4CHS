@@ -1,11 +1,11 @@
 ﻿#include <iostream>
+#include <cstdio>
 
-//£¤§
 using namespace std;
-// 0 - 10FFFF
 
 int main()
 {
+    std::printf("你好，世界！\n");
 
     return 0;
 }

@@ -15,28 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="dllmain.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="plugin.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="bitmapfont.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="functions.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="eu4.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="cjk_fonts.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="cjk_font.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="textbuffer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="byte_pattern.cpp">
@@ -45,36 +24,33 @@
     <ClCompile Include="context.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="std_string.cpp">
+    <ClCompile Include="dllmain.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="eu4.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="functions.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="plugin.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="province.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="std_string.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="textbuffer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="vfs.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="plugin.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="bitmapfont.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="stdinc.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="eu4.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="functions.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="cjk_fonts.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="cjk_font.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="textbuffer.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="byte_pattern.h">
@@ -83,10 +59,28 @@
     <ClInclude Include="context.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="std_string.h">
+    <ClInclude Include="eu4.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="functions.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="plugin.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="province.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="std_string.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="stdinc.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="textbuffer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="vfs.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

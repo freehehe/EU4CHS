@@ -2,7 +2,11 @@
 #include "stdinc.h"
 #include "eu4.h"
 
-namespace TextBuffer
+class CString;
+
+class CTextBuffer :public IncompleteClass
 {
-    void Patch();
-}
+public:
+    CString *GetString();
+    static void InitAndPatch();
+};

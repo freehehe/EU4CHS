@@ -75,7 +75,7 @@ namespace utf8
         if (!utf8::internal::is_code_point_valid(cp))
             throw invalid_code_point(cp);
 
-        if (cp < 0x80)                        // one octet
+        if (cp < 0x80 || cp == 0xA3 || cp == 0xA4 || cp == 0xA7)                        // one octet
             *(result++) = static_cast<uint8_t>(cp);
         else if (cp < 0x800) {                // two octets
             *(result++) = static_cast<uint8_t>((cp >> 6)            | 0xc0);
@@ -157,33 +157,6 @@ namespace utf8
     uint32_t peek_next(octet_iterator it, octet_iterator end)
     {
         return utf8::next(it, end);
-    }
-
-    template <typename octet_iterator>
-    uint32_t prior(octet_iterator& it, octet_iterator start)
-    {
-        // can't do much if it == start
-        if (it == start)
-            throw not_enough_room();
-
-        octet_iterator end = it;
-        // Go back until we hit either a lead octet or start
-        while (utf8::internal::is_trail(*(--it)))
-            if (it == start)
-                throw invalid_utf8(*it); // error - no lead byte in the sequence
-        return utf8::peek_next(it, end);
-    }
-
-    /// Deprecated in versions that include "prior"
-    template <typename octet_iterator>
-    uint32_t previous(octet_iterator& it, octet_iterator pass_start)
-    {
-        octet_iterator end = it;
-        while (utf8::internal::is_trail(*(--it)))
-            if (it == pass_start)
-                throw invalid_utf8(*it); // error - no lead byte in the sequence
-        octet_iterator temp = it;
-        return utf8::next(temp, end);
     }
 
     template <typename octet_iterator, typename distance_type>

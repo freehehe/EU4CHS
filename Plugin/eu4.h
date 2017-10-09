@@ -98,6 +98,8 @@ struct EU4Meta
     std::uintptr_t pfCTextureHandler_AddTexture;
     std::uintptr_t pfCTextureHandler_RemoveTextureInternal;
 
+    FARPROC pfPHYSFS_openRead;
+
     STextVertex *pBitmapVertices;
 
     std::uintptr_t pfCString_Assign;

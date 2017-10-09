@@ -3,7 +3,6 @@
 #include "eu4.h"
 
 class CString;
-class CJKFont;
 
 struct EU4CharInfo
 {
@@ -18,21 +17,20 @@ struct EU4CharInfo
 };
 VALIDATE_SIZE(EU4CharInfo, 0x10)
 
+typedef std::array<std::unique_ptr<EU4CharInfo>, 0x10000> InfoContainer;
+
 struct CBitmapCharacterSet :IncompleteClass
 {
-    EU4CharInfo *GetLatin1Value(uint32_t cp);
-    CJKFont *GetCJKFont();
+    EU4CharInfo *GetCharacterValue(wchar_t cp);
+    InfoContainer *GetContainer();
     float GetScaleX();
 };
 
 struct CBitmapFont :IncompleteClass
 {
-    CBitmapCharacterSet *GetLatin1CharacterSet();
-    CJKFont *GetCJKFont();
-    const CString *GetFontPath();
-    EU4CharInfo *GetCharacterValue(uint32_t cp);
-    int GetTextureWidth();
-    int GetTextureHeight();
+    CBitmapCharacterSet *GetCharacterSet();
+    InfoContainer *GetContainer();
+    EU4CharInfo *GetCharacterValue(wchar_t cp);
 
     static int __fastcall GetWidthOfString(CBitmapFont * pFont, int, const char * Text, const int nLength, bool bUseSpecialChars);
     static int __fastcall GetHeightOfString(CBitmapFont * pFont, int, const CString *text, int nMaxWidth, int nMaxHeight, const CVector2<int> *BorderSize, bool bUseSpecialChars);

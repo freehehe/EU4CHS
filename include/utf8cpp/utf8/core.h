@@ -102,7 +102,7 @@ namespace internal
     sequence_length(octet_iterator lead_it)
     {
         uint8_t lead = utf8::internal::mask8(*lead_it);
-        if (lead < 0x80)
+        if (lead < 0x80 || lead == 0xA3 || lead == 0xA4 || lead == 0xA7)
             return 1;
         else if ((lead >> 5) == 0x6)
             return 2;
@@ -118,15 +118,19 @@ namespace internal
     inline bool is_overlong_sequence(uint32_t cp, octet_difference_type length)
     {
         if (cp < 0x80) {
-            if (length != 1) 
+            if (length != 1)
+                return true;
+        }
+        else if (cp == 0xA3 || cp == 0xA4 || cp == 0xA7) {
+            if (length != 1 && length != 2)
                 return true;
         }
         else if (cp < 0x800) {
-            if (length != 2) 
+            if (length != 2)
                 return true;
         }
         else if (cp < 0x10000) {
-            if (length != 3) 
+            if (length != 3)
                 return true;
         }
 

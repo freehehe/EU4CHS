@@ -27,14 +27,15 @@
 #include <filesystem>
 #include <d3dx9.h>
 #include <sstream>
-#include "utf8cpp/utf8.h"
-//#include "eu4utf8/eu4utf8.h"
+#include "../include/utf8cpp/utf8.h"
 #include "byte_pattern.h"
-#include "injector/hooking.hpp"
-#include "injector/calling.hpp"
-#include "injector/assembly.hpp"
+#include "../include/injector/hooking.hpp"
+#include "../include/injector/calling.hpp"
+#include "../include/injector/assembly.hpp"
 
 #define VALIDATE_SIZE(type,size) static_assert(sizeof(type)==size);
+
+VALIDATE_SIZE(wchar_t, 2)
 
 struct IncompleteClass
 {

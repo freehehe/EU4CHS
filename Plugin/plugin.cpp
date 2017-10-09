@@ -1,7 +1,8 @@
 ﻿#include "plugin.h"
 #include "bitmapfont.h"
 #include "functions.h"
-#include "cjk_fonts.h"
+#include "vfs.h"
+#include "province.h"
 
 CPlugin g_plugin;
 
@@ -15,9 +16,10 @@ void CPlugin::InitAndPatch(HMODULE hself)
     GetModuleFileNameA(GetModuleHandle(NULL), module_path, 512);
     _game_dir = std::experimental::filesystem::path(module_path).parent_path();
 
-    g_Fonts.InitAndPatch();
+    //g_VirtualFiles.InitAndPatch();
     Functions::InitAndPatch();
     CBitmapFont::InitAndPatch();
+    Province::InitAndPatch();
 }
 
 const std::experimental::filesystem::path & CPlugin::GetGameDirectory() const
