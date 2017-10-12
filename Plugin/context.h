@@ -3,7 +3,6 @@
 
 struct CBitmapFont;
 struct CBitmapCharacterSet;
-class CJKFont;
 
 struct HookContext
 {
@@ -12,10 +11,10 @@ struct HookContext
 
     uint32_t textLength;
 
-    wchar_t unicode;
+    uint32_t unicode;
     ptrdiff_t unicodeLength;
 
-    wchar_t nextUnicode;
+    uint32_t nextUnicode;
 
     bool useSpecialChars;
 

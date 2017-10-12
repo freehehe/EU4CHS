@@ -26,9 +26,9 @@ struct CGenerateNamesWork_AddNameArea_InsertSpace
         std::string bstr;
 
         std::string_view source{ pOriginal->c_str() };
-        utf8::utf8to16(source.begin(), source.end(), back_inserter(wstr));
+        utf8::utf8to32(source.begin(), source.end(), back_inserter(wstr));
 
-        for (wchar_t code : wstr)
+        for (uint32_t code : wstr)
         {
             utf8::append(code, back_inserter(bstr));
             bstr.push_back(' ');

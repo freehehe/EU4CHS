@@ -6,9 +6,20 @@
 
 #define CHARSET_OFF 0xB4
 
-EU4CharInfo * CBitmapCharacterSet::GetCharacterValue(wchar_t cp)
+EU4CharInfo * CBitmapCharacterSet::GetCharacterValue(uint32_t cp)
 {
-    return GetContainer()->at(cp).get();
+    auto *pCont = GetContainer();
+
+    auto it = pCont->find(cp);
+
+    if (it != pCont->end())
+    {
+        return &it->second;
+    }
+    else
+    {
+        return &pCont->find('?')->second;
+    }
 }
 
 InfoContainer * CBitmapCharacterSet::GetContainer()
@@ -31,7 +42,7 @@ InfoContainer *CBitmapFont::GetContainer()
     return GetCharacterSet()->GetContainer();
 }
 
-EU4CharInfo *CBitmapFont::GetCharacterValue(wchar_t cp)
+EU4CharInfo *CBitmapFont::GetCharacterValue(uint32_t cp)
 {
     return GetCharacterSet()->GetCharacterValue(cp);
 }
@@ -50,16 +61,12 @@ struct CBitmapFont_ParseFontFile_AllocValue
         CBitmapFont *pFont = *(CBitmapFont **)(regs.ebp.i - 0x10);
         uint32_t id = *(uint32_t *)(regs.ebp.i - 0x14);
 
-        std::unique_ptr<EU4CharInfo> p = std::make_unique<EU4CharInfo>();
-
-        regs.eax = p.get();
-
         if (pFont->GetContainer() == nullptr)
         {
             *pFont->GetCharacterSet()->field<InfoContainer *, 0>() = new InfoContainer;
         }
 
-        pFont->GetContainer()->at(id) = std::move(p);
+        regs.eax = &pFont->GetContainer()->operator [](id);
 
         regs.ecx.i = *(uint32_t *)(regs.ebp.i - 0x30);
     }
@@ -430,12 +437,12 @@ int __fastcall CBitmapFont::GetWidthOfString(CBitmapFont * pFont, int, const cha
         nRealSize = strlen(Text);
     }
 
-    std::vector<wchar_t> wideText;
-    utf8::utf8to16(Text, Text + nRealSize, back_inserter(wideText));
+    std::vector<uint32_t> wideText;
+    utf8::utf8to32(Text, Text + nRealSize, back_inserter(wideText));
 
     for (auto strit = wideText.begin(); strit < wideText.end(); ++strit)
     {
-        wchar_t unicode = *strit;
+        uint32_t unicode = *strit;
 
         if (bUseSpecialChars && (unicode == 0x40 || unicode == 0x7B || unicode == 0xA3 || unicode == 0xA4 || unicode == 0xA7))
         {
@@ -536,12 +543,12 @@ int __fastcall CBitmapFont::GetHeightOfString(CBitmapFont * pFont, int, const CS
         return vHeight;
     }
 
-    std::vector<wchar_t> wideText;
-    utf8::utf8to16(text_view.begin(), text_view.end(), back_inserter(wideText));
+    std::vector<uint32_t> wideText;
+    utf8::utf8to32(text_view.begin(), text_view.end(), back_inserter(wideText));
 
     for (auto strit = wideText.begin(); strit < wideText.end(); ++strit)
     {
-        wchar_t unicode = *strit;
+        uint32_t unicode = *strit;
 
         if (bUseSpecialChars && (unicode == 0x40 || unicode == 0x7B || unicode == 0xA3 || unicode == 0xA7))
         {
@@ -654,12 +661,12 @@ int __fastcall CBitmapFont::GetActualRequiredSize(CBitmapFont *pFont, int, const
     {
         std::string_view source_view{ OriginalText->c_str() };
 
-        std::vector<wchar_t> wideText;
-        utf8::utf8to16(source_view.begin(), source_view.end(), std::back_inserter(wideText));
+        std::vector<uint32_t> wideText;
+        utf8::utf8to32(source_view.begin(), source_view.end(), std::back_inserter(wideText));
 
         for (auto strit = wideText.begin(); strit < wideText.end() && nLines != 52; ++strit)
         {
-            wchar_t unicode = *strit;
+            uint32_t unicode = *strit;
 
             if (unicode == 0xA7)
             {
@@ -803,8 +810,8 @@ void __fastcall CBitmapFont::GetRequiredSize(CBitmapFont *pFont, int, const CStr
 
     std::string Result{ OriginalText->c_str() };
 
-    std::vector<wchar_t> wideText;
-    utf8::utf8to16(Result.begin(), Result.end(), std::back_inserter(wideText));
+    std::vector<uint32_t> wideText;
+    utf8::utf8to32(Result.begin(), Result.end(), std::back_inserter(wideText));
 
     int nDefaultLineHeight = pFont->get_field<int, 0x4D4>() * pSet->GetScaleX();
     int nCurrentLineHeight = nDefaultLineHeight;
@@ -827,7 +834,7 @@ void __fastcall CBitmapFont::GetRequiredSize(CBitmapFont *pFont, int, const CStr
 
     for (auto strit = wideText.begin(); strit < wideText.end(); ++strit)
     {
-        wchar_t unicode = *strit;
+        uint32_t unicode = *strit;
 
         if (bUseSpecialChars && (unicode == 0x40 || unicode == 0x7B || unicode == 0xA3 || unicode == 0xA7))
         {
@@ -896,7 +903,7 @@ void __fastcall CBitmapFont::GetRequiredSize(CBitmapFont *pFont, int, const CStr
                         if (strit - wideText.begin() > 3)
                         {
                             Result.clear();
-                            utf8::utf16to8(wideText.begin(), strit - 4, back_inserter(Result));
+                            utf8::utf32to8(wideText.begin(), strit - 4, back_inserter(Result));
                             Result += " ...";
                         }
                         else
@@ -930,13 +937,13 @@ void __fastcall CBitmapFont::GetRequiredSize(CBitmapFont *pFont, int, const CStr
                         if ((strit - wideText.begin()) > 4)
                         {
                             Result.clear();
-                            utf8::utf16to8(wideText.begin(), strit - 4, back_inserter(Result));
+                            utf8::utf32to8(wideText.begin(), strit - 4, back_inserter(Result));
                             Result += " ...";
                         }
                         else
                         {
                             Result.clear();
-                            utf8::utf16to8(wideText.begin(), strit, back_inserter(Result));
+                            utf8::utf32to8(wideText.begin(), strit, back_inserter(Result));
                         }
 
                         NewText->assign(Result.c_str());
@@ -982,12 +989,12 @@ void __fastcall CBitmapFont::GetActualRealRequiredSizeActually(CBitmapFont *pFon
     nMaxWidth -= 2 * BorderSize->x;
     nMaxHeight -= 2 * BorderSize->y;
 
-    std::vector<wchar_t> wideText;
+    std::vector<uint32_t> wideText;
     std::string_view source_view{ Text->c_str() };
-    utf8::utf8to16(source_view.begin(), source_view.end(), std::back_inserter(wideText));
+    utf8::utf8to32(source_view.begin(), source_view.end(), std::back_inserter(wideText));
 
-    std::vector<wchar_t>::iterator nLastIndexOfWholeWord = wideText.begin();
-    std::vector<wchar_t>::iterator nCurrentLineStartIndex = wideText.begin();
+    std::vector<uint32_t>::iterator nLastIndexOfWholeWord = wideText.begin();
+    std::vector<uint32_t>::iterator nCurrentLineStartIndex = wideText.begin();
 
     if (Text->length() != 0)
     {
@@ -1067,13 +1074,13 @@ void __fastcall CBitmapFont::GetActualRealRequiredSizeActually(CBitmapFont *pFon
                         {
                             if (nLastIndexOfWholeWord > nCurrentLineStartIndex)
                             {
-                                utf8::utf16to8(nCurrentLineStartIndex, nLastIndexOfWholeWord, back_inserter(Result));
+                                utf8::utf32to8(nCurrentLineStartIndex, nLastIndexOfWholeWord, back_inserter(Result));
                                 Result += '\n';
                                 nCurrentLineStartIndex = nLastIndexOfWholeWord + 1;
                             }
                             else
                             {
-                                utf8::utf16to8(nCurrentLineStartIndex, strit, back_inserter(Result));
+                                utf8::utf32to8(nCurrentLineStartIndex, strit, back_inserter(Result));
                                 Result += '\n';
                                 nLastIndexOfWholeWord = strit;
                                 nCurrentLineStartIndex = strit;
@@ -1087,17 +1094,17 @@ void __fastcall CBitmapFont::GetActualRealRequiredSizeActually(CBitmapFont *pFon
                             {
                                 if (bWholeWordOnly)
                                 {
-                                    utf8::utf16to8(wideText.begin(), nLastIndexOfWholeWord, back_inserter(Result));
+                                    utf8::utf32to8(wideText.begin(), nLastIndexOfWholeWord, back_inserter(Result));
                                 }
                                 else
                                 {
                                     if (strit - wideText.begin() > 4)
                                     {
-                                        utf8::utf16to8(wideText.begin(), strit, back_inserter(Result));
+                                        utf8::utf32to8(wideText.begin(), strit, back_inserter(Result));
                                     }
                                     else
                                     {
-                                        utf8::utf16to8(wideText.begin(), strit - 4, back_inserter(Result));
+                                        utf8::utf32to8(wideText.begin(), strit - 4, back_inserter(Result));
                                         Result += " ...";
                                     }
                                 }
@@ -1124,7 +1131,7 @@ void __fastcall CBitmapFont::GetActualRealRequiredSizeActually(CBitmapFont *pFon
 
                         if (bAddBreaksToNewText)
                         {
-                            utf8::utf16to8(nCurrentLineStartIndex, strit, back_inserter(Result));
+                            utf8::utf32to8(nCurrentLineStartIndex, strit, back_inserter(Result));
                             Result += '\n';
 
                             nCurrentLineStartIndex = strit + 1;
@@ -1136,12 +1143,12 @@ void __fastcall CBitmapFont::GetActualRealRequiredSizeActually(CBitmapFont *pFon
                             {
                                 if (!bWholeWordOnly && (strit - wideText.begin()) > 4)
                                 {
-                                    utf8::utf16to8(wideText.begin(), strit - 4, std::back_inserter(Result));
+                                    utf8::utf32to8(wideText.begin(), strit - 4, std::back_inserter(Result));
                                     Result += " ...";
                                 }
                                 else
                                 {
-                                    utf8::utf16to8(wideText.begin(), strit, std::back_inserter(Result));
+                                    utf8::utf32to8(wideText.begin(), strit, std::back_inserter(Result));
                                 }
                             }
 
@@ -1156,7 +1163,7 @@ void __fastcall CBitmapFont::GetActualRealRequiredSizeActually(CBitmapFont *pFon
 
     if (bAddBreaksToNewText)
     {
-        utf8::utf16to8(nCurrentLineStartIndex, wideText.end(), std::back_inserter(Result));
+        utf8::utf32to8(nCurrentLineStartIndex, wideText.end(), std::back_inserter(Result));
         NewText->assign(Result.c_str());
     }
     else

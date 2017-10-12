@@ -45,14 +45,6 @@ namespace utf8
 namespace internal
 {
     // Unicode constants
-    // Leading (high) surrogates: 0xd800 - 0xdbff
-    // Trailing (low) surrogates: 0xdc00 - 0xdfff
-    const uint16_t LEAD_SURROGATE_MIN  = 0xd800u;
-    const uint16_t LEAD_SURROGATE_MAX  = 0xdbffu;
-    const uint16_t TRAIL_SURROGATE_MIN = 0xdc00u;
-    const uint16_t TRAIL_SURROGATE_MAX = 0xdfffu;
-    const uint16_t LEAD_OFFSET         = LEAD_SURROGATE_MIN - (0x10000 >> 10);
-    const uint32_t SURROGATE_OFFSET    = 0x10000u - (LEAD_SURROGATE_MIN << 10) - TRAIL_SURROGATE_MIN;
 
     // Maximum valid value for a Unicode code point
     const uint32_t CODE_POINT_MAX      = 0x0010ffffu;
@@ -62,39 +54,17 @@ namespace internal
     {
         return static_cast<uint8_t>(0xff & oc);
     }
-    template<typename u16_type>
-    inline uint16_t mask16(u16_type oc)
-    {
-        return static_cast<uint16_t>(0xffff & oc);
-    }
+
     template<typename octet_type>
     inline bool is_trail(octet_type oc)
     {
         return ((utf8::internal::mask8(oc) >> 6) == 0x2);
     }
 
-    template <typename u16>
-    inline bool is_lead_surrogate(u16 cp)
-    {
-        return (cp >= LEAD_SURROGATE_MIN && cp <= LEAD_SURROGATE_MAX);
-    }
-
-    template <typename u16>
-    inline bool is_trail_surrogate(u16 cp)
-    {
-        return (cp >= TRAIL_SURROGATE_MIN && cp <= TRAIL_SURROGATE_MAX);
-    }
-
-    template <typename u16>
-    inline bool is_surrogate(u16 cp)
-    {
-        return (cp >= LEAD_SURROGATE_MIN && cp <= TRAIL_SURROGATE_MAX);
-    }
-
     template <typename u32>
     inline bool is_code_point_valid(u32 cp)
     {
-        return (cp <= CODE_POINT_MAX && !utf8::internal::is_surrogate(cp));
+        return (cp <= CODE_POINT_MAX);
     }
 
     template <typename octet_iterator>

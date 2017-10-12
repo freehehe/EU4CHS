@@ -17,11 +17,11 @@ struct EU4CharInfo
 };
 VALIDATE_SIZE(EU4CharInfo, 0x10)
 
-typedef std::array<std::unique_ptr<EU4CharInfo>, 0x10000> InfoContainer;
+typedef std::unordered_map<uint32_t, EU4CharInfo> InfoContainer;
 
 struct CBitmapCharacterSet :IncompleteClass
 {
-    EU4CharInfo *GetCharacterValue(wchar_t cp);
+    EU4CharInfo *GetCharacterValue(uint32_t cp);
     InfoContainer *GetContainer();
     float GetScaleX();
 };
@@ -30,7 +30,7 @@ struct CBitmapFont :IncompleteClass
 {
     CBitmapCharacterSet *GetCharacterSet();
     InfoContainer *GetContainer();
-    EU4CharInfo *GetCharacterValue(wchar_t cp);
+    EU4CharInfo *GetCharacterValue(uint32_t cp);
 
     static int __fastcall GetWidthOfString(CBitmapFont * pFont, int, const char * Text, const int nLength, bool bUseSpecialChars);
     static int __fastcall GetHeightOfString(CBitmapFont * pFont, int, const CString *text, int nMaxWidth, int nMaxHeight, const CVector2<int> *BorderSize, bool bUseSpecialChars);

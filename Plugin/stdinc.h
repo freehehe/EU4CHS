@@ -35,8 +35,6 @@
 
 #define VALIDATE_SIZE(type,size) static_assert(sizeof(type)==size);
 
-VALIDATE_SIZE(wchar_t, 2)
-
 struct IncompleteClass
 {
     template <typename T, std::uintptr_t offset>
