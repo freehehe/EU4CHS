@@ -22,15 +22,15 @@ struct CGenerateNamesWork_AddNameArea_InsertSpace
         const CString *pOriginal = (const CString *)(regs.ebp.i - 0xD0);
         CString *pResult = (CString *)(regs.ebp.i - 0xA4);
 
-        std::wstring wstr;
+        std::vector<uint32_t> wstr;
         std::string bstr;
-
+        
         std::string_view source{ pOriginal->c_str() };
-        utf8::utf8to32(source.begin(), source.end(), back_inserter(wstr));
+        utf8::utf8to32(source.begin(), source.end(), std::back_inserter(wstr));
 
         for (uint32_t code : wstr)
         {
-            utf8::append(code, back_inserter(bstr));
+            utf8::append(code, std::back_inserter(bstr));
             bstr.push_back(' ');
         }
 
@@ -109,7 +109,7 @@ struct CurveText_GetCharInfo
         regs.eax.i += (g_context.unicodeLength - 1);
         *(uint32_t *)(regs.ebp.i - 0x20) = regs.eax.i;
 
-        regs.eax = pSet->GetCharacterValue(g_context.unicode);
+        regs.eax.p = pSet->GetCharacterValue(g_context.unicode);
     }
 };
 
@@ -147,7 +147,7 @@ struct CCountryNameCollection_AddNudgedNames_CountDrawables
             g_context.nextUnicode,
             false);
 
-        regs.eax = pFont->GetCharacterValue(g_context.unicode);
+        regs.eax.p = pFont->GetCharacterValue(g_context.unicode);
         regs.ecx.i += (g_context.unicodeLength - 1);
     }
 };

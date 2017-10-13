@@ -39,25 +39,10 @@
 namespace injector
 {
     //helpers
-    union _general_register
+    union general_register
     {
         uint32_t i;
         void *p;
-
-        _general_register &operator=(uint32_t value)
-        {
-            i = value;
-
-            return *this;
-        }
-
-        template <typename T>
-        _general_register &operator=(T *pointer)
-        {
-            p = pointer;
-
-            return *this;
-        }
 
         template <typename T>
         operator T*() const
@@ -66,7 +51,7 @@ namespace injector
         }
     };
 
-    struct _flags_register
+    struct flags_register
     {
         bool carry_flag : 1;
         bool flag1 : 1;
@@ -101,8 +86,8 @@ namespace injector
         bool flag30 : 1;
         bool flag31 : 1;
     };
-    static_assert(sizeof(_general_register) == 4);
-    static_assert(sizeof(_flags_register) == 4);
+    static_assert(sizeof(general_register) == 4);
+    static_assert(sizeof(flags_register) == 4);
 
     struct reg_pack
     {
@@ -110,13 +95,13 @@ namespace injector
         // The first field is the last to be pushed and first to be poped
 
         // PUSHFD / POPFD
-        _flags_register ef;
+        flags_register ef;
 
         // PUSHAD/POPAD -- must be the lastest fields (because of esp)
         union
         {
-            _general_register arr[8];
-            struct { _general_register edi, esi, ebp, esp, ebx, edx, ecx, eax; };
+            general_register arr[8];
+            struct { general_register edi, esi, ebp, esp, ebx, edx, ecx, eax; };
         };
     };
 

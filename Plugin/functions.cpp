@@ -46,34 +46,6 @@ namespace Functions
                 cp = '?';
                 break;
 
-            case 0x152: cp = 0x8c; break;
-            case 0x153: cp = 0x9c; break;
-            case 0x160: cp = 0x8a; break;
-            case 0x161: cp = 0x9a; break;
-            case 0x178: cp = 0x9f; break;
-            case 0x17d: cp = 0x8e; break;
-            case 0x17e: cp = 0x9e; break;
-            case 0x192: cp = 0x83; break;
-            case 0x2c6: cp = 0x88; break;
-            case 0x2dc: cp = 0x98; break;
-            case 0x2013: cp = 0x96; break;
-            case 0x2014: cp = 0x97; break;
-            case 0x2018: cp = 0x91; break;
-            case 0x2019: cp = 0x92; break;
-            case 0x201a: cp = 0x82; break;
-            case 0x201c: cp = 0x93; break;
-            case 0x201d: cp = 0x94; break;
-            case 0x201e: cp = 0x84; break;
-            case 0x2020: cp = 0x86; break;
-            case 0x2021: cp = 0x87; break;
-            case 0x2022: cp = 0x95; break;
-            case 0x2026: cp = 0x85; break;
-            case 0x2030: cp = 0x89; break;
-            case 0x2039: cp = 0x8b; break;
-            case 0x203a: cp = 0x9b; break;
-            case 0x20ac: cp = 0x80; break;
-            case 0x2122: cp = 0x99; break;
-
             default:
                 break;
             }
@@ -183,8 +155,8 @@ namespace Functions
 
             memset(pText, 0, 32);
 
-            regs.ecx = 0;
-            regs.eax = 0;
+            regs.ecx.i = 0;
+            regs.eax.i = 0;
         }
     };
 
