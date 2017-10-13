@@ -67,6 +67,25 @@ struct CGenerateNamesWork_AddNameArea_CountDrawables
 };
 
 //CurveText
+//CalcExtraWidth
+//8D 47 FE F7 D8 1B C0 40
+//8
+//0xD065A0
+struct CurveText_CalcExtraWidth
+{
+    void operator()(injector::reg_pack &regs) const
+    {
+        const CString *pString = regs.ecx;
+        std::string_view view(pString->c_str());
+
+        auto len = utf8::distance(view.begin(), view.end());
+
+        regs.eax.i = ((len == 2) ? 1 : 0);
+    }
+};
+
+
+//CurveText
 //GetCharInfo
 //8A 04 01 F3 0F 10 82 28 04 00 00
 //3 + 6 +3
@@ -158,6 +177,9 @@ namespace Province
     
         //CurveText
         //0xD05F50
+
+        g_pattern.find_pattern("8D 47 FE F7 D8 1B C0 40");
+        injector::MakeInline<CurveText_CalcExtraWidth>(g_pattern.get_first().pointer(), g_pattern.get_first().pointer(8));
 
         g_pattern.find_pattern("8A 04 01 F3 0F 10 82 28 04 00 00");
         injector::MakeNOP(g_pattern.get_first().pointer(), 3);

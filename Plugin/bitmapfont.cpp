@@ -18,7 +18,10 @@ EU4CharInfo * CBitmapCharacterSet::GetCharacterValue(uint32_t cp)
     }
     else
     {
-        return &pCont->find('?')->second;
+        if (Functions::IsLatin1Char(cp))
+            return nullptr;
+        else
+            return &pCont->find('?')->second;
     }
 }
 

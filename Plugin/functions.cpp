@@ -199,5 +199,8 @@ namespace Functions
 
         //校验总是成功
         injector::MakeNOP(g_pattern.find_first("0F 94 45 F3 56").integer(), 4, true);
+
+        //贴图大小限制
+        injector::WriteMemory<uint8_t>(g_pattern.find_first("81 FE 00 00 00 01 72 0F").integer(6), 0xEB, true);
     }
 }
