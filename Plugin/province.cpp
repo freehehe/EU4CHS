@@ -22,7 +22,7 @@ struct CGenerateNamesWork_AddNameArea_InsertSpace
         const CString *pOriginal = (const CString *)(regs.ebp.i - 0xD0);
         CString *pResult = (CString *)(regs.ebp.i - 0xA4);
 
-        std::wstring wstr;
+        std::vector<uint32_t> wstr;
         std::string bstr;
 
         std::string_view source{ pOriginal->c_str() };
