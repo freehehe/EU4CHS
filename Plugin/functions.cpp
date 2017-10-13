@@ -155,8 +155,8 @@ namespace Functions
 
             memset(pText, 0, 32);
 
-            regs.ecx = 0;
-            regs.eax = 0;
+            regs.ecx.i = 0;
+            regs.eax.i = 0;
         }
     };
 

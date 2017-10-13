@@ -66,7 +66,7 @@ struct CBitmapFont_ParseFontFile_AllocValue
             *pFont->GetCharacterSet()->field<InfoContainer *, 0>() = new InfoContainer;
         }
 
-        regs.eax = &pFont->GetContainer()->operator [](id);
+        regs.eax.p = &pFont->GetContainer()->operator [](id);
 
         regs.ecx.i = *(uint32_t *)(regs.ebp.i - 0x30);
     }
@@ -126,7 +126,7 @@ struct CBitmapFont_RenderToScreen_ReadWord
 
         if (!Functions::IsLatin1Char(g_context.unicode))
         {
-            regs.ecx = 0;
+            regs.ecx.i = 0;
         }
     }
 };
@@ -140,9 +140,9 @@ struct CBitmapFont_RenderToScreen_GetCharInfo1
 {
     void operator()(injector::reg_pack &regs) const
     {
-        regs.eax = g_context.unicode;
+        regs.eax.i = g_context.unicode;
 
-        regs.ecx = g_context.pFont->GetCharacterValue(g_context.unicode);
+        regs.ecx.p = g_context.pFont->GetCharacterValue(g_context.unicode);
     }
 };
 
@@ -189,13 +189,13 @@ struct CBitmapFont_GetCharInfo2
             g_context.nextUnicode,
             g_context.useSpecialChars);
 
-        regs.edx = g_context.pSet;
-        regs.ecx = g_context.unicode;
-        regs.eax = g_context.unicode;
+        regs.edx.p = g_context.pSet;
+        regs.ecx.i = g_context.unicode;
+        regs.eax.i = g_context.unicode;
 
         regs.edi.i += (g_context.unicodeLength - 1);
 
-        regs.esi = g_context.pFont->GetCharacterValue(g_context.unicode);
+        regs.esi.p = g_context.pFont->GetCharacterValue(g_context.unicode);
     }
 };
 
@@ -224,7 +224,7 @@ struct CBitmapFont_RenderToTexture_AppendChar
         pDst[length] = 0;
         pRight->_length = length;
 
-        regs.eax = pRight;
+        regs.eax.p = pRight;
     }
 };
 
@@ -255,7 +255,7 @@ struct CBitmapFont_RenderToTexture_GetCharInfo1
 
         regs.esi.i += (g_context.unicodeLength - 1);
 
-        regs.eax = g_context.pFont->GetCharacterValue(g_context.unicode);
+        regs.eax.p = g_context.pFont->GetCharacterValue(g_context.unicode);
     }
 };
 
@@ -305,7 +305,7 @@ struct CBitmapFont_RenderToTexture_GetCharInfo2
         regs.edi.i += (g_context.unicodeLength - 1);
         *(uint32_t *)(regs.ebp.i - 0x10) = regs.edi.i;
 
-        regs.eax = g_context.pFont->GetCharacterValue(g_context.unicode);
+        regs.eax.p = g_context.pFont->GetCharacterValue(g_context.unicode);
     }
 };
 
@@ -339,7 +339,7 @@ struct CBitmapFont_FillVertexBuffer_ReadChar1
         pRight->_sso_head[g_context.unicodeLength] = 0;
         pRight->_length = g_context.unicodeLength;
 
-        regs.eax = pRight;
+        regs.eax.p = pRight;
     }
 };
 
@@ -353,7 +353,7 @@ struct CBitmapFont_FillVertexBuffer_GetCharInfo1
     void operator()(injector::reg_pack &regs) const
     {
         CBitmapFont *pFont = regs.ecx;
-        regs.edx = pFont->GetCharacterValue(g_context.unicode);
+        regs.edx.p = pFont->GetCharacterValue(g_context.unicode);
         regs.edi.i += (g_context.unicodeLength - 1);
     }
 };
@@ -403,7 +403,7 @@ struct CBitmapFont_FillVertexBuffer_GetCharInfo2
 
         regs.esi.i += (g_context.unicodeLength - 1);
 
-        regs.edi = pSet->GetCharacterValue(g_context.unicode);
+        regs.edi.p = pSet->GetCharacterValue(g_context.unicode);
     }
 };
 
