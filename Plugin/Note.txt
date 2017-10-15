@@ -64,3 +64,4 @@ pdx_launcher/common/gfx/interface/Chinese_flag.dds 国旗贴图
 4飞龙2审判2白杨2冥界爪2灵气戒指
 
 editbin /dynamicbase:no "D:/Steam/steamapps/common/Europa Universalis IV/eu4.exe"
+physfs_openread先判断存在否再打开的
