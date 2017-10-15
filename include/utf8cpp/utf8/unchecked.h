@@ -37,7 +37,7 @@ namespace utf8
         template <typename octet_iterator>
         octet_iterator append(uint32_t cp, octet_iterator result)
         {
-            if (cp < 0x80 || cp == 0xA3 || cp == 0xA4 || cp == 0xA7)                        // one octet
+            if (cp < 0x80)                        // one octet
                 *(result++) = static_cast<uint8_t>(cp);  
             else if (cp < 0x800) {                // two octets
                 *(result++) = static_cast<uint8_t>((cp >> 6)          | 0xc0);
@@ -94,6 +94,21 @@ namespace utf8
             return utf8::unchecked::next(it);    
         }
 
+        template <typename octet_iterator>
+        uint32_t prior(octet_iterator& it)
+        {
+            while (utf8::internal::is_trail(*(--it))) ;
+            octet_iterator temp = it;
+            return utf8::unchecked::next(temp);
+        }
+
+        // Deprecated in versions that include prior, but only for the sake of consistency (see utf8::previous)
+        template <typename octet_iterator>
+        inline uint32_t previous(octet_iterator& it)
+        {
+            return utf8::unchecked::prior(it);
+        }
+
         template <typename octet_iterator, typename distance_type>
         void advance (octet_iterator& it, distance_type n)
         {
@@ -109,6 +124,36 @@ namespace utf8
             for (dist = 0; first < last; ++dist) 
                 utf8::unchecked::next(first);
             return dist;
+        }
+
+        template <typename u16bit_iterator, typename octet_iterator>
+        octet_iterator utf16to8 (u16bit_iterator start, u16bit_iterator end, octet_iterator result)
+        {       
+            while (start != end) {
+                uint32_t cp = utf8::internal::mask16(*start++);
+            // Take care of surrogate pairs first
+                if (utf8::internal::is_lead_surrogate(cp)) {
+                    uint32_t trail_surrogate = utf8::internal::mask16(*start++);
+                    cp = (cp << 10) + trail_surrogate + internal::SURROGATE_OFFSET;
+                }
+                result = utf8::unchecked::append(cp, result);
+            }
+            return result;         
+        }
+
+        template <typename u16bit_iterator, typename octet_iterator>
+        u16bit_iterator utf8to16 (octet_iterator start, octet_iterator end, u16bit_iterator result)
+        {
+            while (start < end) {
+                uint32_t cp = utf8::unchecked::next(start);
+                if (cp > 0xffff) { //make a surrogate pair
+                    *result++ = static_cast<uint16_t>((cp >> 10)   + internal::LEAD_OFFSET);
+                    *result++ = static_cast<uint16_t>((cp & 0x3ff) + internal::TRAIL_SURROGATE_MIN);
+                }
+                else
+                    *result++ = static_cast<uint16_t>(cp);
+            }
+            return result;
         }
 
         template <typename octet_iterator, typename u32bit_iterator>

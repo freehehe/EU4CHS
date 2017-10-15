@@ -52,7 +52,7 @@ namespace Functions
         }
 
         wideText.push_back(0);
-        utf8::utf32to8(wideText.begin(), wideText.end(), dest);
+        eu4utf8::utf32to8(wideText.begin(), wideText.end(), dest);
     }
 
     bool IsLatin1Char(uint32_t cp)
@@ -72,16 +72,16 @@ namespace Functions
         //First
         if (index < text_length)
         {
-            first_length = utf8::internal::sequence_length(pText + index);
-            first = utf8::peek_next(pText + index, pText + text_length);
+            first_length = eu4utf8::internal::sequence_length(pText + index);
+            first = eu4utf8::peek_next(pText + index, pText + text_length);
             index += first_length;
         }
 
         //Second
         if (index < text_length)
         {
-            ptrdiff_t second_length = utf8::internal::sequence_length(pText + index);
-            uint32_t temp_second = utf8::peek_next(pText + index, pText + text_length);
+            ptrdiff_t second_length = eu4utf8::internal::sequence_length(pText + index);
+            uint32_t temp_second = eu4utf8::peek_next(pText + index, pText + text_length);
 
             if (bUseSpecialChars)
             {
@@ -94,7 +94,7 @@ namespace Functions
                         return;
                     }
 
-                    temp_second = utf8::peek_next(pText + index, pText + text_length);
+                    temp_second = eu4utf8::peek_next(pText + index, pText + text_length);
                 }
             }
 

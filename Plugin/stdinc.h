@@ -28,6 +28,7 @@
 #include <d3dx9.h>
 #include <sstream>
 #include "../include/utf8cpp/utf8.h"
+#include "../include/utf8cpp/eu4utf8.h"
 #include "byte_pattern.h"
 #include "../include/injector/hooking.hpp"
 #include "../include/injector/calling.hpp"

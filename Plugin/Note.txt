@@ -1,13 +1,7 @@
 ﻿£¤§
 
-3D Ripper DX
-
-CEU3GraphicalMap
-1.21.1 0x33C
-1.16.3 0x398
-
-地图字体 64 64 64 有透明
-外发光200 200 200 不透明度100 精确4像素
+地图字体 255 255 255 有透明
+外发光200 200 200 不透明度90 精确4像素
 
 只有地图字体需要mipmap
 
@@ -19,6 +13,9 @@ credits.txt 中A7为加大字号用
 12 14 16 18 20 22 24 29 36 100(75?)
 包含0导致换行爆炸
 
+尝试预枚举文件后用scripts/eu4chs/覆盖
+
+12 14 16 18用宋体12
 NotoSansCJKSCRegular_12
 NotoSansCJKSCRegular_14
 NotoSansCJKSCRegular_16
@@ -29,8 +26,6 @@ NotoSansCJKSCBold_24
 NotoSansCJKSCBold_29
 NotoSansCJKSCBold_36
 NotoSansCJKSCBold_75
-
-不搞定地图字体造成utf8cpp接受到莫名字节
 
 languages.yml增加l_schinese
 pdx_launcher/game/interface/launcher.gui 语言按钮排版

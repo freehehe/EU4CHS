@@ -1,10 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.15
+VisualStudioVersion = 15.0.27004.2002
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FontGen", "FontGen\FontGen.vcxproj", "{7C7C02FC-1F99-452D-A87F-A0ED2CB5FBAD}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Test", "Test\Test.vcxproj", "{8C78B825-62A0-4801-826E-E38274379EE3}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PO2YML", "PO2YML\PO2YML.vcxproj", "{38F451AB-2D22-4067-B483-260B2757C4E4}"
@@ -23,12 +21,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{7C7C02FC-1F99-452D-A87F-A0ED2CB5FBAD}.Debug|x64.ActiveCfg = Debug|Win32
-		{7C7C02FC-1F99-452D-A87F-A0ED2CB5FBAD}.Debug|x86.ActiveCfg = Release|Win32
-		{7C7C02FC-1F99-452D-A87F-A0ED2CB5FBAD}.Debug|x86.Build.0 = Release|Win32
-		{7C7C02FC-1F99-452D-A87F-A0ED2CB5FBAD}.Release|x64.ActiveCfg = Release|Win32
-		{7C7C02FC-1F99-452D-A87F-A0ED2CB5FBAD}.Release|x86.ActiveCfg = Release|Win32
-		{7C7C02FC-1F99-452D-A87F-A0ED2CB5FBAD}.Release|x86.Build.0 = Release|Win32
 		{8C78B825-62A0-4801-826E-E38274379EE3}.Debug|x64.ActiveCfg = Debug|Win32
 		{8C78B825-62A0-4801-826E-E38274379EE3}.Debug|x86.ActiveCfg = Debug|Win32
 		{8C78B825-62A0-4801-826E-E38274379EE3}.Debug|x86.Build.0 = Debug|Win32
