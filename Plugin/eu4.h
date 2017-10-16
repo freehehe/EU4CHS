@@ -92,6 +92,8 @@ struct EU4Meta
     char *pWord;
     char *pText;
  
+    FARPROC pfPHYSFS_openRead;
+
     EU4Meta();
 };
 
