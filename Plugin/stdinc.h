@@ -25,14 +25,13 @@
 #include <cctype>
 #include <optional>
 #include <filesystem>
-#include <d3dx9.h>
 #include <sstream>
-#include "../include/utf8cpp/utf8.h"
-#include "../include/utf8cpp/eu4utf8.h"
+#include <utf8cpp/utf8.h>
+#include <utf8cpp/eu4utf8.h>
 #include "byte_pattern.h"
-#include "../include/injector/hooking.hpp"
-#include "../include/injector/calling.hpp"
-#include "../include/injector/assembly.hpp"
+#include <injector/hooking.hpp>
+#include <injector/calling.hpp>
+#include <injector/assembly.hpp>
 
 #define VALIDATE_SIZE(type,size) static_assert(sizeof(type)==size);
 
