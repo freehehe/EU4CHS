@@ -16,6 +16,11 @@ static void CollectChars(const path &filename, std::set<uint32_t> &collection)
 {
 	std::ifstream stream{ filename };
 
+	if (!stream)
+	{
+		return;
+	}
+
 	std::istreambuf_iterator<char> stream_it{ stream };
 
 	std::vector<uint32_t> wide_text;
@@ -51,15 +56,33 @@ static std::set<uint32_t> ScanFolder(const path &folder)
 	return result;
 }
 
+static void GenerateTable(const std::set<uint32_t> &collection, const path &text)
+{
+	std::vector<char> buffer;
+
+	utf8::append(0xFEFF, std::back_inserter(buffer));
+	utf8::utf32to8(collection.begin(), collection.end(), std::back_inserter(buffer));
+
+	std::ofstream ofs(text, std::ios::trunc);
+
+	if (!ofs)
+	{
+		return;
+	}
+
+	std::copy(buffer.begin(), buffer.end(), std::ostreambuf_iterator<char>(ofs));
+
+	ofs.close();
+}
+
 //.exe 文件夹 输出文本
 int main(int argc, char **argv)
 {
-	if (argc != 3)
+	if (argc != 3) 
 	{
 		return 0;
 	}
 
-	auto collection = ScanFolder(argv[1]);
-
-
+	std::set<uint32_t> collection = ScanFolder(argv[1]);
+	GenerateTable(collection, argv[2]);
 }
