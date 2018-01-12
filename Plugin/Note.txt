@@ -1,7 +1,6 @@
 ﻿£¤§
 
-地图字体 255 255 255 有透明
-外发光200 200 200 不透明度90 精确4像素
+黑色描边白色文字为模板，PS
 
 只有地图字体需要mipmap
 
@@ -10,10 +9,10 @@ credits.txt 中A7为加大字号用
 
 看看CTextBuffer::Write的过滤关键字
 
-12 14 16 18 20 22 24 29 36 100(75?)
+12 14 16 18 20 22 24 29 36 100(75?可以更小直到看得舒服)
 包含0导致换行爆炸
 
-尝试预枚举文件后用scripts/eu4chs/覆盖
+替换所有内存分配释放??
 
 12 14 16 18用宋体12
 NotoSansCJKSCRegular_12
@@ -37,6 +36,7 @@ pdx_launcher/game/interface/launcher.gui 语言按钮排版
 					slotsize = { width = 186 height = 45 }
 					max_slots_horizontal = 1
 					format = "UPPER_LEFT"
+}
 
 pdx_launcher/common/interface/common_core.gfx 增加中国国旗
 
@@ -46,22 +46,6 @@ spriteType = {
 }
 
 pdx_launcher/common/gfx/interface/Chinese_flag.dds 国旗贴图
-
-无脑拳弹开荒
-
-战嚎 15
-蹂躏 15
-嗜血 15
-刽子手 15
-暴怒 10
-冰盾 10
-碎片风暴 1
-暗影爆发 5
-野蛮冲刺 1
-军旗 15
-狂暴专精 15
-碎甲 15
-4飞龙2审判2白杨2冥界爪2灵气戒指
 
 editbin /dynamicbase:no "D:/Steam/steamapps/common/Europa Universalis IV/eu4.exe"
 看A4怎么处理
