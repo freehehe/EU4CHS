@@ -9,23 +9,23 @@
 #include <algorithm>
 #include "../include/utf8cpp/utf8.h"
 
-using std::experimental::filesystem::v1::path;
-using std::experimental::filesystem::v1::directory_iterator;
+using namespace std;
+using namespace std::experimental::filesystem::v1;
 
-static void CollectChars(const path &filename, std::set<uint32_t> &collection)
+static void CollectChars(const path &filename, set<uint32_t> &collection)
 {
-	std::ifstream stream{ filename };
+	ifstream stream{ filename };
 
 	if (!stream)
 	{
 		return;
 	}
 
-	std::istreambuf_iterator<char> stream_it{ stream };
+	istreambuf_iterator<char> stream_it{ stream };
 
-	std::vector<uint32_t> wide_text;
+	vector<uint32_t> wide_text;
 
-	utf8::utf8to32(stream_it, std::istreambuf_iterator<char>{}, std::back_inserter(wide_text));
+	utf8::utf8to32(stream_it, istreambuf_iterator<char>{}, back_inserter(wide_text));
 
 	for (auto wide_char : wide_text)
 	{
@@ -33,9 +33,9 @@ static void CollectChars(const path &filename, std::set<uint32_t> &collection)
 	}
 }
 
-static std::set<uint32_t> ScanFolder(const path &folder)
+static set<uint32_t> ScanFolder(const path &folder)
 {
-	std::set<uint32_t> result;
+	set<uint32_t> result;
 
 	directory_iterator dir_it{ folder };
 
@@ -56,21 +56,20 @@ static std::set<uint32_t> ScanFolder(const path &folder)
 	return result;
 }
 
-static void GenerateTable(const std::set<uint32_t> &collection, const path &text)
+static void GenerateTable(const set<uint32_t> &collection, const path &text)
 {
-	std::vector<char> buffer;
+	vector<char> buffer;
 
-	utf8::append(0xFEFF, std::back_inserter(buffer));
-	utf8::utf32to8(collection.begin(), collection.end(), std::back_inserter(buffer));
+	utf8::utf32to8(collection.begin(), collection.end(), back_inserter(buffer));
 
-	std::ofstream ofs(text, std::ios::trunc);
+	ofstream ofs(text, ios::trunc);
 
 	if (!ofs)
 	{
 		return;
 	}
 
-	std::copy(buffer.begin(), buffer.end(), std::ostreambuf_iterator<char>(ofs));
+	copy(buffer.begin(), buffer.end(), ostreambuf_iterator<char>(ofs));
 
 	ofs.close();
 }
@@ -83,6 +82,6 @@ int main(int argc, char **argv)
 		return 0;
 	}
 
-	std::set<uint32_t> collection = ScanFolder(argv[1]);
+	set<uint32_t> collection = ScanFolder(argv[1]);
 	GenerateTable(collection, argv[2]);
 }

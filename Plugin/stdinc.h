@@ -1,5 +1,8 @@
 #pragma once
 
+#define _CRT_SECURE_NO_WARNINGS
+#define _DISABLE_DEPRECATE_LTL_MESSAGE
+
 #include <windows.h>
 #include <cstdio>
 #include <cstdint>

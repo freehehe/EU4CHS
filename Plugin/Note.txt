@@ -12,8 +12,6 @@ credits.txt 中A7为加大字号用
 12 14 16 18 20 22 24 29 36 100(75?可以更小直到看得舒服)
 包含0导致换行爆炸
 
-替换所有内存分配释放??
-
 12 14 16 18用宋体12
 NotoSansCJKSCRegular_12
 NotoSansCJKSCRegular_14
@@ -47,5 +45,5 @@ spriteType = {
 
 pdx_launcher/common/gfx/interface/Chinese_flag.dds 国旗贴图
 
-editbin /dynamicbase:no "D:/Steam/steamapps/common/Europa Universalis IV/eu4.exe"
+editbin /dynamicbase:no "D:/SteamLibrary/steamapps/common/Europa Universalis IV/eu4.exe"
 看A4怎么处理
