@@ -9,7 +9,7 @@
 #pragma comment(lib, "Ole32.lib")
 
 using namespace std;
-using namespace std::experimental;
+using namespace std::experimental::filesystem::v1;
 
 struct
 {
@@ -28,24 +28,24 @@ struct
 void InitD3D9()
 {
     wchar_t *pd3d9path;
-    filesystem::path d3d9path;
+    path d3d9path;
 
     SHGetKnownFolderPath(FOLDERID_System, 0, NULL, &pd3d9path);
-    d3d9path = filesystem::path{ pd3d9path } / L"d3d9.dll";
+    d3d9path = path{ pd3d9path } / L"d3d9.dll";
     CoTaskMemFree(pd3d9path);
 
     d3d9meta.LoadOriginalLibrary(LoadLibraryW(d3d9path.c_str()));
 }
 
-void LoadScripts(const filesystem::path &folder)
+void LoadScripts(const path &folder)
 {
-    filesystem::directory_iterator dirit{ folder };
+    directory_iterator dirit{ folder };
 
-    while (dirit != filesystem::directory_iterator{})
+    while (dirit != directory_iterator{})
     {
         auto _path = dirit->path();
 
-        if (filesystem::is_regular_file(_path) && _path.extension() == L".dll")
+        if (is_regular_file(_path) && _path.extension() == L".dll")
         {
             LoadLibraryW(_path.c_str());
         }
@@ -61,7 +61,7 @@ void Initialize(HMODULE hSelf)
     GetModuleFileNameW(hSelf, pluginpath, MAX_PATH);
 
     InitD3D9();
-    LoadScripts(filesystem::path{ pluginpath }.parent_path() / L"scripts");
+    LoadScripts(path{ pluginpath }.parent_path() / L"plugins");
 }
 
 BOOL WINAPI DllMain(HMODULE module, DWORD reason, LPVOID reserved)

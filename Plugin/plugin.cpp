@@ -18,9 +18,9 @@ void CPlugin::InitAndPatch(HMODULE hself)
     _game_dir = std::experimental::filesystem::path(module_path).parent_path();
 
     g_vfs.InitAndPatch();
-    //Functions::InitAndPatch();
-    //CBitmapFont::InitAndPatch();
-    //Province::InitAndPatch();
+    Functions::InitAndPatch();
+    CBitmapFont::InitAndPatch();
+    Province::InitAndPatch();
 }
 
 const std::experimental::filesystem::path & CPlugin::GetGameDirectory() const
