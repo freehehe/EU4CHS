@@ -166,7 +166,6 @@
     <ClCompile Include="province.cpp" />
     <ClCompile Include="std_string.cpp" />
     <ClCompile Include="textbuffer.cpp" />
-    <ClCompile Include="vfs.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bitmapfont.h" />
@@ -179,7 +178,6 @@
     <ClInclude Include="stdinc.h" />
     <ClInclude Include="std_string.h" />
     <ClInclude Include="textbuffer.h" />
-    <ClInclude Include="vfs.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Note.txt" />

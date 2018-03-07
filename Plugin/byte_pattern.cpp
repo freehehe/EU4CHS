@@ -32,15 +32,6 @@ byte_pattern &byte_pattern::set_pattern(const char *pattern_literal)
 	return *this;
 }
 
-byte_pattern &byte_pattern::set_pattern(const void *data, size_t size)
-{
-	this->_pattern.assign(reinterpret_cast<const uint8_t *>(data), reinterpret_cast<const uint8_t *>(data) + size);
-	this->_mask.assign(size, 0xFF);
-	this->bm_preprocess();
-
-	return *this;
-}
-
 byte_pattern & byte_pattern::set_module()
 {
 	static HMODULE default_module = GetModuleHandleA(NULL);
@@ -76,23 +67,6 @@ byte_pattern & byte_pattern::find_pattern(const char * pattern_literal)
 	this->set_pattern(pattern_literal).search();
 
 	return *this;
-}
-
-memory_pointer byte_pattern::find_first(const char * pattern_literal)
-{
-	return this->find_pattern(pattern_literal).get_first();
-}
-
-byte_pattern & byte_pattern::find_pattern(const void * data, std::size_t size)
-{
-	this->set_pattern(data, size).search();
-
-	return *this;
-}
-
-memory_pointer byte_pattern::find_first(const void * data, std::size_t size)
-{
-	return this->find_pattern(data, size).get_first();
 }
 
 void byte_pattern::transform_pattern(const char *pattern_literal)
