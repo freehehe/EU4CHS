@@ -165,22 +165,22 @@ namespace Functions
 		//yml转码函数
 		g_pattern.find_pattern("81 EC B0 00 00 00 53 56 8B F1 8B DA");
 		if (g_pattern.has_size(1))
-			injector::MakeJMP(g_pattern.get_first().i(-0x18), ConvertUTF8ToLatin1);
+			injector::MakeJMP(g_pattern.get_first().integer(-0x18), ConvertUTF8ToLatin1);
 
 		//从输入接受整个字符串
 		//mov ecx, [ebp - 0x48]; xor al, al
 		g_pattern.find_pattern("8B 4D B8 32 C0");
 		if (g_pattern.has_size(1))
-			injector::MakeInline<CSdlEvents_HandlePdxEvents_0x2DE>(g_pattern.get_first().i());
+			injector::MakeInline<CSdlEvents_HandlePdxEvents_0x2DE>(g_pattern.get_first().integer());
 
 		//校验总是成功
 		g_pattern.find_pattern("0F 94 45 F3 56");
 		if (g_pattern.has_size(1))
-			injector::MakeNOP(g_pattern.get_first().i(), 4, true);
+			injector::MakeNOP(g_pattern.get_first().integer(), 4, true);
 
 		//贴图大小限制
 		g_pattern.find_pattern("81 FE 00 00 00 01 72 0F");
 		if (g_pattern.has_size(1))
-			injector::WriteMemory<uint8_t>(g_pattern.get_first().i(6), 0xEB, true);
+			injector::WriteMemory<uint8_t>(g_pattern.get_first().integer(6), 0xEB, true);
 	}
 }

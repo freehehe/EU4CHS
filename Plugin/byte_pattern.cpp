@@ -48,7 +48,7 @@ byte_pattern &byte_pattern::set_module(memory_pointer module)
 
 byte_pattern &byte_pattern::set_range(memory_pointer beg, memory_pointer end)
 {
-	this->_ranges.resize(1, make_pair(beg.i(), end.i()));
+	this->_ranges.resize(1, make_pair(beg.integer(), end.integer()));
 
 	return *this;
 }
@@ -173,15 +173,15 @@ void byte_pattern::get_module_ranges(memory_pointer module)
 	_ranges.clear();
 	std::pair<std::uintptr_t, std::uintptr_t> range;
 
-	PIMAGE_DOS_HEADER dosHeader = module.p<IMAGE_DOS_HEADER>();
-	PIMAGE_NT_HEADERS ntHeader = module.p<IMAGE_NT_HEADERS>(dosHeader->e_lfanew);
+	PIMAGE_DOS_HEADER dosHeader = module.pointer<IMAGE_DOS_HEADER>();
+	PIMAGE_NT_HEADERS ntHeader = module.pointer<IMAGE_NT_HEADERS>(dosHeader->e_lfanew);
 
 	for (int i = 0; i < ntHeader->FileHeader.NumberOfSections; i++)
 	{
 		auto sec = getSection(ntHeader, i);
 		auto secSize = sec->SizeOfRawData != 0 ? sec->SizeOfRawData : sec->Misc.VirtualSize;
 
-		range.first = module.i() + sec->VirtualAddress;
+		range.first = module.integer() + sec->VirtualAddress;
 
 		if (memcmp((const char *)sec->Name, ".text", 6) == 0 || memcmp((const char *)sec->Name, ".rdata", 7) == 0)
 		{
@@ -190,7 +190,7 @@ void byte_pattern::get_module_ranges(memory_pointer module)
 		}
 
 		if ((i == ntHeader->FileHeader.NumberOfSections - 1) && _ranges.empty())
-			this->_ranges.emplace_back(module.i(), module.i() + sec->PointerToRawData + secSize);
+			this->_ranges.emplace_back(module.integer(), module.integer() + sec->PointerToRawData + secSize);
 	}
 }
 
@@ -302,7 +302,7 @@ void byte_pattern::debug_output() const
 		for_each_result(
 			[&ofs](memory_pointer pointer)
 		{
-			ofs << pointer.i() << '\n';
+			ofs << pointer.integer() << '\n';
 		});
 	}
 	else

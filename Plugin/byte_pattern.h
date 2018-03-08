@@ -10,8 +10,6 @@
 #include <fstream>
 #include <utility>
 
-extern HMODULE pattern_default_module;
-
 class memory_pointer
 {
     union
@@ -27,38 +25,30 @@ public:
 
     }
 
-    memory_pointer(void *pointer)
-        : Pointer(pointer)
+    memory_pointer(void *p)
+        : Pointer(p)
     {
     }
 
-    memory_pointer(std::uintptr_t address)
-        : Address(address)
+    memory_pointer(std::uintptr_t i)
+        : Address(i)
     {
     }
 
-    memory_pointer(const memory_pointer &rhs) = default;
-
-    std::uintptr_t i(std::ptrdiff_t offset = 0) const
+    std::uintptr_t integer(std::ptrdiff_t offset = 0) const
     {
         return (this->Address + offset);
     }
 
     template<typename T = void>
-    T *p(std::ptrdiff_t offset = 0) const
+    T *pointer(std::ptrdiff_t offset = 0) const
     {
-        return reinterpret_cast<T *>(this->i(offset));
+        return reinterpret_cast<T *>(this->integer(offset));
     }
 
     operator std::uintptr_t() const
     {
-        return this->i();
-    }
-
-    template <typename T>
-    operator T*() const
-    {
-        return this->p<T>();
+        return this->integer();
     }
 };
 

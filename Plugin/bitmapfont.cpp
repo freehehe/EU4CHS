@@ -4,8 +4,6 @@
 #include "std_string.h"
 #include "context.h"
 
-#define CHARSET_OFF 0xB4
-
 EU4CharInfo * CBitmapCharacterSet::GetCharacterValue(uint32_t cp)
 {
 	auto *pCont = GetContainer();
@@ -37,7 +35,7 @@ float CBitmapCharacterSet::GetScaleX()
 
 CBitmapCharacterSet *CBitmapFont::GetCharacterSet()
 {
-	return field<CBitmapCharacterSet, CHARSET_OFF>();
+	return field<CBitmapCharacterSet, 0xB4>();
 }
 
 InfoContainer *CBitmapFont::GetContainer()
@@ -1180,94 +1178,94 @@ void CBitmapFont::InitAndPatch()
 	//去掉Kerning
 	g_pattern.find_pattern("50 56 57 8D 89 B4 00 00 00 E8 ? ? ? ? E9");
 	if (g_pattern.has_size(1))
-		injector::MakeNOP(g_pattern.get_first().i(), 14);
+		injector::MakeNOP(g_pattern.get_first().integer(), 14);
 
 	//整个换掉的函数
 	g_pattern.find_pattern("81 EC 8C 00 00 00 53 8B 5D 0C");
 	if (g_pattern.has_size(1))
-		injector::MakeJMP(g_pattern.get_first().i(-6), GetWidthOfString);
+		injector::MakeJMP(g_pattern.get_first().integer(-6), GetWidthOfString);
 
 	g_pattern.find_pattern("81 EC AC 00 00 00 8B 55 0C");
 	if (g_pattern.has_size(1))
-		injector::MakeJMP(g_pattern.get_first().i(-6), GetHeightOfString);
+		injector::MakeJMP(g_pattern.get_first().integer(-6), GetHeightOfString);
 
 	g_pattern.find_pattern("81 EC 0C 03 00 00 8B 45 0C");
 	if (g_pattern.has_size(1))
-		injector::MakeJMP(g_pattern.get_first().i(-0x18), GetActualRequiredSize);
+		injector::MakeJMP(g_pattern.get_first().integer(-0x18), GetActualRequiredSize);
 
 	g_pattern.find_pattern("81 EC CC 00 00 00 53 56 57 8B 7D 08 89 4D F0");
 	if (g_pattern.has_size(1))
-		injector::MakeJMP(g_pattern.get_first().i(-0x18), GetRequiredSize);
+		injector::MakeJMP(g_pattern.get_first().integer(-0x18), GetRequiredSize);
 
 	g_pattern.find_pattern("81 EC 04 01 00 00 53 8B 5D 0C 56");
 	if (g_pattern.has_size(1))
-		injector::MakeJMP(g_pattern.get_first().i(-0x18), GetActualRealRequiredSizeActually);
+		injector::MakeJMP(g_pattern.get_first().integer(-0x18), GetActualRealRequiredSizeActually);
 
 	//ParseFontFile
 	g_pattern.find_pattern("6A 10 E8 ? ? ? ? 8B 4D D0 83 C4 04");
 	if (g_pattern.has_size(1))
-		injector::MakeInline<CBitmapFont_ParseFontFile_AllocValue>(g_pattern.get_first().p(), g_pattern.get_first().p(13));
+		injector::MakeInline<CBitmapFont_ParseFontFile_AllocValue>(g_pattern.get_first().pointer(), g_pattern.get_first().pointer(13));
 
 	g_pattern.find_pattern("89 84 8A B4 00 00 00");
 	if (g_pattern.has_size(1))
-		injector::MakeNOP(g_pattern.get_first().p(), 7);
+		injector::MakeNOP(g_pattern.get_first().pointer(), 7);
 
 	//Destructor
 	g_pattern.find_pattern("8B 04 B7 85 C0 74 0B");
 	if (g_pattern.has_size(1))
-		injector::MakeInline<CBitmapFont_Destructor_ClearValues>(g_pattern.get_first().p());
+		injector::MakeInline<CBitmapFont_Destructor_ClearValues>(g_pattern.get_first().pointer());
 
 	//RenderToScreen
 	g_pattern.find_pattern("8A 87 ? ? ? ? 88 86 ? ? ? ? 46");
 	if (g_pattern.has_size(1))
-		injector::MakeInline<CBitmapFont_RenderToScreen_ReadWord>(g_pattern.get_first().p(), g_pattern.get_first().p(13));
+		injector::MakeInline<CBitmapFont_RenderToScreen_ReadWord>(g_pattern.get_first().pointer(), g_pattern.get_first().pointer(13));
 
 	g_pattern.find_pattern("0F B6 C0 8B 0C 82");
 	if (g_pattern.has_size(1))
-		injector::MakeInline<CBitmapFont_RenderToScreen_GetCharInfo1>(g_pattern.get_first().p(), g_pattern.get_first().p(9));
+		injector::MakeInline<CBitmapFont_RenderToScreen_GetCharInfo1>(g_pattern.get_first().pointer(), g_pattern.get_first().pointer(9));
 
 	g_pattern.find_pattern("66 83 79 06 00");
 	if (g_pattern.has_size(1))
-		injector::MakeInline<CBitmapFont_RenderToScreen_Delim>(g_pattern.get_first().p());
+		injector::MakeInline<CBitmapFont_RenderToScreen_Delim>(g_pattern.get_first().pointer());
 
 	g_pattern.find_pattern("8A 8F ? ? ? ? 8B 55 CC");
 	if (g_pattern.has_size(1))
 	{
-		injector::MakeNOP(g_pattern.get_first().p(20), 3);
-		injector::MakeInline<CBitmapFont_GetCharInfo2>(g_pattern.get_first().p(), g_pattern.get_first().p(12));
+		injector::MakeNOP(g_pattern.get_first().pointer(20), 3);
+		injector::MakeInline<CBitmapFont_GetCharInfo2>(g_pattern.get_first().pointer(), g_pattern.get_first().pointer(12));
 	}
 
 	//RenderToTexture
 	g_pattern.find_pattern("8A 04 30 88 85 60 FF FF FF FF B5 60 FF FF FF E8");
 	if (g_pattern.has_size(1))
-		injector::MakeInline<CBitmapFont_RenderToTexture_AppendChar>(g_pattern.get_first().p(), g_pattern.get_first().p(20));
+		injector::MakeInline<CBitmapFont_RenderToTexture_AppendChar>(g_pattern.get_first().pointer(), g_pattern.get_first().pointer(20));
 
 	g_pattern.find_pattern("8A 04 30 0F B6 C0 8B 84 87 B4 00 00 00");
 	if (g_pattern.has_size(1))
-		injector::MakeInline<CBitmapFont_RenderToTexture_GetCharInfo1>(g_pattern.get_first().p(), g_pattern.get_first().p(13));
+		injector::MakeInline<CBitmapFont_RenderToTexture_GetCharInfo1>(g_pattern.get_first().pointer(), g_pattern.get_first().pointer(13));
 
 	g_pattern.find_pattern("8B 45 D0 66 83 78 06 00");
 	if (g_pattern.has_size(1))
-		injector::MakeInline<CBitmapFont_RenderToTexture_Delim>(g_pattern.get_first().p(3));
+		injector::MakeInline<CBitmapFont_RenderToTexture_Delim>(g_pattern.get_first().pointer(3));
 
 	g_pattern.find_pattern("0F B6 04 38 8B 04 81");
 	if (g_pattern.has_size(1))
-		injector::MakeInline<CBitmapFont_RenderToTexture_GetCharInfo2>(g_pattern.get_first().p(), g_pattern.get_first().p(7));
+		injector::MakeInline<CBitmapFont_RenderToTexture_GetCharInfo2>(g_pattern.get_first().pointer(), g_pattern.get_first().pointer(7));
 
 	//FillVertexBuffer
 	g_pattern.find_pattern("8A 04 38 8D 4D 80");
 	if (g_pattern.has_size(1))
-		injector::MakeInline<CBitmapFont_FillVertexBuffer_ReadChar1>(g_pattern.get_first().p(), g_pattern.get_first().p(17));
+		injector::MakeInline<CBitmapFont_FillVertexBuffer_ReadChar1>(g_pattern.get_first().pointer(), g_pattern.get_first().pointer(17));
 
 	g_pattern.find_pattern("0F B6 04 38 8B 94 81 B4 00 00 00");
 	if (g_pattern.has_size(1))
-		injector::MakeInline<CBitmapFont_FillVertexBuffer_GetCharInfo1>(g_pattern.get_first().p(), g_pattern.get_first().p(11));
+		injector::MakeInline<CBitmapFont_FillVertexBuffer_GetCharInfo1>(g_pattern.get_first().pointer(), g_pattern.get_first().pointer(11));
 
 	g_pattern.find_pattern("66 83 7A 06 00 0F 85 99 01 00 00");
 	if (g_pattern.has_size(1))
-		injector::MakeInline<CBitmapFont_FillVertexBuffer_Delim>(g_pattern.get_first().p());
+		injector::MakeInline<CBitmapFont_FillVertexBuffer_Delim>(g_pattern.get_first().pointer());
 
 	g_pattern.find_pattern("0F B6 04 30 8B 3C 83");
 	if (g_pattern.has_size(1))
-		injector::MakeInline<CBitmapFont_FillVertexBuffer_GetCharInfo2>(g_pattern.get_first().p(), g_pattern.get_first().p(7));
+		injector::MakeInline<CBitmapFont_FillVertexBuffer_GetCharInfo2>(g_pattern.get_first().pointer(), g_pattern.get_first().pointer(7));
 }

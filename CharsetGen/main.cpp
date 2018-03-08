@@ -21,11 +21,9 @@ static void CollectChars(const path &filename, set<uint32_t> &collection)
 		return;
 	}
 
-	istreambuf_iterator<char> stream_it{ stream };
-
 	vector<uint32_t> wide_text;
 
-	utf8::utf8to32(stream_it, istreambuf_iterator<char>{}, back_inserter(wide_text));
+	utf8::utf8to32(istreambuf_iterator<char>(stream), istreambuf_iterator<char>{}, back_inserter(wide_text));
 
 	for (auto wide_char : wide_text)
 	{
@@ -43,7 +41,7 @@ static set<uint32_t> ScanFolder(const path &folder)
 	{
 		path filename = dir_it->path();
 
-		if (filename.extension() == ".txt" || filename.extension() == ".yml")
+		if (filename.extension() == ".yml")
 		{
 			CollectChars(filename, result);
 		}
@@ -52,16 +50,15 @@ static set<uint32_t> ScanFolder(const path &folder)
 	}
 
 	result.erase(0xFEFF);
+	result.erase(0xA3);
+	result.erase(0xA4);
+	result.erase(0xA7);
 
 	return result;
 }
 
 static void GenerateTable(const set<uint32_t> &collection, const path &text)
 {
-	vector<char> buffer;
-
-	utf8::utf32to8(collection.begin(), collection.end(), back_inserter(buffer));
-
 	ofstream ofs(text, ios::trunc);
 
 	if (!ofs)
@@ -69,7 +66,8 @@ static void GenerateTable(const set<uint32_t> &collection, const path &text)
 		return;
 	}
 
-	copy(buffer.begin(), buffer.end(), ostreambuf_iterator<char>(ofs));
+	utf8::append(0xFEFF, ostreambuf_iterator<char>(ofs));
+	utf8::utf32to8(collection.begin(), collection.end(), ostreambuf_iterator<char>(ofs));
 
 	ofs.close();
 }
@@ -77,11 +75,11 @@ static void GenerateTable(const set<uint32_t> &collection, const path &text)
 //.exe 文件夹 输出文本
 int main(int argc, char **argv)
 {
-	if (argc != 3) 
+	if (argc == 3) 
 	{
-		return 0;
+		set<uint32_t> collection = ScanFolder(argv[1]);
+		GenerateTable(collection, argv[2]);
 	}
 
-	set<uint32_t> collection = ScanFolder(argv[1]);
-	GenerateTable(collection, argv[2]);
+	return 0;
 }

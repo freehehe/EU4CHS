@@ -171,33 +171,33 @@ namespace Province
 	{
 		g_pattern.find_pattern("51 8D 45 F0 50 8D 8D 5C FF FF FF E8 ? ? ? ? 8B 45 B8");
 		if (g_pattern.has_size(1))
-			injector::MakeInline<CGenerateNamesWork_AddNameArea_InsertSpace>(g_pattern.get_first().p(), g_pattern.get_first().p(16));
+			injector::MakeInline<CGenerateNamesWork_AddNameArea_InsertSpace>(g_pattern.get_first().pointer(), g_pattern.get_first().pointer(16));
 
 		g_pattern.find_pattern("0F B6 04 01 8B 04 82");
 		if (g_pattern.has_size(1))
-			injector::MakeInline<CGenerateNamesWork_AddNameArea_CountDrawables>(g_pattern.get_first().p(), g_pattern.get_first().p(7));
+			injector::MakeInline<CGenerateNamesWork_AddNameArea_CountDrawables>(g_pattern.get_first().pointer(), g_pattern.get_first().pointer(7));
 
 		//CurveText
 		g_pattern.find_pattern("8D 47 FE F7 D8 1B C0 40");
 		if (g_pattern.has_size(1))
-			injector::MakeInline<CurveText_CalcExtraWidth>(g_pattern.get_first().p(), g_pattern.get_first().p(8));
+			injector::MakeInline<CurveText_CalcExtraWidth>(g_pattern.get_first().pointer(), g_pattern.get_first().pointer(8));
 
 		g_pattern.find_pattern("8A 04 01 F3 0F 10 82 28 04 00 00");
 		if (g_pattern.has_size(1))
 		{
-			injector::MakeNOP(g_pattern.get_first().p(), 3);
-			injector::MakeNOP(g_pattern.get_first().p(11), 6);
-			injector::MakeNOP(g_pattern.get_first().p(22), 3);
-			injector::MakeInline<CurveText_GetCharInfo>(g_pattern.get_first().p(11));
+			injector::MakeNOP(g_pattern.get_first().pointer(), 3);
+			injector::MakeNOP(g_pattern.get_first().pointer(11), 6);
+			injector::MakeNOP(g_pattern.get_first().pointer(22), 3);
+			injector::MakeInline<CurveText_GetCharInfo>(g_pattern.get_first().pointer(11));
 		}
 
 		g_pattern.find_pattern("3C 27 74 64 3C 2E");
 		if (g_pattern.has_size(1))
-			injector::MakeInline<CurveText_CheckDots>(g_pattern.get_first().p(), g_pattern.get_first().p(6));
+			injector::MakeInline<CurveText_CheckDots>(g_pattern.get_first().pointer(), g_pattern.get_first().pointer(6));
 
 		//CCountryNameCollection::AddNudgedNames
 		g_pattern.find_pattern("0F B6 04 08 8B 84 82 B4 00 00 00");
 		if (g_pattern.has_size(1))
-			injector::MakeInline<CCountryNameCollection_AddNudgedNames_CountDrawables>(g_pattern.get_first().p(), g_pattern.get_first().p(11));
+			injector::MakeInline<CCountryNameCollection_AddNudgedNames_CountDrawables>(g_pattern.get_first().pointer(), g_pattern.get_first().pointer(11));
 	}
 }

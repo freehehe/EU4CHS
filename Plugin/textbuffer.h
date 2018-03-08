@@ -1,8 +1,7 @@
 #pragma once
 #include "stdinc.h"
 #include "eu4.h"
-
-class CString;
+#include "std_string.h"
 
 class CTextBuffer :public IncompleteClass
 {
