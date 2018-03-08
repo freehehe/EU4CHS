@@ -7,9 +7,7 @@
 #include <cstddef>
 #include <vector>
 #include <string>
-#include <string_view>
 #include <fstream>
-#include <sstream>
 #include <utility>
 
 extern HMODULE pattern_default_module;
@@ -18,101 +16,49 @@ class memory_pointer
 {
     union
     {
-        void *_pointer;
-        std::uintptr_t _address;
+        void *Pointer;
+        std::uintptr_t Address;
     };
 
 public:
     memory_pointer()
-        :_pointer{}
+        :Pointer{}
     {
 
     }
 
     memory_pointer(void *pointer)
-        : _pointer(pointer)
+        : Pointer(pointer)
     {
     }
 
     memory_pointer(std::uintptr_t address)
-        : _address(address)
+        : Address(address)
     {
     }
 
     memory_pointer(const memory_pointer &rhs) = default;
 
-    std::uintptr_t integer(std::ptrdiff_t offset = 0) const
+    std::uintptr_t i(std::ptrdiff_t offset = 0) const
     {
-        return (this->_address + offset);
+        return (this->Address + offset);
     }
 
     template<typename T = void>
-    T *pointer(std::ptrdiff_t offset = 0) const
+    T *p(std::ptrdiff_t offset = 0) const
     {
-        return reinterpret_cast<T *>(this->integer(offset));
-    }
-
-    bool operator==(const memory_pointer &rhs) const
-    {
-        return this->integer() == rhs.integer();
-    }
-
-    bool operator!=(const memory_pointer &rhs) const
-    {
-        return this->integer() != rhs.integer();
-    }
-
-    bool operator>(const memory_pointer &rhs) const
-    {
-        return this->integer() > rhs.integer();
-    }
-
-    bool operator<(const memory_pointer &rhs) const
-    {
-        return this->integer() < rhs.integer();
-    }
-
-    bool operator>=(const memory_pointer &rhs) const
-    {
-        return this->integer() >= rhs.integer();
-    }
-
-    bool operator<=(const memory_pointer &rhs) const
-    {
-        return this->integer() <= rhs.integer();
-    }
-
-    memory_pointer operator+(std::ptrdiff_t offset) const
-    {
-        return memory_pointer{ this->integer(offset) };
-    }
-
-    memory_pointer operator-(std::ptrdiff_t offset) const
-    {
-        return memory_pointer{ this->integer(-offset) };
-    }
-
-    memory_pointer &operator+=(std::ptrdiff_t offset)
-    {
-        this->_address += offset;
-        return *this;
-    }
-
-    memory_pointer &operator-=(std::ptrdiff_t offset)
-    {
-        this->_address -= offset;
-        return *this;
+        return reinterpret_cast<T *>(this->i(offset));
     }
 
     operator std::uintptr_t() const
     {
-        return this->integer();
+        return this->i();
     }
 
     template <typename T>
     operator T*() const
     {
-        return this->raw<T>();
+        return this->p<T>();
     }
 };
 
