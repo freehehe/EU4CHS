@@ -171,7 +171,7 @@ void byte_pattern::get_module_ranges(memory_pointer module)
 	};
 
 	_ranges.clear();
-	std::pair<std::uintptr_t, std::uintptr_t> range;
+	pair<uintptr_t, uintptr_t> range;
 
 	PIMAGE_DOS_HEADER dosHeader = module.pointer<IMAGE_DOS_HEADER>();
 	PIMAGE_NT_HEADERS ntHeader = module.pointer<IMAGE_NT_HEADERS>(dosHeader->e_lfanew);
@@ -291,9 +291,9 @@ void byte_pattern::bm_search()
 
 void byte_pattern::debug_output() const
 {
-	ofstream ofs{ "pattern_debug.log", ios::trunc };
+	ofstream ofs{ "pattern_debug.log", ios::app };
 
-	ofs << hex << showbase << uppercase;
+	ofs << hex << uppercase;
 
 	ofs << "Results of pattern: " << _literal << '\n';
 
@@ -302,7 +302,7 @@ void byte_pattern::debug_output() const
 		for_each_result(
 			[&ofs](memory_pointer pointer)
 		{
-			ofs << pointer.integer() << '\n';
+			ofs << "0x" << pointer.integer() << '\n';
 		});
 	}
 	else

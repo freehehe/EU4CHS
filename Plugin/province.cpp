@@ -5,11 +5,6 @@
 #include "std_string.h"
 #include "context.h"
 
-struct InlineBase
-{
-	virtual void operator()(injector::reg_pack &regs) const = 0;
-};
-
 //CGenerateNamesWork_AddNameArea
 //InsertSpace
 //51 8D 45 F0 50 8D 8D 5C FF FF FF E8 ? ? ? ? 8B 45 B8
