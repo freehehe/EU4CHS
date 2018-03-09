@@ -1,4 +1,7 @@
-﻿#include "byte_pattern.h"
+﻿//Core code from Hooking.Patterns
+//https://github.com/ThirteenAG/Hooking.Patterns
+
+#include "byte_pattern.h"
 
 byte_pattern g_pattern;
 
