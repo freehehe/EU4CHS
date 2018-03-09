@@ -41,7 +41,7 @@ static set<uint32_t> ScanFolder(const path &folder)
 	{
 		path filename = dir_it->path();
 
-		if (filename.extension() == ".yml")
+		if (filename.extension() == ".yml" || filename.extension() == ".txt")
 		{
 			CollectChars(filename, result);
 		}
@@ -53,6 +53,7 @@ static set<uint32_t> ScanFolder(const path &folder)
 	result.erase(0xA3);
 	result.erase(0xA4);
 	result.erase(0xA7);
+	result.insert(0xBF); //倒问号
 
 	return result;
 }

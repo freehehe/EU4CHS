@@ -23,7 +23,7 @@
     <ProjectGuid>{221AA81A-8E66-49EB-8496-591A7BC06105}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>CharsetGen</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

@@ -6,19 +6,21 @@ struct CBitmapCharacterSet;
 
 struct HookContext
 {
-    CBitmapFont *pFont;
-    CBitmapCharacterSet *pSet;
+	std::string tempString;
 
-    uint32_t textLength;
+	CBitmapFont *pFont;
+	CBitmapCharacterSet *pSet;
 
-    uint32_t unicode;
-    ptrdiff_t unicodeLength;
+	uint32_t textLength;
 
-    uint32_t nextUnicode;
+	uint32_t unicode;
+	ptrdiff_t unicodeLength;
 
-    bool useSpecialChars;
+	uint32_t nextUnicode;
 
-    void *ret_addr;
+	bool useSpecialChars;
+
+	void *ret_addr;
 };
 
 extern HookContext g_context;

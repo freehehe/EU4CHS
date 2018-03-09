@@ -7,4 +7,5 @@ CString * CTextBuffer::GetString()
 
 void CTextBuffer::InitAndPatch()
 {
+
 }
