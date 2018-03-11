@@ -54,6 +54,8 @@ public:
 
 class byte_pattern
 {
+    static std::ofstream _log_stream;
+
     std::vector<std::pair<std::uintptr_t, std::uintptr_t>> _ranges;
     std::vector<std::uint8_t> _pattern;
     std::vector<std::uint8_t> _mask;
@@ -71,6 +73,9 @@ class byte_pattern
     void debug_output() const;
 
 public:
+    static void start_log(const char *module_name);
+    static void shutdown_log();
+
     byte_pattern();
 
     byte_pattern &set_pattern(const char *pattern_literal);

@@ -1181,11 +1181,11 @@ void CBitmapFont::InitAndPatch()
 		injector::MakeNOP(g_pattern.get_first().integer(), 14);
 
 	//整个换掉的函数
-	g_pattern.find_pattern("81 EC 8C 00 00 00 53 8B 5D 0C");
+	g_pattern.find_pattern("81 EC 8C 00 00 00 8B 55 08");
 	if (g_pattern.has_size(1))
 		injector::MakeJMP(g_pattern.get_first().integer(-6), GetWidthOfString);
 
-	g_pattern.find_pattern("81 EC AC 00 00 00 8B 55 0C");
+	g_pattern.find_pattern("81 EC A4 00 00 00 8B 45 0C");
 	if (g_pattern.has_size(1))
 		injector::MakeJMP(g_pattern.get_first().integer(-6), GetHeightOfString);
 
@@ -1197,7 +1197,7 @@ void CBitmapFont::InitAndPatch()
 	if (g_pattern.has_size(1))
 		injector::MakeJMP(g_pattern.get_first().integer(-0x18), GetRequiredSize);
 
-	g_pattern.find_pattern("81 EC 04 01 00 00 53 8B 5D 0C 56");
+	g_pattern.find_pattern("81 EC 08 01 00 00 53 8B 5D 0C 56");
 	if (g_pattern.has_size(1))
 		injector::MakeJMP(g_pattern.get_first().integer(-0x18), GetActualRealRequiredSizeActually);
 
@@ -1228,7 +1228,7 @@ void CBitmapFont::InitAndPatch()
 	if (g_pattern.has_size(1))
 		injector::MakeInline<CBitmapFont_RenderToScreen_Delim>(g_pattern.get_first().pointer());
 
-	g_pattern.find_pattern("8A 8F ? ? ? ? 8B 55 CC");
+	g_pattern.find_pattern("8A 8A ? ? ? ? F3 0F 10 9F");
 	if (g_pattern.has_size(1))
 	{
 		injector::MakeNOP(g_pattern.get_first().pointer(20), 3);
@@ -1244,7 +1244,7 @@ void CBitmapFont::InitAndPatch()
 	if (g_pattern.has_size(1))
 		injector::MakeInline<CBitmapFont_RenderToTexture_GetCharInfo1>(g_pattern.get_first().pointer(), g_pattern.get_first().pointer(13));
 
-	g_pattern.find_pattern("8B 45 D0 66 83 78 06 00");
+	g_pattern.find_pattern("8B 45 D8 66 83 78 06 00");
 	if (g_pattern.has_size(1))
 		injector::MakeInline<CBitmapFont_RenderToTexture_Delim>(g_pattern.get_first().pointer(3));
 
@@ -1257,11 +1257,11 @@ void CBitmapFont::InitAndPatch()
 	if (g_pattern.has_size(1))
 		injector::MakeInline<CBitmapFont_FillVertexBuffer_ReadChar1>(g_pattern.get_first().pointer(), g_pattern.get_first().pointer(17));
 
-	g_pattern.find_pattern("0F B6 04 38 8B 94 81 B4 00 00 00");
+	g_pattern.find_pattern("8A 04 38 8B 4D E4");
 	if (g_pattern.has_size(1))
 		injector::MakeInline<CBitmapFont_FillVertexBuffer_GetCharInfo1>(g_pattern.get_first().pointer(), g_pattern.get_first().pointer(11));
 
-	g_pattern.find_pattern("66 83 7A 06 00 0F 85 99 01 00 00");
+	g_pattern.find_pattern("66 83 7A 06 00 0F 85 DB 01 00 00");
 	if (g_pattern.has_size(1))
 		injector::MakeInline<CBitmapFont_FillVertexBuffer_Delim>(g_pattern.get_first().pointer());
 

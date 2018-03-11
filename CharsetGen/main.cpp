@@ -27,7 +27,10 @@ static void CollectChars(const path &filename, set<uint32_t> &collection)
 
 	for (auto wide_char : wide_text)
 	{
-		collection.insert(wide_char);
+		if (wide_char > 0x20)
+		{
+			collection.insert(wide_char);
+		}
 	}
 }
 
@@ -67,8 +70,7 @@ static void GenerateTable(const set<uint32_t> &collection, const path &text)
 		return;
 	}
 
-	utf8::append(0xFEFF, ostreambuf_iterator<char>(ofs));
-	utf8::utf32to8(collection.begin(), collection.end(), ostreambuf_iterator<char>(ofs));
+	utf8::utf32to8(collection.begin(), collection.end(), utf8::append(0xFEFF, ostreambuf_iterator<char>(ofs)));
 
 	ofs.close();
 }
@@ -76,10 +78,15 @@ static void GenerateTable(const set<uint32_t> &collection, const path &text)
 //.exe 文件夹 输出文本
 int main(int argc, char **argv)
 {
-	if (argc == 3) 
+	if (argc == 3)
 	{
 		set<uint32_t> collection = ScanFolder(argv[1]);
 		GenerateTable(collection, argv[2]);
+	}
+	else 
+	{
+		set<uint32_t> collection = ScanFolder(R"(C:\Users\Kelashi\OneDrive\附件\EU4汉化补丁\补丁\localisation)");
+		GenerateTable(collection, R"(C:\Users\Kelashi\OneDrive\附件\EU4汉化补丁\characters.txt)");
 	}
 
 	return 0;

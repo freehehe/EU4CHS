@@ -24,7 +24,45 @@ NotoSansCJKSCBold_29
 NotoSansCJKSCBold_36
 NotoSansCJKSCBold_75
 
+---------------------------------------------------
 languages.yml增加l_schinese
+
+l_english:
+ l_english:0 "English"
+ l_german:0 "German"
+ l_french:0 "French"
+ l_spanish:0 "Spanish"
+ l_schinese:0 "Simplified Chinese"
+ l_english_tag:0 ""
+l_german:
+ l_english:0 "Englisch"
+ l_german:0 "Deutsch"
+ l_french:0 "Französisch"
+ l_spanish:0 "Spanisch"
+ l_schinese:0 "Vereinfachtes Chinesisch"
+ l_english_tag:0 ""
+l_french:
+ l_english:0 "Anglais"
+ l_german:0 "Allemand"
+ l_french:0 "Français"
+ l_spanish:0 "Espagnol"
+ l_schinese:0 "Chinois simplifié"
+ l_english_tag:0 ""
+l_spanish:
+ l_english:0 "Inglés"
+ l_german:0 "Alemán"
+ l_french:0 "Francés"
+ l_spanish:0 "Español"
+ l_schinese:0 "Chino simplificado"
+ l_english_tag:0 ""
+l_schinese:
+ l_english:0 "英语"
+ l_german:0 "德语"
+ l_french:0 "法语"
+ l_spanish:0 "西班牙语"
+ l_schinese:0 "简体中文"
+ l_english_tag:0 ""
+---------------------------------------------------------------------
 pdx_launcher/game/interface/launcher.gui 语言按钮排版
 
 				gridBoxType = {
@@ -35,15 +73,15 @@ pdx_launcher/game/interface/launcher.gui 语言按钮排版
 					max_slots_horizontal = 1
 					format = "UPPER_LEFT"
 }
-
+--------------------------------------------------------------------
 pdx_launcher/common/interface/common_core.gfx 增加中国国旗
 
 spriteType = {
 	name = "GFX_lang_flag_l_schinese"
 	texturefile = "pdx_launcher/common/gfx/interface/Chinese_flag.dds"
 }
-
+---------------------------------------------------------------------
 pdx_launcher/common/gfx/interface/Chinese_flag.dds 国旗贴图
-
+---------------------------------------------------------------------
 editbin /dynamicbase:no "D:\SteamLibrary\steamapps\common\Europa Universalis IV\eu4.exe"
-看A4怎么处理
+--------------------------------------------------------------------------------------------

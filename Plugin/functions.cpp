@@ -163,7 +163,7 @@ namespace Functions
 	void InitAndPatch()
 	{
 		//yml转码函数
-		g_pattern.find_pattern("81 EC B0 00 00 00 53 56 8B F1 8B DA");
+		g_pattern.find_pattern("81 EC B0 00 00 00 53 56 57 8B F9 8B DA");
 		if (g_pattern.has_size(1))
 			injector::MakeJMP(g_pattern.get_first().integer(-0x18), ConvertUTF8ToLatin1);
 

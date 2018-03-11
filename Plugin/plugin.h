@@ -1,16 +1,7 @@
 #pragma once
 #include "stdinc.h"
 
-class CPlugin
+namespace Plugin
 {
-    std::experimental::filesystem::path GameDir;
-    std::experimental::filesystem::path PluginDir;
-
-public:
-    void InitAndPatch(HMODULE hself);
-
-    const std::experimental::filesystem::path &GetGameDirectory() const;
-    const std::experimental::filesystem::path &GetPluginDirectory() const;
+    void InitAndPatch();
 };
-
-extern CPlugin g_plugin;
