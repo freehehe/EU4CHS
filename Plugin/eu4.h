@@ -45,30 +45,6 @@ struct CCursorPosition
     uint16_t column;
 };
 
-struct CToken
-{
-    int _LexerToken;
-    char _szVal[512];
-    bool _bExplicitString;
-};
-VALIDATE_SIZE(CToken,520)
-
-struct STextVertex
-{
-    CVector3<float> Position;
-    CVector2<float> UV;
-    uint32_t FillColor;
-    uint32_t BorderColor;
-};
-VALIDATE_SIZE(STextVertex,0x1C)
-
-struct SProvinceTextVertex
-{
-    CVector3<float> Position;
-    CVector2<float> UV;
-};
-VALIDATE_SIZE(SProvinceTextVertex, 0x14)
-
 struct CInputEvent
 {
     char _data[0x58];
@@ -83,16 +59,3 @@ struct CInputEvent
     }
 };
 VALIDATE_SIZE(CInputEvent,0x58)
-
-struct EU4Meta
-{
-    std::uintptr_t pfCString_Assign;
-
-    char *pOriginalText;
-    char *pWord;
-    char *pText;
-
-    EU4Meta();
-};
-
-extern EU4Meta g_game;

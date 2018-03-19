@@ -307,8 +307,8 @@ void byte_pattern::debug_output() const
 {
     _log_stream << hex << uppercase;
 
-    _log_stream << "Results of pattern: " << _literal << '\n';
-
+    _log_stream << "Result(s) of pattern: " << _literal << '\n';
+    
     if (count() > 0)
     {
         for_each_result(

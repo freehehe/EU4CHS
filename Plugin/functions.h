@@ -4,6 +4,12 @@
 
 namespace Functions
 {
+    extern std::uintptr_t pfCString_Assign;
+
+    extern  char *pOriginalText;
+    extern char *pWord;
+    extern char *pText;
+
     void __fastcall ConvertUTF8ToLatin1(const char *source, char *dest);
     bool IsLatin1Char(uint32_t cp);
     bool IsTextIconChar(uint32_t cp);

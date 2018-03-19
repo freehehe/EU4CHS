@@ -7,5 +7,5 @@ void Plugin::InitAndPatch()
 {
     Functions::InitAndPatch();
     CBitmapFont::InitAndPatch();
-    Province::InitAndPatch();
+    //Province::InitAndPatch();
 }

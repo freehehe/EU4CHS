@@ -1,5 +1,5 @@
 #include "std_string.h"
-#include "eu4.h"
+#include "functions.h"
 
 size_t CString::length() const
 {
@@ -8,7 +8,7 @@ size_t CString::length() const
 
 CString &CString::assign(const char *cstr)
 {
-    return injector::thiscall<CString &(CString *, const char *, size_t)>::call(g_game.pfCString_Assign, this, cstr, strlen(cstr));
+    return injector::thiscall<CString &(CString *, const char *, size_t)>::call(Functions::pfCString_Assign, this, cstr, strlen(cstr));
 }
 
 const char *CString::c_str() const
