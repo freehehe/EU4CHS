@@ -21,16 +21,20 @@ memory_pointer byte_pattern::get_first() const
 
 void byte_pattern::start_log(const char *module_name)
 {
+#ifdef PATTERN_LOG
     char filename[512];
 
     sprintf(filename, "pattern_%s.log", module_name);
 
     _log_stream.open(filename, ios::trunc);
+#endif
 }
 
 void byte_pattern::shutdown_log()
 {
+#ifdef PATTERN_LOG
     _log_stream.close();
+#endif
 }
 
 byte_pattern::byte_pattern()
@@ -62,7 +66,7 @@ byte_pattern &byte_pattern::set_module(memory_pointer module)
 
 byte_pattern &byte_pattern::set_range(memory_pointer beg, memory_pointer end)
 {
-    this->_ranges.resize(1, make_pair(beg.integer(), end.integer()));
+    this->_ranges.resize(1, make_pair(beg.address(), end.address()));
 
     return *this;
 }
@@ -71,7 +75,9 @@ byte_pattern &byte_pattern::search()
 {
     this->bm_search();
 
+#ifdef PATTERN_LOG
     debug_output();
+#endif
 
     return *this;
 }
@@ -195,7 +201,7 @@ void byte_pattern::get_module_ranges(memory_pointer module)
         auto sec = getSection(ntHeader, i);
         auto secSize = sec->SizeOfRawData != 0 ? sec->SizeOfRawData : sec->Misc.VirtualSize;
 
-        range.first = module.integer() + sec->VirtualAddress;
+        range.first = module.address() + sec->VirtualAddress;
 
         if (memcmp((const char *)sec->Name, ".text", 6) == 0 || memcmp((const char *)sec->Name, ".rdata", 7) == 0)
         {
@@ -204,7 +210,7 @@ void byte_pattern::get_module_ranges(memory_pointer module)
         }
 
         if ((i == ntHeader->FileHeader.NumberOfSections - 1) && _ranges.empty())
-            this->_ranges.emplace_back(module.integer(), module.integer() + sec->PointerToRawData + secSize);
+            this->_ranges.emplace_back(module.address(), module.address() + sec->PointerToRawData + secSize);
     }
 }
 
@@ -314,7 +320,7 @@ void byte_pattern::debug_output() const
         for_each_result(
             [this](memory_pointer pointer)
         {
-            _log_stream << "0x" << pointer.integer() << '\n';
+            _log_stream << "0x" << pointer.address() << '\n';
         });
     }
     else
@@ -322,7 +328,5 @@ void byte_pattern::debug_output() const
         _log_stream << "None\n";
     }
 
-    _log_stream << "--------------------------------------------------------------------------------------" << endl << endl;
-
-    _log_stream.flush();
+    _log_stream << "--------------------------------------------------------------------------------------" << '\n' << endl;
 }

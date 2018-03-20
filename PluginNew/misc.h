@@ -22,7 +22,6 @@ namespace Misc
 
     void __fastcall ConvertUTF8ToLatin1(const char *source, char *dest);
     bool IsLatin1Char(std::uint32_t cp);
-    bool IsTextIconChar(std::uint32_t cp);
     void GetTwoUnicode(const char * pText, std::uint32_t index);
 
     void InitAndPatch();

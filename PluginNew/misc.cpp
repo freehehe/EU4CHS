@@ -1,5 +1,6 @@
 ﻿#include "misc.h"
 #include "eu4.h"
+#include "byte_pattern.h"
 
 using namespace std;
 
@@ -62,12 +63,7 @@ namespace Misc
         return cp <= 0xFF;
     }
 
-    bool IsTextIconChar(uint32_t cp)
-    {
-        return isalpha(cp) || isdigit(cp) || cp == '_' || cp == '|';
-    }
-
-    void GetTwoUnicode(const char * pText, uint32_t index)
+    void GetTwoUnicode(const char *pText, uint32_t index)
     {
         size_t length = strlen(pText);
 
@@ -118,7 +114,7 @@ namespace Misc
             for (char c : text_view)
             {
                 temp.Init(c);
-
+#error Check it
                 injector::thiscall<void(void *, const CInputEvent *)>::vtbl<3>(regs.ebx, &temp);
             }
 
@@ -134,22 +130,22 @@ namespace Misc
         //yml转码函数
         g_pattern.find_pattern("81 EC B0 00 00 00 53 56 57 8B F9 8B DA");
         if (g_pattern.has_size(1))
-            injector::MakeJMP(g_pattern.get_first().integer(-0x18), ConvertUTF8ToLatin1);
+            injector::MakeJMP(g_pattern.get_first().address(-0x18), ConvertUTF8ToLatin1);
 
         //从输入接受整个字符串
         //mov ecx, [ebp - 0x48]; xor al, al
         g_pattern.find_pattern("8B 4D B8 32 C0");
         if (g_pattern.has_size(1))
-            injector::MakeInline<CSdlEvents_HandlePdxEvents_ReadInputs>(g_pattern.get_first().integer());
+            injector::MakeInline<CSdlEvents_HandlePdxEvents_ReadInputs>(g_pattern.get_first().address());
 
         //校验总是成功
         g_pattern.find_pattern("0F 94 45 F3 56");
         if (g_pattern.has_size(1))
-            injector::MakeNOP(g_pattern.get_first().integer(), 4, true);
+            injector::MakeNOP(g_pattern.get_first().address(), 4, true);
 
         //贴图大小限制
         g_pattern.find_pattern("81 FE 00 00 00 01 72 0F");
         if (g_pattern.has_size(1))
-            injector::WriteMemory<uint8_t>(g_pattern.get_first().integer(6), 0xEB, true);
+            injector::WriteMemory<uint8_t>(g_pattern.get_first().address(6), 0xEB, true);
     }
 }

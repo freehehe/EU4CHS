@@ -21,39 +21,15 @@ namespace BitmapFont
     class CBitmapCharacterSet :IncompleteClass
     {
     public:
-        ValuesContainer &GetContainer()
-        {
-            if (get_field<std::unordered_map<std::uint32_t, SBitmapCharacterValue>*, 0>() == nullptr)
-            {
-                *field<std::unordered_map<std::uint32_t, SBitmapCharacterValue> *, 0>() = new std::unordered_map<std::uint32_t, SBitmapCharacterValue>;
-            }
-
-            return *field<std::unordered_map<std::uint32_t, SBitmapCharacterValue>, 0>();
-        }
-
-        SBitmapCharacterValue *GetCharacterValue(std::uint32_t character)
-        {
-            return &GetContainer()[character];
-        }
+        ValuesContainer *GetContainer();
+        SBitmapCharacterValue *GetCharacterValue(std::uint32_t character);
     };
 
     class CBitmapFont :IncompleteClass
     {
     public:
-        CBitmapCharacterSet *GetCharacterSet()
-        {
-            return field<CBitmapCharacterSet, 0xB4>();
-        }
+        CBitmapCharacterSet * GetCharacterSet();
     };
-
-    void GetWidthOfStringPatch();
-    void GetHeightOfStringPatch();
-    void FillVertexBufferPatch();
-    void RenderToScreenPatch();
-    void RenderToTexturePatch();
-    void GetRequiredSizePatch();
-    void GetActualRequiredSizePatch();
-    void GetActualRealRequiredSizeActuallyPatch();
 
     void InitAndPatch();
 }
