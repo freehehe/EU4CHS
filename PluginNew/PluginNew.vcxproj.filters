@@ -21,9 +21,6 @@
     <ClCompile Include="bitmapfont.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="context.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="misc.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -31,6 +28,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="province.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="byte_pattern.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -41,9 +41,6 @@
     <ClInclude Include="bitmapfont.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="context.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="misc.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -51,6 +48,12 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="province.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="byte_pattern.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="eu4.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

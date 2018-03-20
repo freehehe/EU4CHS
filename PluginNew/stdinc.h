@@ -22,16 +22,14 @@
 #include <functional>
 #include <utility>
 #include <cstring>
-#include <cctype>
-#include <optional>
 #include <filesystem>
 #include <sstream>
-#include <utf8cpp/utf8.h>
-#include <utf8cpp/eu4utf8.h>
 #include "byte_pattern.h"
-#include <injector/hooking.hpp>
-#include <injector/calling.hpp>
-#include <injector/assembly.hpp>
+#include "../include/utf8cpp/utf8.h"
+#include "../include/utf8cpp/eu4utf8.h"
+#include "../include/injector/hooking.hpp"
+#include "../include/injector/calling.hpp"
+#include "../include/injector/assembly.hpp"
 
 #define VALIDATE_SIZE(type,size) static_assert(sizeof(type)==size);
 
