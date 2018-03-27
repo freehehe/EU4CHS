@@ -1,11 +1,22 @@
 #pragma once
 #include "stdinc.h"
-#include "eu4.h"
-#include "std_string.h"
 
-class CTextBuffer :public IncompleteClass
+namespace TextBuffer
 {
-public:
-    CString *GetString();
-    static void InitAndPatch();
-};
+    //
+    //
+    struct CTextBuffer
+    {
+        void operator()(injector::reg_pack &regs) const
+        {
+
+        }
+    };
+
+    class CTextBuffer :IncompleteClass
+    {
+
+    };
+
+    void InitAndPatch();
+}

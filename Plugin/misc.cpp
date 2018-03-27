@@ -69,36 +69,43 @@ namespace Misc
 
         context.nextUnicode = 0;
 
-        //First
-        if (index < length)
+        try
         {
-            context.unicodeLength = eu4utf8::internal::sequence_length(pText + index);
-            context.unicode = eu4utf8::peek_next(pText + index, pText + length);
-            index += context.unicodeLength;
-        }
-
-        //Second
-        if (index < length)
-        {
-            ptrdiff_t second_length = eu4utf8::internal::sequence_length(pText + index);
-            uint32_t temp_second = eu4utf8::peek_next(pText + index, pText + length);
-
-            if (context.useSpecialChars)
+            //First
+            if (index < length)
             {
-                while (temp_second == 0xA7)
-                {
-                    index += 2;
-
-                    if (index >= length)
-                    {
-                        return;
-                    }
-
-                    temp_second = eu4utf8::peek_next(pText + index, pText + length);
-                }
+                context.unicodeLength = eu4utf8::internal::sequence_length(pText + index);
+                context.unicode = eu4utf8::peek_next(pText + index, pText + length);
+                index += context.unicodeLength;
             }
 
-            context.nextUnicode = temp_second;
+            //Second
+            if (index < length)
+            {
+                ptrdiff_t second_length = eu4utf8::internal::sequence_length(pText + index);
+                uint32_t temp_second = eu4utf8::peek_next(pText + index, pText + length);
+
+                if (context.useSpecialChars)
+                {
+                    while (temp_second == 0xA7)
+                    {
+                        index += 2;
+
+                        if (index >= length)
+                        {
+                            return;
+                        }
+
+                        temp_second = eu4utf8::peek_next(pText + index, pText + length);
+                    }
+                }
+
+                context.nextUnicode = temp_second;
+            }
+        }
+        catch (std::exception &ex)
+        {
+            throw;
         }
     }
 
@@ -114,7 +121,7 @@ namespace Misc
             for (char c : text_view)
             {
                 temp.Init(c);
-#error Check it
+
                 injector::thiscall<void(void *, const CInputEvent *)>::vtbl<3>(regs.ebx, &temp);
             }
 
@@ -134,7 +141,7 @@ namespace Misc
 
         //从输入接受整个字符串
         //mov ecx, [ebp - 0x48]; xor al, al
-        g_pattern.find_pattern("8B 4D B8 32 C0");
+        g_pattern.find_pattern("8B 4D B8 32 C0 88 45 0B");
         if (g_pattern.has_size(1))
             injector::MakeInline<CSdlEvents_HandlePdxEvents_ReadInputs>(g_pattern.get_first().address());
 

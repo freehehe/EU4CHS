@@ -15,28 +15,22 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <Text Include="Note.txt" />
+  </ItemGroup>
+  <ItemGroup>
     <ClCompile Include="bitmapfont.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="byte_pattern.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="context.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="dllmain.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="functions.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="plugin.cpp">
+    <ClCompile Include="misc.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="province.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="std_string.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="textbuffer.cpp">
@@ -50,22 +44,13 @@
     <ClInclude Include="byte_pattern.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="context.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="eu4.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="functions.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="plugin.h">
+    <ClInclude Include="misc.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="province.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="std_string.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="stdinc.h">
@@ -74,8 +59,5 @@
     <ClInclude Include="textbuffer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="Note.txt" />
   </ItemGroup>
 </Project>

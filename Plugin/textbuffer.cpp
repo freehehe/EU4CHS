@@ -1,11 +1,9 @@
-﻿#include "textbuffer.h"
+#include "textbuffer.h"
 
-CString * CTextBuffer::GetString()
+namespace TextBuffer
 {
-	return this->field<CString, 0xB4>();
-}
+    void InitAndPatch()
+    {
 
-void CTextBuffer::InitAndPatch()
-{
-
+    }
 }

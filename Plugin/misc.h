@@ -5,17 +5,12 @@ namespace Misc
 {
     struct HookContext
     {
-        BitmapFont::CBitmapFont *pFont;
-        BitmapFont::CBitmapCharacterSet *pSet;
-
         std::uint32_t unicode;
         std::ptrdiff_t unicodeLength;
 
         std::uint32_t nextUnicode;
 
         bool useSpecialChars;
-
-        void *ret_addr;
     };
 
     extern HookContext context;

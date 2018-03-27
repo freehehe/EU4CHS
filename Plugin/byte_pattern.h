@@ -9,6 +9,9 @@
 #include <string>
 #include <fstream>
 #include <utility>
+#include <filesystem>
+
+#define PATTERN_LOG
 
 class memory_pointer
 {
@@ -35,7 +38,7 @@ public:
     {
     }
 
-    std::uintptr_t integer(std::ptrdiff_t offset = 0) const
+    std::uintptr_t address(std::ptrdiff_t offset = 0) const
     {
         return (this->Address + offset);
     }
@@ -43,12 +46,12 @@ public:
     template<typename T = void>
     T *pointer(std::ptrdiff_t offset = 0) const
     {
-        return reinterpret_cast<T *>(this->integer(offset));
+        return reinterpret_cast<T *>(this->address(offset));
     }
 
     operator std::uintptr_t() const
     {
-        return this->integer();
+        return this->address();
     }
 };
 
