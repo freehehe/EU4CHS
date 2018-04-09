@@ -278,6 +278,7 @@ namespace BitmapFont
 
             Misc::GetTwoUnicode(regs.edx, regs.esi.i);
 
+            regs.edx.i = Misc::context.unicode;
             regs.edi.p = pSet->GetCharacterValue(Misc::context.unicode);
             regs.esi.i += (Misc::context.unicodeLength - 1);
         }

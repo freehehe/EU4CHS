@@ -79,6 +79,14 @@ int main(int argc, char **argv)
         set<uint32_t> collection = ScanFolder(argv[1]);
         GenerateTable(collection, argv[2]);
     }
+    else
+    {
+        set<uint32_t> collection = ScanFolder(R"(C:\Users\Kelashi\Desktop\EU4\Translation\全部文本)");
+        GenerateTable(collection, R"(C:\Users\Kelashi\Desktop\EU4\Translation\characters.txt)");
+
+        set<uint32_t> collection1 = ScanFolder(R"(C:\Users\Kelashi\Desktop\EU4\Translation\大地图)");
+        GenerateTable(collection1, R"(C:\Users\Kelashi\Desktop\EU4\Translation\province.txt)");
+    }
 
     return 0;
 }

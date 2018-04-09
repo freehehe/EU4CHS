@@ -8,20 +8,6 @@ namespace Province
 {
     using namespace std;
 
-    inline void assign_string(CString *str, const char *text)
-    {
-        static void *pfAssign = nullptr;
-
-        if (pfAssign == nullptr)
-        {
-            g_pattern.find_pattern("8B 5D 08 56 8B F1 85 DB 74 57");
-            if (g_pattern.has_size(2))
-                pfAssign = g_pattern.get(1).pointer(-4);
-        }
-
-        injector::thiscall<void(CString *, const char *, size_t)>::call(pfAssign, str, text, strlen(text));
-    }
-
     //E8 ? ? ? ? 8B 45 AC 8D 55 BC
     //5
     //"ABC" --> "A B C"
@@ -52,7 +38,7 @@ namespace Province
 
             eu4utf8::utf32to8(wbuffer.begin(), wbuffer.end(), back_inserter(cbuffer));
 
-            assign_string(pDest, cbuffer.c_str());
+            Misc::assign_string(pDest, cbuffer.c_str());
         }
     };
 

@@ -314,6 +314,9 @@ void byte_pattern::bm_search()
 
 void byte_pattern::debug_output() const
 {
+    if (!_log_stream.is_open())
+        return;
+
     _log_stream << hex << uppercase;
 
     _log_stream << "Result(s) of pattern: " << _literal << '\n';

@@ -104,8 +104,7 @@
       <ModuleDefinitionFile>d3d9.def</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>copy /y $(TargetPath) "D:\SteamLibrary\steamapps\common\Europa Universalis IV\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

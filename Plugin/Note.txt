@@ -1,41 +1,28 @@
-﻿£¤§
+﻿全游戏txt编码处理
 
 黑色描边白色文字为模板，PS
 
 只有地图字体需要mipmap
 
-credits.txt 中A7为加大字号用
-特殊处理或换掉
-
-看看CTextBuffer::Write的过滤关键字
-
 不包含0-31
 
-12 -> NotoSans 19
-14 -> NotoSans 21 bold
-16 -> NotoSans 23 bold
-18 -> NotoSans 28 bold
-20 -> NotoSans 32 bold
-22 -> NotoSans 34
-24 -> NotoSans 36
-29 -> NotoSans 46
-36 -> NotoSans 56
-100 -> NotoSans 90 bold
+合并字体
 
-14  NotoSansBold_21
-16  NotoSansBold_23
-18  NotoSansBold_28
-20  NotoSansBold_32
-12  NotoSansRegular_19
-14  NotoSansRegular_21
-16  NotoSansRegular_23
-18  NotoSansRegular_28
-20  NotoSansRegular_32
-22  NotoSansRegular_34
-24  NotoSansRegular_36
-29  NotoSansRegular_46
-36  NotoSansRegular_56
-100 NotoSansRegular_90
+14  NotoSansBold_14
+16  NotoSansBold_16
+18  NotoSansBold_18
+20  NotoSansBold_20
+--------------------------
+12  NotoSansThin_12
+14  NotoSansThin_14
+16  NotoSansThin_16
+18  NotoSansThin_18
+20  NotoSansRegular_20
+22  NotoSansRegular_22
+24  NotoSansRegular_24
+29  NotoSansRegular_29
+36  NotoSerifSemiBold_36
+100 NotoSansRegular_100
 
 standard 18
 garamond_16

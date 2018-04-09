@@ -8,6 +8,20 @@ namespace Misc
 {
     HookContext context;
 
+    void assign_string(CString *str, const char *text)
+    {
+        static void *pfAssign = nullptr;
+
+        if (pfAssign == nullptr)
+        {
+            g_pattern.find_pattern("8B 5D 08 56 8B F1 85 DB 74 57");
+            if (g_pattern.has_size(2))
+                pfAssign = g_pattern.get(1).pointer(-4);
+        }
+
+        injector::thiscall<void(CString *, const char *, size_t)>::call(pfAssign, str, text, strlen(text));
+    }
+
     void __fastcall ConvertUTF8ToLatin1(const char *source, char *dest)
     {
         string_view source_view(source);
@@ -151,7 +165,7 @@ namespace Misc
             injector::MakeNOP(g_pattern.get_first().address(), 4, true);
 
         //贴图大小限制
-        g_pattern.find_pattern("81 FE 00 00 00 01 72 0F");
+        g_pattern.find_pattern("81 FE 00 00 00 01");
         if (g_pattern.has_size(1))
             injector::WriteMemory<uint8_t>(g_pattern.get_first().address(6), 0xEB, true);
     }

@@ -1,10 +1,11 @@
 #pragma once
-#include "bitmapfont.h"
+#include "eu4.h"
 
 namespace Misc
 {
     struct HookContext
     {
+        std::string tempString;
         std::uint32_t unicode;
         std::ptrdiff_t unicodeLength;
 
@@ -20,4 +21,6 @@ namespace Misc
     void GetTwoUnicode(const char * pText, std::uint32_t index);
 
     void InitAndPatch();
+
+    void assign_string(CString *str, const char *text);
 }
