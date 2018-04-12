@@ -15,6 +15,7 @@ namespace TextBuffer
     public:
         CString *GetString();
         BitmapFont::CBitmapFont *GetFont();
+        bool UseSpecialChar();
     };
 
     void InitAndPatch();

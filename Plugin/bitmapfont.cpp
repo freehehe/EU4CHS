@@ -276,7 +276,9 @@ namespace BitmapFont
             CBitmapCharacterSet *pSet = regs.ecx;
             Misc::context.useSpecialChars = *(bool *)(regs.ebp.i + 0x10);
 
-            Misc::GetTwoUnicode(regs.edx, regs.esi.i);
+            const char *pStr = *(const char **)(regs.ebp.i + 8);
+
+            Misc::GetTwoUnicode(pStr, regs.esi.i);
 
             regs.edx.i = Misc::context.unicode;
             regs.edi.p = pSet->GetCharacterValue(Misc::context.unicode);

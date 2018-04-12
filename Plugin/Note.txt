@@ -22,7 +22,7 @@
 24  NotoSansRegular_24
 29  NotoSansRegular_29
 36  NotoSerifSemiBold_36
-100 NotoSansRegular_100
+100 NotoSansBold_100
 
 standard 18
 garamond_16
@@ -101,10 +101,10 @@ pdx_launcher/game/interface/launcher.gui 语言按钮排版
 --------------------------------------------------------------------
 pdx_launcher/common/interface/common_core.gfx 增加中国国旗
 
-spriteType = {
+	spriteType = {
 	name = "GFX_lang_flag_l_schinese"
-	texturefile = "pdx_launcher/common/gfx/interface/Chinese_flag
-}
+	texturefile = "pdx_launcher/common/gfx/interface/Chinese_flag.dds"
+	}
 ---------------------------------------------------------------------
 pdx_launcher/common/gfx/interface/Chinese_flag.dds 国旗贴图
 ---------------------------------------------------------------------
