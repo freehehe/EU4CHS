@@ -11,34 +11,20 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Plugin", "Plugin\Plugin.vcx
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
-		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{93B27020-C6FA-4EDB-BDAC-38A313718217}.Debug|x64.ActiveCfg = Debug|x64
-		{93B27020-C6FA-4EDB-BDAC-38A313718217}.Debug|x64.Build.0 = Debug|x64
 		{93B27020-C6FA-4EDB-BDAC-38A313718217}.Debug|x86.ActiveCfg = Debug|Win32
 		{93B27020-C6FA-4EDB-BDAC-38A313718217}.Debug|x86.Build.0 = Debug|Win32
-		{93B27020-C6FA-4EDB-BDAC-38A313718217}.Release|x64.ActiveCfg = Release|x64
-		{93B27020-C6FA-4EDB-BDAC-38A313718217}.Release|x64.Build.0 = Release|x64
 		{93B27020-C6FA-4EDB-BDAC-38A313718217}.Release|x86.ActiveCfg = Release|Win32
 		{93B27020-C6FA-4EDB-BDAC-38A313718217}.Release|x86.Build.0 = Release|Win32
-		{8D202CA6-BD87-42C5-9395-3737C7282F2E}.Debug|x64.ActiveCfg = Debug|x64
-		{8D202CA6-BD87-42C5-9395-3737C7282F2E}.Debug|x64.Build.0 = Debug|x64
 		{8D202CA6-BD87-42C5-9395-3737C7282F2E}.Debug|x86.ActiveCfg = Debug|Win32
 		{8D202CA6-BD87-42C5-9395-3737C7282F2E}.Debug|x86.Build.0 = Debug|Win32
-		{8D202CA6-BD87-42C5-9395-3737C7282F2E}.Release|x64.ActiveCfg = Release|x64
-		{8D202CA6-BD87-42C5-9395-3737C7282F2E}.Release|x64.Build.0 = Release|x64
 		{8D202CA6-BD87-42C5-9395-3737C7282F2E}.Release|x86.ActiveCfg = Release|Win32
 		{8D202CA6-BD87-42C5-9395-3737C7282F2E}.Release|x86.Build.0 = Release|Win32
-		{21821C49-C894-454D-8896-8384EC80E7DD}.Debug|x64.ActiveCfg = Debug|x64
-		{21821C49-C894-454D-8896-8384EC80E7DD}.Debug|x64.Build.0 = Debug|x64
 		{21821C49-C894-454D-8896-8384EC80E7DD}.Debug|x86.ActiveCfg = Debug|Win32
 		{21821C49-C894-454D-8896-8384EC80E7DD}.Debug|x86.Build.0 = Debug|Win32
-		{21821C49-C894-454D-8896-8384EC80E7DD}.Release|x64.ActiveCfg = Release|x64
-		{21821C49-C894-454D-8896-8384EC80E7DD}.Release|x64.Build.0 = Release|x64
 		{21821C49-C894-454D-8896-8384EC80E7DD}.Release|x86.ActiveCfg = Release|Win32
 		{21821C49-C894-454D-8896-8384EC80E7DD}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
