@@ -25,13 +25,12 @@ namespace Province
             const CString *pSource = (CString *)(regs.ebp.i - 0xC0);
             CString *pDest = regs.ecx;
 
-            string_view view(pSource->c_str());
+            const char *it = pSource->c_str();
+            const char *end = pSource->c_str() + strlen(pSource->c_str());
 
-            string_view::iterator it = view.begin();
-
-            while (it != view.end())
+            while (it != end)
             {
-                wbuffer.push_back(eu4utf8::next(it, view.end()));
+                wbuffer.push_back(eu4utf8::next(it, end));
                 wbuffer.push_back(' ');
             }
             wbuffer.pop_back();
@@ -65,9 +64,8 @@ namespace Province
         void operator()(injector::reg_pack &regs) const
         {
             const CString *pString = regs.ecx;
-            string_view view(pString->c_str());
 
-            regs.edi.i = eu4utf8::distance(view.begin(), view.end());
+            regs.edi.i = eu4utf8::distance(pString->c_str(), pString->c_str() + strlen(pString->c_str()));
 
             regs.ef.zero_flag = (regs.edi.i == 2);
         }

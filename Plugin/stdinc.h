@@ -9,7 +9,6 @@
 #include <string>
 #include <iterator>
 #include <algorithm>
-#include <string_view>
 #include <utility>
 #include <cstring>
 #include <filesystem>
@@ -19,7 +18,7 @@
 #include "../include/injector/calling.hpp"
 #include "../include/injector/assembly.hpp"
 
-#define VALIDATE_SIZE(type,size) static_assert(sizeof(type)==size);
+#define VALIDATE_SIZE(type,size) static_assert(sizeof(type)==size, "Type size error.");
 
 struct IncompleteClass
 {

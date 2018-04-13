@@ -24,10 +24,8 @@ namespace Misc
 
     void __fastcall ConvertUTF8ToLatin1(const char *source, char *dest)
     {
-        string_view source_view(source);
-
         vector<uint32_t> wideText;
-        utf8::utf8to32(source_view.begin(), source_view.end(), back_inserter(wideText));
+        utf8::utf8to32(source, source + strlen(source), back_inserter(wideText));
 
         for (uint32_t &cp : wideText)
         {
@@ -130,13 +128,16 @@ namespace Misc
             CInputEvent temp;
             char *pText = (char *)(regs.ebp.i - 0x48);
 
-            string_view text_view(pText);
+            char *it = pText;
+            char *end = pText + strlen(pText);
 
-            for (char c : text_view)
+            while (it != end)
             {
-                temp.Init(c);
+                temp.Init(*it);
 
                 injector::thiscall<void(void *, const CInputEvent *)>::vtbl<3>(regs.ebx, &temp);
+
+                ++it;
             }
 
             memset(pText, 0, 32);

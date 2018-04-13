@@ -86,8 +86,8 @@ namespace injector
         bool flag30 : 1;
         bool flag31 : 1;
     };
-    static_assert(sizeof(general_register) == 4);
-    static_assert(sizeof(flags_register) == 4);
+    static_assert(sizeof(general_register) == 4, "Type size error.");
+    static_assert(sizeof(flags_register) == 4, "Type size error.");
 
     struct reg_pack
     {
